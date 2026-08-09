@@ -1,40 +1,120 @@
+/* ==========================================================================
+   globals.css — shared design tokens for AMSUL x StruktHQ
+   Adapted from screens-html/styles/global.css. Colors, fonts, spacing,
+   radii, and base reset. Reuse these variables instead of hardcoding raw
+   values. Source of truth: Figma "AMSUL x StruktHQ" design variables.
+
+   Font loading differs from the static export: Thurkle/DM Sans are loaded
+   via next/font in app/layout.tsx, which exposes them as the --font-thurkle
+   / --font-dm-sans CSS variables consumed below (instead of an @font-face
+   block + a Google Fonts <link>).
+   ========================================================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ----- Brand & neutral colors (from Figma variables) ------------------ */
+  --color-header-text: #faf9f7;   /* Header Text  */
+  --color-body-text:   #d1ccc5;   /* Body Text    */
+  --color-gold:        #f4c95d;   /* Gold         */
+  --color-gold-100:    #ffe8a9;   /* Gold/100 (button fill) */
+  --color-wine:        #900000;   /* Wine         */
+  --color-wine-500:    #5e0807;   /* Jali Wine/500 (event card media bg) */
+  --color-wine-200:    #8a0401;   /* Wine/200 (highlight pill label)     */
+  --color-white:       #ffffff;   /* Pure White   */
+  --color-page-bg:     #111111;   /* Page BG      */
+  --color-alt-bg:      #171717;   /* Alt Section BG */
+  --color-section-bg:  #090909;   /* Section BG (near-black text) */
+
+  --color-neutral-50:  #f7f7f7;   /* Neutral/50 (candidate card bg) */
+  --color-neutral-100: #f1f1f1;   /* Neutral/100  */
+  --color-neutral-200: #ebebeb;   /* Neutral/200 (chip bg)         */
+  --color-neutral-300: #d1d1d1;   /* Neutral/300 (separator dot)   */
+  --color-neutral-400: #bfbfbf;   /* Neutral/400  */
+  --color-neutral-500: #7b7b7b;   /* Neutral/500 (candidate border)*/
+  --color-neutral-600: #5c5c5c;   /* Neutral/600 (muted label)     */
+  --color-neutral-700: #808080;   /* Neutral/700  */
+  --color-neutral-800: #262626;   /* Neutral/800  */
+  --color-neutral-900: #1c1c1c;   /* Neutral/900 (position text)   */
+  --color-neutral-1100: #2b2b2b;  /* Neutral/1100 */
+  --color-neutral-1200: #000000;  /* Neutral/1200 */
+  --color-input-border: #cfcfcf;  /* input outline */
+  --color-select-border: #a3a3a3; /* unchecked radio/checkbox ring */
+  --color-selected-bg:   #fffbf1; /* selected candidate card fill  */
+  --color-amber:         #ed9a00; /* "View Details" link / accent  */
+
+  /* ----- Typography ----------------------------------------------------- */
+  --font-header: var(--font-thurkle), "Georgia", serif;
+  --font-body:   var(--font-dm-sans), -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Nav links use "Satoshi" in Figma — not a Google Font, not sourced yet.
+     Falls back to the body stack until Satoshi is sourced. */
+  --font-nav:    "Satoshi", var(--font-dm-sans), -apple-system, "Segoe UI", sans-serif;
+
+  /* Font sizes / line heights (px, matching Figma) */
+  --fs-display: 48px;   --lh-display: 64px; /* landing banner headline (Thurkle) */
+  --fs-hero: 36px;      --lh-hero: 48px;   /* hero headline (Thurkle) */
+  --fs-title: 32px;     --lh-title: 40px;  /* card titles (Thurkle)   */
+  --fs-lg: 20px;        --lh-lg: 24px;     /* button label            */
+  --fs-body-lg: 18px;   --lh-body-lg: 24px;
+  --fs-body: 16px;      --lh-body: 24px;
+  --fs-sm: 14px;        --lh-sm: 20px;
+
+  /* ----- Spacing scale (8pt-based) -------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* ----- Radii ---------------------------------------------------------- */
+  --radius-md: 16px;      /* OTP input cells */
+  --radius-card: 24px;
+  --radius-logo: 32px;
+  --radius-btn: 48px;
+  --radius-pill: 100px;
+  --radius-round: 1000px;
+
+  /* ----- Layout --------------------------------------------------------- */
+  --content-max: 1248px;  /* inner content width */
+  --nav-pad-x: 96px;      /* nav horizontal padding */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ----- Base reset -------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 html {
-  height: 100%;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-body-text);
+  background-color: var(--color-page-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
 }
 
 a {
@@ -42,8 +122,6 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+p {
+  margin: 0;
 }

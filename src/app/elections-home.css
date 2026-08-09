@@ -1,0 +1,365 @@
+/* ==========================================================================
+   elections-home.css — page-only layout for the Elections landing page.
+   Adapted from screens-html/styles/elections-home.css. Shared pieces
+   (navbar, nav-link, event-card, site-footer) live in components.css;
+   tokens live in globals.css. The hero banner, highlight pill and listing
+   section wrapper are lifted directly from the mock.
+
+   Everything from "Card CTA" onward has no precedent in screens-html (the
+   static mock's two example cards had no vote CTA, no paused/closed
+   states, and a numbered-pagination footer instead of a load-more button —
+   see build notes). Those blocks are new, built from the same design
+   tokens/BEM conventions as the rest of this file rather than invented
+   from scratch.
+   ========================================================================== */
+
+.elections-home {
+  min-height: 100vh;
+  background-color: var(--color-section-bg);
+}
+
+/* ----- Hero banner ------------------------------------------------------- */
+.elections-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 440px;
+  overflow: hidden;
+  background-color: var(--color-header-text);
+}
+
+.elections-hero__bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("/assets/images/elections-hero.jpg");
+  background-position: center;
+  background-size: cover;
+}
+
+/* Gold wash faded in over the flat wine overlay, top edge only — settled on
+   0.45 opacity fading out by 37% after comparing against a stronger (0.65)
+   and weaker (0.25) pass. */
+.elections-hero__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(180deg, rgba(244, 201, 93, 0.45) 0%, rgba(244, 201, 93, 0) 37%),
+    linear-gradient(180deg, rgba(41, 8, 8, 0.8) 0%, rgba(41, 8, 8, 0.8) 100%);
+}
+
+/* Brand mark only — the mock's full navbar (About/Careers/Resources/Contact)
+   was dropped from this page; the AMSUL logo stays, positioned where the
+   navbar used to sit. */
+.elections-hero__brand {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  padding: var(--space-4) var(--nav-pad-x);
+}
+
+.elections-hero__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 824px;
+  max-width: 100%;
+  margin: auto;
+  padding: 0 var(--space-6);
+  text-align: center;
+}
+
+/* Larger centered logo, mobile only — see .elections-hero__brand--mobile
+   override at the 640px breakpoint below. */
+.elections-hero__brand--mobile {
+  display: none;
+}
+
+.elections-hero__title {
+  margin: 0 0 var(--space-2);
+  width: 100%;
+  font-family: var(--font-header);
+  font-weight: 400;
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  color: var(--color-header-text);
+}
+
+.elections-hero__subtitle {
+  width: 100%;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-body-text);
+}
+
+/* "ELECTION UPDATES" chip */
+.highlight-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 1px 2px 0 rgba(10, 13, 18, 0.05); /* matches load-more__btn / pagination__btn */
+  font-weight: 500;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  color: var(--color-wine-200);
+}
+
+.highlight-pill__icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* ----- Listing section --------------------------------------------------- */
+.elections-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-10);
+  padding: var(--space-16) var(--nav-pad-x);
+  background-color: var(--color-section-bg);
+}
+
+.event-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  width: var(--content-max);
+  max-width: 100%;
+}
+
+/* Two cards per row at full width; each keeps the shared card's look. */
+.event-grid .event-card {
+  flex: 1 1 480px;
+}
+
+/* ----- Card CTA (new — see file header) ----------------------------------- */
+.event-card__cta-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+}
+
+.event-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 48px;
+  padding: var(--space-2) var(--space-6);
+  background-color: var(--color-gold-100);
+  border: none;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-1200);
+}
+
+.event-card__cta--disabled {
+  background-color: rgba(255, 232, 169, 0.5); /* gold-100 @ 50% */
+  color: #b6b6b6;
+  cursor: not-allowed;
+}
+
+.event-card__cta-note {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  color: var(--color-body-text);
+  text-align: center;
+}
+
+/* ----- Results per page (new — see file header) ---------------------------
+   Controls the batch size fetched via getElections({ limit }) — changing it
+   resets additionalPages and refetches page 1 at the new size. Kept on top
+   of the cursor-based load-more model rather than converting to numbered
+   pages (that's a bigger change than this control needs). Sits below the
+   grid, above Load More — spacing comes from .elections-list's own flex
+   gap, this is just a positioning wrapper; PerPageSelect brings its own
+   look. */
+.elections-per-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 824px;
+  max-width: 100%;
+}
+
+/* ----- Load more (new — see file header) ---------------------------------
+   Reuses the source pagination__btn's visual language (white pill, subtle
+   shadow, medium-weight label) instead of the mock's numbered pagination,
+   since the API is cursor-based and only ever exposes a "next" page. */
+.load-more {
+  display: flex;
+  justify-content: center;
+  width: 824px;
+  max-width: 100%;
+}
+
+.load-more__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background-color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 1px 2px 0 rgba(10, 13, 18, 0.05);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-900);
+}
+
+.load-more__btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ----- Empty / error states (new — see file header) ----------------------- */
+.elections-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-16) var(--space-6);
+  text-align: center;
+}
+
+.elections-notice__title {
+  margin: 0;
+  font-family: var(--font-header);
+  font-weight: 400;
+  font-size: var(--fs-title);
+  line-height: var(--lh-title);
+  color: var(--color-header-text);
+}
+
+.elections-notice__text {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-body-text);
+}
+
+.elections-notice--error .elections-notice__title {
+  color: var(--color-gold);
+}
+
+.elections-notice__retry {
+  height: 48px;
+  padding: var(--space-2) var(--space-8);
+  background-color: var(--color-gold-100);
+  border: none;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  color: var(--color-neutral-1200);
+}
+
+/* ----- Loading skeleton (new — see file header) ---------------------------
+   Mirrors event-card's box model exactly so the grid doesn't jump once
+   real cards replace it. */
+.event-card-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex: 1 1 480px;
+  min-width: 0;
+  padding: var(--space-1) var(--space-1) var(--space-4);
+  background-color: rgba(244, 201, 93, 0.05);
+  border-radius: var(--radius-md);
+}
+
+.event-card-skeleton__media {
+  height: 360px;
+  border-radius: 12px;
+  background: linear-gradient(
+    100deg,
+    rgba(244, 201, 93, 0.08) 30%,
+    rgba(244, 201, 93, 0.18) 50%,
+    rgba(244, 201, 93, 0.08) 70%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.event-card-skeleton__line {
+  height: var(--fs-lg);
+  margin: 0 var(--space-3);
+  border-radius: var(--space-1);
+  background: linear-gradient(
+    100deg,
+    rgba(244, 201, 93, 0.08) 30%,
+    rgba(244, 201, 93, 0.18) 50%,
+    rgba(244, 201, 93, 0.08) 70%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.event-card-skeleton__line--desc {
+  width: 70%;
+  height: var(--fs-body);
+}
+
+.event-card-skeleton__line--meta {
+  width: 40%;
+  height: var(--fs-sm);
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ----- Responsive -------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .elections-list {
+    padding-left: var(--space-8);
+    padding-right: var(--space-8);
+  }
+}
+
+@media (max-width: 640px) {
+  .elections-hero__brand {
+    display: none;
+  }
+
+  .elections-hero__brand--mobile {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-5);
+  }
+
+  .elections-hero__logo--mobile {
+    width: var(--space-24);
+    height: var(--space-24);
+  }
+
+  .elections-list {
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+
+  .elections-hero__title {
+    font-size: 36px;
+    line-height: 44px;
+  }
+}

@@ -1,0 +1,1069 @@
+/* ==========================================================================
+   vote.css — page-specific styles for the vote route's step cards
+   (Verify Identity + Verify Email/OTP). Adapted from screens-html's
+   verify-identity.css + verify-email.css; the shared page shell/hero/
+   notice/assistance chrome lives in src/app/components.css.
+   ========================================================================== */
+
+/* ----- Verify identity card ------------------------------------------------ */
+.verify-form {
+  gap: var(--space-10);
+  align-items: center;
+  padding: var(--space-10) var(--space-10) var(--space-6);
+}
+
+.verify-form__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.verify-form__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.verify-form__subtitle {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-alt-bg);
+}
+
+.verify-form__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.verify-form__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.verify-form__note {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-alt-bg);
+}
+
+/* ----- Verify email (OTP) card --------------------------------------------- */
+.verify-email {
+  gap: var(--space-10);
+  align-items: center;
+  padding: var(--space-10) var(--space-10) var(--space-6);
+}
+
+.verify-email__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.verify-email__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.verify-email__subtitle {
+  font-size: var(--fs-body-lg);
+  line-height: var(--lh-body);
+  color: var(--color-alt-bg);
+}
+
+.verify-email__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.verify-email__email {
+  font-size: var(--fs-lg);
+  line-height: 28px;
+  letter-spacing: -0.8px;
+  color: var(--color-section-bg);
+}
+
+.verify-email__otp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.verify-email__otp-label {
+  font-size: var(--fs-lg);
+  line-height: 28px;
+  letter-spacing: -0.8px;
+  color: var(--color-alt-bg);
+}
+
+.verify-email__inputs {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.otp-input {
+  width: 56px;
+  height: 56px;
+  padding: var(--space-1) var(--space-5);
+  background-color: var(--color-neutral-100);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 32px;
+  text-align: center;
+  color: var(--color-section-bg);
+  outline: none;
+}
+
+.otp-input:focus {
+  border-color: var(--color-wine);
+}
+
+.verify-email__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.verify-email__meta {
+  display: flex;
+  gap: var(--space-2);
+  font-size: var(--fs-body-lg);
+  line-height: var(--lh-body);
+}
+
+.verify-email__meta-label {
+  color: var(--color-alt-bg);
+}
+
+.verify-email__meta-value {
+  font-weight: 500;
+  color: var(--color-wine);
+}
+
+.verify-email__resend {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.verify-email__resend:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ----- Responsive ----------------------------------------------------------- */
+@media (max-width: 640px) {
+  .verify-form {
+    padding: var(--space-6);
+  }
+
+  .verify-email {
+    padding: var(--space-6);
+  }
+
+  .verify-email__inputs {
+    justify-content: space-between;
+  }
+
+  .otp-input {
+    width: 48px;
+    height: 48px;
+    padding: var(--space-1) var(--space-2);
+  }
+}
+
+/* ==========================================================================
+   Ballot flow (screens 4-8) — Main Voting, Vote Review, Confirm Submission
+   modal and Vote Successful. Adapted from screens-html's main-voting.css
+   (empty — its content moved into components.css upstream), the "Vote-flow
+   layout" + "Voting" sections of components.css, vote-review.css and
+   vote-successful.css. Uses its own single-column `.vote` page shell
+   (VotePageShell) rather than the two-column `.verify` shell screens 2-3
+   use — screens-html gives this flow its own body class/layout entirely.
+   ========================================================================== */
+
+/* ----- Page shell --------------------------------------------------------- */
+.vote {
+  min-height: 100vh;
+  background-color: var(--color-page-bg);
+}
+
+.vote__main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-10);
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-8) var(--nav-pad-x) var(--space-24);
+}
+
+/* ----- Election header block ------------------------------------------------ */
+.election-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.election-head__logo {
+  width: 120px;
+  height: 120px;
+  /* True circle, not screens-html's rounded-square --radius-logo — same fix
+     as .navbar__logo/.hero__logo in components.css (the AMSUL mark itself
+     is circular artwork). */
+  border-radius: 50%;
+  border: 1px solid rgba(250, 249, 247, 0.35);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  object-fit: cover;
+}
+
+.election-head__title {
+  margin: 0;
+  width: 100%;
+  font-family: var(--font-header);
+  font-weight: 400;
+  font-size: var(--fs-hero);
+  line-height: var(--lh-hero);
+  color: var(--color-body-text);
+  text-align: center;
+}
+
+/* Voter's details tag row */
+.voter-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: var(--space-3) var(--space-4);
+}
+
+.voter-tags__label {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-100);
+}
+
+.voter-tags__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.voter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.voter-tag__icon {
+  width: 24px;
+  height: 24px;
+}
+
+.voter-tag__text {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-100);
+  white-space: nowrap;
+}
+
+/* ----- Flow section title ("VOTE YOUR CANDIDATES") ------------------------- */
+.vote__section-title {
+  margin: 0;
+  font-family: var(--font-header);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--color-body-text);
+  text-align: center;
+}
+
+/* ----- Ballot container ----------------------------------------------------- */
+.vote__ballot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-14);
+  width: 824px;
+  max-width: 100%;
+}
+
+.vote__positions {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  width: 612px;
+  max-width: 100%;
+}
+
+.position-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+/* ----- Position header ------------------------------------------------------ */
+.position {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.position__number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  padding: var(--space-3);
+  background-color: var(--color-wine);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-header);
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--color-white);
+}
+
+.position__bar {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  padding: var(--space-3) var(--space-6) var(--space-3) var(--space-3);
+  background-color: var(--color-white);
+  border-radius: var(--radius-pill);
+}
+
+.position__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.position__icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background-color: var(--color-wine);
+  border-radius: var(--radius-pill);
+}
+
+.position__icon {
+  width: 20px;
+  height: 20px;
+}
+
+.position__name {
+  font-family: var(--font-header);
+  font-size: var(--fs-lg);
+  line-height: 32px;
+  color: var(--color-neutral-900);
+}
+
+.position__limit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.position__limit-label {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  color: var(--color-neutral-600);
+  white-space: nowrap;
+}
+
+.position__limit-value {
+  padding: var(--space-1) var(--space-4);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-900);
+  text-align: right;
+}
+
+/* Inverted theme (wine bar / white number) — alternating positions */
+.position--inverted .position__number {
+  background-color: var(--color-white);
+  color: var(--color-wine);
+}
+
+.position--inverted .position__bar {
+  background-color: var(--color-wine);
+}
+
+.position--inverted .position__icon-badge {
+  background-color: var(--color-white);
+}
+
+.position--inverted .position__name {
+  color: var(--color-white);
+}
+
+.position--inverted .position__limit-label {
+  color: var(--color-neutral-300);
+}
+
+.position--inverted .position__limit-value {
+  color: var(--color-white);
+}
+
+/* ----- Candidate card -------------------------------------------------------- */
+.candidate-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.candidate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-5);
+  background-color: var(--color-neutral-50);
+  border: 1px solid var(--color-neutral-500);
+  border-radius: var(--radius-card);
+  cursor: pointer;
+}
+
+.candidate--selected {
+  background-color: var(--color-selected-bg);
+  border: 3px solid var(--color-gold);
+}
+
+.candidate__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.candidate__avatar {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-round);
+  object-fit: cover;
+}
+
+.candidate__info {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 2px;
+  justify-content: center;
+  min-width: 0;
+}
+
+.candidate__identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.candidate__name {
+  font-weight: 500;
+  font-size: var(--fs-lg);
+  line-height: 32px;
+  color: var(--color-section-bg);
+}
+
+.candidate__details {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) 0;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-amber);
+}
+
+.candidate__details-icon {
+  width: 16px;
+  height: 9px;
+  transition: transform 0.2s ease;
+}
+
+/* Expandable details panel (toggled open by "View Details") */
+.candidate__panel {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-white);
+  border-radius: 20px;
+}
+
+.candidate.is-open .candidate__panel {
+  display: flex;
+}
+
+.candidate.is-open .candidate__details-icon {
+  transform: rotate(180deg);
+}
+
+.candidate__panel-text {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-800);
+}
+
+.candidate__panel-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.candidate__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  height: 40px;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-neutral-200);
+  border: none;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: -0.48px;
+  color: var(--color-neutral-800);
+}
+
+.candidate__chip-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* "Withhold Vote" row — no avatar, just a label */
+.candidate--withhold .candidate__row {
+  justify-content: space-between;
+}
+
+.candidate__withhold-label {
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 32px;
+  color: var(--color-section-bg);
+}
+
+/* ----- Selection controls (radio / checkbox) --------------------------------- */
+.select-radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-select-border);
+  border-radius: var(--radius-pill);
+}
+
+.select-radio--on {
+  border-color: var(--color-gold);
+}
+
+.select-radio--on::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  background-color: var(--color-gold);
+  border-radius: var(--radius-pill);
+}
+
+.select-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-select-border);
+  border-radius: var(--space-1);
+}
+
+.select-check--on {
+  background-color: var(--color-gold);
+  border-color: var(--color-gold);
+}
+
+.select-check__icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* ----- Pagination ------------------------------------------------------------ */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-3) var(--space-6) var(--space-4);
+}
+
+.pagination__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 1px 2px 0 rgba(10, 13, 18, 0.05);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-900);
+}
+
+.pagination__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination__btn-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.pagination__btn--prev .pagination__btn-icon {
+  transform: rotate(180deg);
+}
+
+.pagination__center {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.pagination__numbers {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.pagination__page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  border-radius: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  color: #717680;
+  text-align: center;
+}
+
+.pagination__page--current {
+  background-color: #f9f5ff;
+  color: #7f56d9;
+}
+
+/* ----- Top review bar (title only — Go Back lives in the bottom row next to
+   Submit, so it isn't duplicated) ----------------------------------------- */
+.review-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 824px;
+  max-width: 100%;
+}
+
+.review-bar__title {
+  margin: 0;
+  font-family: var(--font-header);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--color-body-text);
+  text-align: center;
+}
+
+/* Gold "Submit My Vote" pill — reuses the shared .pagination__btn shape and
+   just swaps the fill to gold. */
+.review-submit {
+  background-color: var(--color-gold-100);
+}
+
+/* ----- Per-position review block ---------------------------------------------- */
+.review-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+/* ----- "Edit Vote" action ------------------------------------------------------ */
+.edit-vote {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-1) 0;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-amber);
+}
+
+.edit-vote__icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* ----- Completion pagination ---------------------------------------------------- */
+.review-pagination {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.review-pagination__note {
+  width: 100%;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-100);
+  text-align: center;
+}
+
+.review-pagination__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* ----- Confirm Submission modal --------------------------------------------------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background-color: rgba(9, 9, 9, 0.6);
+}
+
+.modal__dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 480px;
+  max-width: 100%;
+  padding: var(--space-6);
+  background-color: var(--color-header-text);
+  border: 1px solid var(--color-neutral-100);
+  border-radius: var(--radius-card);
+}
+
+.modal__close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: none;
+  border: 1.5px solid var(--color-neutral-800);
+  border-radius: var(--radius-pill);
+}
+
+.modal__close-icon {
+  width: 19px;
+  height: 19px;
+}
+
+.modal__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.modal__title {
+  margin: 0;
+  font-family: var(--font-header);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--color-neutral-1100);
+}
+
+.modal__desc {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-alt-bg);
+}
+
+.modal__actions {
+  display: flex;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.modal__btn {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 0;
+  height: 56px;
+  padding: var(--space-3) var(--space-6);
+  border: none;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 1px 2px 0 rgba(10, 13, 18, 0.05);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-body-lg);
+  line-height: var(--lh-body-lg);
+  color: var(--color-neutral-900);
+}
+
+.modal__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal__btn--secondary {
+  background-color: var(--color-neutral-200);
+}
+
+.modal__btn--gold {
+  background-color: var(--color-gold-100);
+}
+
+.modal__btn-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.modal__btn-icon--back {
+  transform: rotate(180deg);
+}
+
+/* ----- Success confirmation card (Vote Successful screen) ------------------------ */
+.success-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  width: 824px;
+  max-width: 100%;
+  padding: var(--space-5);
+  background-color: var(--color-neutral-50);
+  border-radius: var(--radius-md);
+}
+
+.success-card__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.success-card__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  padding: var(--space-2);
+  background-color: var(--color-gold);
+  border-radius: var(--radius-round);
+  overflow: hidden;
+}
+
+.success-card__badge-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.success-card__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  text-align: center;
+}
+
+.success-card__title {
+  margin: 0;
+  font-family: var(--font-header);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--color-neutral-900);
+}
+
+.success-card__desc {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-600);
+}
+
+.success-card__desc p + p {
+  margin-top: 0;
+}
+
+.success-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 480px;
+  max-width: 100%;
+}
+
+.success-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.success-card__label {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-600);
+}
+
+.success-card__value {
+  font-weight: 600;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-900);
+}
+
+/* Reuses the shared .pagination__btn pill shape and just swaps to the gold
+   fill and a larger 56px height. */
+.success-cta {
+  align-self: center;
+  height: 56px;
+  padding: var(--space-3) var(--space-6);
+  background-color: var(--color-gold-100);
+}
+
+/* ----- Status / rejected cards (submitting, loading, rejected_election_state) ---
+   Not in screens-html (no dedicated mock for these transient/edge states) —
+   styled with the same `.card` base every other page-shell card uses, kept
+   minimal per build spec §7.0/§11.2. */
+.status-card,
+.rejected-card {
+  align-items: center;
+  gap: var(--space-4);
+  width: 640px;
+  max-width: 100%;
+  text-align: center;
+}
+
+.status-card__subtitle,
+.rejected-card__subtitle {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-alt-bg);
+}
+
+/* ----- Ballot-flow responsive ----------------------------------------------------- */
+@media (max-width: 1024px) {
+  .vote__main {
+    padding-left: var(--space-8);
+    padding-right: var(--space-8);
+  }
+}
+
+@media (max-width: 640px) {
+  .vote__main {
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+
+  .election-head__title {
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  .position {
+    flex-wrap: wrap;
+  }
+
+  .position__bar {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .candidate__row {
+    flex-wrap: wrap;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .review-pagination__row {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .modal__actions {
+    flex-direction: column;
+  }
+}

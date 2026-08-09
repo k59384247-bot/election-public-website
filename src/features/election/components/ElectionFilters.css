@@ -1,0 +1,178 @@
+/* ==========================================================================
+   ElectionFilters.css — search bar + filters row for the elections home
+   page listing. Visual design copied from the Figma "AMSUL x StruktHQ" dark
+   search/filter frame (dark pill fields on --color-section-bg), rebuilt
+   with this project's own tokens/BEM conventions; data mapping (status,
+   sort) is custom to the elections list — see ElectionFilters.tsx.
+   ========================================================================== */
+
+.election-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+/* ----- Search ------------------------------------------------------------- */
+.election-filters__search {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 56px;
+  width: 400px;
+  max-width: 100%;
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
+  background-color: var(--color-neutral-1200);
+  border: 1px solid var(--color-neutral-500);
+  border-radius: var(--radius-pill);
+}
+
+.election-filters__search-field {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.election-filters__search-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: var(--color-neutral-700);
+}
+
+.election-filters__search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-header-text);
+}
+
+.election-filters__search-input::placeholder {
+  color: var(--color-neutral-700);
+}
+
+/* Search inputs render a native clear ("x") button in WebKit/Blink once
+   there's a value — it doesn't match this dark pill's chrome and there's
+   already a way to clear (select-all + delete), so it's suppressed. */
+.election-filters__search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.election-filters__search-submit {
+  flex-shrink: 0;
+  height: 100%;
+  padding: var(--space-2) var(--space-6);
+  background-color: var(--color-gold-100);
+  border: none;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: -0.48px;
+  color: var(--color-neutral-1200);
+}
+
+/* ----- Status / Sort dropdowns --------------------------------------------- */
+.election-filters__group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.election-filters__group-label {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-700);
+  white-space: nowrap;
+}
+
+.election-filters__select-control {
+  position: relative;
+}
+
+.election-filters__select {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-neutral-1200);
+  border: 1px solid var(--color-neutral-500);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-header-text);
+  white-space: nowrap;
+}
+
+.election-filters__select-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--color-neutral-700);
+  transition: transform 0.15s ease;
+}
+
+.election-filters__select[aria-expanded='true'] .election-filters__select-icon {
+  transform: rotate(180deg);
+}
+
+.election-filters__panel {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  z-index: 10;
+  min-width: 100%;
+  margin: 0;
+  padding: var(--space-1);
+  list-style: none;
+  background: var(--color-neutral-1200);
+  border: 1px solid var(--color-neutral-500);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.election-filters__option {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  color: var(--color-header-text);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.election-filters__option--highlighted {
+  background: var(--color-neutral-800);
+}
+
+.election-filters__option--selected {
+  background: var(--color-neutral-800);
+  color: var(--color-gold);
+}
+
+/* ----- Responsive ----------------------------------------------------------- */
+@media (max-width: 640px) {
+  .election-filters {
+    align-items: stretch;
+    gap: var(--space-4);
+  }
+
+  .election-filters__search {
+    width: 100%;
+  }
+
+  .election-filters__group {
+    justify-content: space-between;
+  }
+}
