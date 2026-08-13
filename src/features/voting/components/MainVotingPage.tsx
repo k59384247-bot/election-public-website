@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type Dispatch } from 'react';
+import { useEffect, useMemo, useState, type Dispatch } from 'react';
 import { ArrowRight, UserCog, VenetianMask, Waves } from 'lucide-react';
 import type { Election } from '@/lib/types';
 import type { BallotDraft, BallotDraftAction } from '../useBallotDraft';
@@ -51,6 +51,17 @@ export function MainVotingPage({
   const isLastPage = currentPage === totalPages;
   const startIndex = (currentPage - 1) * positionsPerPage;
   const pagePositions = positions.slice(startIndex, startIndex + positionsPerPage);
+
+  // This is a client-rendered step swap, not a route change (see page.tsx),
+  // so the browser never resets scroll on its own — it keeps whatever
+  // offset the previous page/step left it at. Since page/step heights
+  // differ, that stale offset can land the voter past the ballot, e.g. on
+  // the contact-info card at the bottom. Reset on every page change
+  // (including the initial mount, e.g. after "Edit Vote" remounts this
+  // component) so the voter always lands where they need to act.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [currentPage]);
 
   function goToPage(next: number) {
     setPage(Math.min(Math.max(1, next), totalPages));

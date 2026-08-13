@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, Check, ChevronDown, Download, Pencil, UserCog, VenetianMask, Video, Waves } from 'lucide-react';
 import type { Election } from '@/lib/types';
 import type { BallotDraft } from '../useBallotDraft';
@@ -38,6 +38,15 @@ export function VoteReviewPage({
     [election.positions]
   );
   const [openCandidateIds, setOpenCandidateIds] = useState<Set<string>>(new Set());
+
+  // Mounts fresh whenever the voter hits "Proceed to Review" — this is a
+  // client-rendered step swap, not a route change, so the browser keeps
+  // whatever scroll offset the ballot page left it at instead of resetting.
+  // Reset explicitly so the voter lands at the top of the review, not
+  // wherever the (differently-sized) ballot page happened to be scrolled to.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
 
   function toggleDetails(candidateId: string) {
     setOpenCandidateIds((prev) => {
