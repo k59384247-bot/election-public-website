@@ -64,6 +64,15 @@ export function VoteReviewPage({
     <>
       <ElectionHead election={election} />
 
+      <button
+        className="pagination__btn pagination__btn--prev review-top-back"
+        type="button"
+        onClick={onEdit}
+      >
+        <ArrowRight className="pagination__btn-icon" style={{ color: 'var(--color-neutral-900)' }} aria-hidden="true" />
+        Go Back
+      </button>
+
       <nav className="review-bar" aria-label="Review navigation">
         <h2 className="review-bar__title">REVIEW YOUR VOTES</h2>
       </nav>
@@ -114,6 +123,9 @@ export function VoteReviewPage({
                               <div className="candidate__info">
                                 <div className="candidate__identity">
                                   <span className="candidate__name">{candidate.name}</span>
+                                  {candidate.nickname && (
+                                    <span className="candidate__nickname">({candidate.nickname})</span>
+                                  )}
                                 </div>
                                 <button
                                   className="candidate__details"

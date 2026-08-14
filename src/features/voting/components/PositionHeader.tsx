@@ -36,7 +36,10 @@ export function PositionHeader({
           </span>
         </div>
         <div className="position__limit">
-          <span className="position__limit-label">Max. Vote Allowed:</span>
+          <span className="position__limit-label">
+            <span className="position__limit-label-full">Max. Vote Allowed:</span>
+            <span className="position__limit-label-short">Max.</span>
+          </span>
           <span className="position__limit-value">{maxVotesPerVoter}</span>
         </div>
       </div>

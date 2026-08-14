@@ -59,11 +59,12 @@ export default async function ElectionsHomePage() {
               style={{ color: 'var(--color-amber)' }}
               aria-hidden="true"
             />
-            ELECTION UPDATES
+            ELECTIONS
           </span>
-          <h1 className="elections-hero__title">ELECTIONS</h1>
+          <h1 className="elections-hero__title">Make Your Voice Count</h1>
           <p className="elections-hero__subtitle">
-            Cast your vote and make your voice heard. Every ballot counts.
+            Welcome to AMSUL Elections. Eligible voters can securely verify their identity, access
+            the ballot, and cast their vote. All ballots remain anonymous and every vote counts.
           </p>
         </div>
 

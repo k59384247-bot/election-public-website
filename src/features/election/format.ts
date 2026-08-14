@@ -31,7 +31,7 @@ export function formatElectionDate(iso: string): string {
   return `${month} ${ordinal(day)}, ${year}`;
 }
 
-function formatTime(iso: string): string {
+export function formatTime(iso: string): string {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: LAGOS_TIME_ZONE,
     hour: 'numeric',

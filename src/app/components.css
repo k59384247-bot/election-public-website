@@ -470,8 +470,7 @@
   }
 
   .hero {
-    padding-left: 0;
-    padding-right: 0;
+    padding: 0;
   }
 
   .assistance {
@@ -481,17 +480,103 @@
 
 @media (max-width: 640px) {
   .verify__main {
-    padding-left: var(--space-6);
-    padding-right: var(--space-6);
+    padding: var(--space-12) var(--space-5);
+    gap: var(--space-10);
+  }
+
+  .verify__row {
+    gap: var(--space-10);
   }
 
   .card {
-    padding: var(--space-6);
+    padding: var(--space-5) var(--space-4) var(--space-6);
+  }
+
+  .card__title {
+    font-size: 24px;
+    line-height: 32px;
   }
 
   .hero__title {
-    font-size: 28px;
-    line-height: 36px;
+    font-size: var(--fs-title);
+    line-height: var(--lh-title);
+  }
+
+  .hero__description {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-sm);
+  }
+
+  .field__label {
+    font-size: var(--fs-body);
+  }
+
+  .field__control {
+    height: 48px;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-4);
+  }
+
+  .field__icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .field__input {
+    font-size: var(--fs-sm);
+  }
+
+  .btn--gold {
+    height: 48px;
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-body-lg);
+  }
+
+  .notice {
+    gap: var(--space-6);
+  }
+
+  .notice__head {
+    gap: 2px;
+  }
+
+  .notice__lead {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-sm);
+  }
+
+  .notice__item {
+    gap: var(--space-3);
+  }
+
+  .notice__text {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-sm);
+  }
+
+  .notice .icon-badge {
+    width: 36px;
+    height: 36px;
+  }
+
+  .notice .icon-badge__icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .assistance {
+    padding: var(--space-10) 0;
+  }
+
+  .assistance__subtitle {
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+  }
+
+  .assistance__contact-label {
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    letter-spacing: normal;
   }
 }
 
@@ -808,5 +893,42 @@
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-2);
+  }
+
+  .event-card__media {
+    height: 200px;
+  }
+
+  .event-card__title {
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+  }
+
+  .event-card__desc {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-sm);
+  }
+
+  .event-card__meta-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Figma mobile stacks the date/time row above the status pill instead of
+     desktop's single space-between row. */
+  .event-card__footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .event-card__meta {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .event-card__status {
+    font-size: 12px;
+    line-height: 16px;
   }
 }

@@ -67,6 +67,7 @@ export interface CandidateSocialLinks {
 export interface Candidate {
   id: string;
   name: string;
+  nickname: string | null;
   manifesto: string;
   photoUrl: string | null;
   campaignVideoUrl: string | null;

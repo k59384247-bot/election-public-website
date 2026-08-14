@@ -67,6 +67,7 @@ export function ConfirmSubmissionModal({
         type: 'CAST_VOTE_SUCCESS',
         receiptCode: result.receiptCode,
         alreadyVoted: result.alreadyVoted,
+        submittedAt: new Date().toISOString(),
       });
     } catch (err) {
       // TEMP vote-debug — remove once the submit-hang is diagnosed.

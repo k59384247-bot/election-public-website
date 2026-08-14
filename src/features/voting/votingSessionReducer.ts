@@ -31,6 +31,13 @@ export interface VotingSessionState {
   /** Set entering 'voted' — true when castVote() resolved via its ALREADY_VOTED-as-success path. */
   alreadyVoted: boolean;
   /**
+   * Set entering 'voted' — client-captured timestamp of the cast-vote call,
+   * not a server-confirmed one (castVote()'s response carries no timestamp).
+   * Captured by the caller (ConfirmSubmissionModal), not this reducer, so
+   * the reducer itself stays a pure function of state + action.
+   */
+  submittedAt: string | null;
+  /**
    * Set entering 'rejected_election_state'. 'election_state' is a genuine,
    * definitive rejection (ELECTION_CLOSED/FORBIDDEN/malformed ballot — build
    * spec §9.3 step e); 'network' is castVote() giving up after its own
@@ -48,6 +55,7 @@ export const initialVotingSessionState: VotingSessionState = {
   attemptsRemaining: INITIAL_ATTEMPTS_REMAINING,
   receiptCode: null,
   alreadyVoted: false,
+  submittedAt: null,
   rejectionReason: null,
 };
 
@@ -64,7 +72,7 @@ export type VotingSessionAction =
   | { type: 'VERIFY_OTP_FAILURE'; code: OtpFailureCode }
   | { type: 'PROCEED_TO_BALLOT' }
   | { type: 'SUBMIT_VOTE' }
-  | { type: 'CAST_VOTE_SUCCESS'; receiptCode: string | null; alreadyVoted: boolean }
+  | { type: 'CAST_VOTE_SUCCESS'; receiptCode: string | null; alreadyVoted: boolean; submittedAt: string }
   | { type: 'CAST_VOTE_FAILURE'; reason: 'election_state' | 'network' }
   | { type: 'RESET' };
 
@@ -128,6 +136,7 @@ export function votingSessionReducer(
         step: 'voted',
         receiptCode: action.receiptCode,
         alreadyVoted: action.alreadyVoted,
+        submittedAt: action.submittedAt,
       };
     }
 

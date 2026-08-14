@@ -9,7 +9,7 @@
   font-weight: 500;
   font-size: var(--fs-body);
   line-height: var(--lh-body);
-  color: var(--color-body-text);
+  color: var(--color-neutral-200);
   white-space: nowrap;
 }
 
@@ -24,14 +24,14 @@
   gap: var(--space-1);
   width: 56px;
   padding: 6px var(--space-2);
-  background: var(--color-white);
+  background: transparent;
   border: 1px solid #edeff5;
   border-radius: var(--radius-md);
   font-family: var(--font-body);
   font-weight: 500;
   font-size: var(--fs-sm);
   line-height: var(--lh-sm);
-  color: var(--color-neutral-900);
+  color: var(--color-header-text);
 }
 
 .per-page__icon {

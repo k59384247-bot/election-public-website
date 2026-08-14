@@ -129,6 +129,9 @@ export function PositionControl({
                 <div className="candidate__info">
                   <div className="candidate__identity">
                     <span className="candidate__name">{candidate.name}</span>
+                    {candidate.nickname && (
+                      <span className="candidate__nickname">({candidate.nickname})</span>
+                    )}
                   </div>
                   <button
                     className="candidate__details"

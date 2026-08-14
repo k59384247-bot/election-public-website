@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ArrowRight, Ban, Check, FileCheck2, Lock } from 'lucide-react';
 import type { Election } from '@/lib/types';
+import { formatElectionDate, formatTime } from '@/features/election/format';
 import { useVotingSession } from '../VotingSessionContext';
 import { ElectionHead } from './ElectionHead';
 import { NoticeCard } from './NoticeCard';
@@ -57,13 +58,29 @@ export function VoteSuccessPage({ election }: { election: Election }) {
           </div>
         </div>
 
-        {state.receiptCode && (
+        {(state.receiptCode || state.submittedAt) && (
           <div className="success-card__meta">
-            <div className="success-card__row">
-              <span className="success-card__label">Reference ID:</span>
-              <span className="success-card__value">{state.receiptCode}</span>
-            </div>
+            {state.receiptCode && (
+              <div className="success-card__row">
+                <span className="success-card__label">Reference ID:</span>
+                <span className="success-card__value">{state.receiptCode}</span>
+              </div>
+            )}
+            {state.submittedAt && (
+              <div className="success-card__row">
+                <span className="success-card__label">Submitted:</span>
+                <span className="success-card__value-group">
+                  <span className="success-card__value">{formatElectionDate(state.submittedAt)}</span>
+                  <span className="success-card__dot" aria-hidden="true" />
+                  <span className="success-card__value">{formatTime(state.submittedAt)}</span>
+                </span>
+              </div>
+            )}
           </div>
+        )}
+
+        {!state.alreadyVoted && (
+          <p className="success-card__note">Voting closes today by {formatTime(election.endDate)}.</p>
         )}
       </section>
 

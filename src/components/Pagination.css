@@ -76,8 +76,27 @@
 }
 
 @media (max-width: 640px) {
+  /* Figma mobile stacks the per-page/page-number block above a second row
+     holding Previous + Next, instead of desktop's single space-between row.
+     Achieved with flex-wrap + order rather than restructuring the DOM. */
   .pagination {
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: var(--space-4);
+  }
+
+  .pagination__center {
+    order: -1;
+    flex-basis: 100%;
+    justify-content: center;
+  }
+
+  .pagination__btn {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-sm);
+  }
+
+  .pagination__btn-icon {
+    width: 16px;
+    height: 16px;
   }
 }

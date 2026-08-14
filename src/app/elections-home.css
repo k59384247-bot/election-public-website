@@ -318,7 +318,22 @@
   }
 
   .elections-hero__title {
-    font-size: 36px;
-    line-height: 44px;
+    font-size: var(--fs-title);
+    line-height: var(--lh-title);
+  }
+
+  .elections-hero__subtitle {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-sm);
+  }
+
+  .highlight-pill {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .highlight-pill__icon {
+    width: 12px;
+    height: 12px;
   }
 }
