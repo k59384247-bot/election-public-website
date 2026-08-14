@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getElections, type GetElectionsResult } from './api';
-import { PAGE1_QUERY_KEY } from './useElections';
+import { ELECTIONS_QUERY_KEY } from './useElections';
 
 /**
  * Single election lookup for the vote flow's hero. There's no dedicated
@@ -18,7 +18,7 @@ export function useElection(electionId: string) {
   const queryClient = useQueryClient();
 
   const cachedSummary = useMemo(() => {
-    const cached = queryClient.getQueryData<GetElectionsResult>(PAGE1_QUERY_KEY);
+    const cached = queryClient.getQueryData<GetElectionsResult>(ELECTIONS_QUERY_KEY);
     return cached?.data.find((election) => election.id === electionId);
   }, [queryClient, electionId]);
 

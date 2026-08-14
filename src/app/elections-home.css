@@ -2,13 +2,13 @@
    elections-home.css — page-only layout for the Elections landing page.
    Adapted from screens-html/styles/elections-home.css. Shared pieces
    (navbar, nav-link, event-card, site-footer) live in components.css;
-   tokens live in globals.css. The hero banner, highlight pill and listing
-   section wrapper are lifted directly from the mock.
+   pagination lives in components/Pagination.css; tokens live in
+   globals.css. The hero banner, highlight pill, listing section wrapper
+   and numbered-pagination footer are lifted directly from the mock.
 
    Everything from "Card CTA" onward has no precedent in screens-html (the
-   static mock's two example cards had no vote CTA, no paused/closed
-   states, and a numbered-pagination footer instead of a load-more button —
-   see build notes). Those blocks are new, built from the same design
+   static mock's two example cards had no vote CTA and no paused/closed
+   states). Those blocks are new, built from the same design
    tokens/BEM conventions as the rest of this file rather than invented
    from scratch.
    ========================================================================== */
@@ -104,7 +104,7 @@
   background-color: var(--color-white);
   border: 1px solid var(--color-neutral-200);
   border-radius: var(--radius-pill);
-  box-shadow: 0 1px 2px 0 rgba(10, 13, 18, 0.05); /* matches load-more__btn / pagination__btn */
+  box-shadow: 0 1px 2px 0 rgba(10, 13, 18, 0.05); /* matches pagination__btn */
   font-weight: 500;
   font-size: var(--fs-sm);
   line-height: var(--lh-sm);
@@ -137,6 +137,14 @@
 /* Two cards per row at full width; each keeps the shared card's look. */
 .event-grid .event-card {
   flex: 1 1 480px;
+}
+
+/* Scopes the shared Pagination component (100%-width nav) to the same
+   column width as .event-grid above it — on the voting page the equivalent
+   nav sits inside .vote__ballot, which provides this same constraint. */
+.elections-pagination {
+  width: var(--content-max);
+  max-width: 100%;
 }
 
 /* ----- Card CTA (new — see file header) ----------------------------------- */
@@ -175,55 +183,6 @@
   line-height: var(--lh-sm);
   color: var(--color-body-text);
   text-align: center;
-}
-
-/* ----- Results per page (new — see file header) ---------------------------
-   Controls the batch size fetched via getElections({ limit }) — changing it
-   resets additionalPages and refetches page 1 at the new size. Kept on top
-   of the cursor-based load-more model rather than converting to numbered
-   pages (that's a bigger change than this control needs). Sits below the
-   grid, above Load More — spacing comes from .elections-list's own flex
-   gap, this is just a positioning wrapper; PerPageSelect brings its own
-   look. */
-.elections-per-page {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 824px;
-  max-width: 100%;
-}
-
-/* ----- Load more (new — see file header) ---------------------------------
-   Reuses the source pagination__btn's visual language (white pill, subtle
-   shadow, medium-weight label) instead of the mock's numbered pagination,
-   since the API is cursor-based and only ever exposes a "next" page. */
-.load-more {
-  display: flex;
-  justify-content: center;
-  width: 824px;
-  max-width: 100%;
-}
-
-.load-more__btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-6);
-  background-color: var(--color-white);
-  border: none;
-  border-radius: var(--radius-pill);
-  box-shadow: 0 1px 2px 0 rgba(10, 13, 18, 0.05);
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: var(--fs-body);
-  line-height: var(--lh-body);
-  color: var(--color-neutral-900);
-}
-
-.load-more__btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
 }
 
 /* ----- Empty / error states (new — see file header) ----------------------- */

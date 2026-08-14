@@ -1,16 +1,17 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useElections, RESULTS_PER_PAGE_OPTIONS } from '../useElections';
+import { useElections } from '../useElections';
 import type { GetElectionsResult } from '../api';
 import type { ElectionSummary } from '@/lib/types';
-import { PerPageSelect } from '@/components/PerPageSelect';
+import { Pagination } from '@/components/Pagination';
 import { ElectionCard } from './ElectionCard';
 import { ElectionFilters, type SortKey, type StatusFilter } from './ElectionFilters';
-import { LoadMoreButton } from './LoadMoreButton';
 import { EmptyState } from './EmptyState';
 import { ErrorState } from './ErrorState';
 import { LoadingSkeleton } from './LoadingSkeleton';
+
+const RESULTS_PER_PAGE_OPTIONS = [12, 24, 48] as const;
 
 // Sort applied on top of whatever's currently loaded (useElections already
 // orders `elections` by status priority — 'relevance' just keeps that).
@@ -49,23 +50,15 @@ function matchesSearch(election: ElectionSummary, query: string): boolean {
 }
 
 export function ElectionList({ initialData }: { initialData?: GetElectionsResult }) {
-  const {
-    elections,
-    hasMore,
-    loadMore,
-    isLoadingMore,
-    loadMoreError,
-    resultsPerPage,
-    changeResultsPerPage,
-    isInitialLoading,
-    isError,
-    error,
-    retry,
-  } = useElections({ initialData });
+  const { elections, isInitialLoading, isError, error, hasBackgroundError, retry } = useElections({
+    initialData,
+  });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sortKey, setSortKey] = useState<SortKey>('relevance');
+  const [page, setPage] = useState(1);
+  const [resultsPerPage, setResultsPerPage] = useState<number>(RESULTS_PER_PAGE_OPTIONS[0]);
 
   const visibleElections = useMemo(() => {
     const filtered = elections.filter(
@@ -75,6 +68,35 @@ export function ElectionList({ initialData }: { initialData?: GetElectionsResult
     );
     return sortForDisplay(filtered, sortKey);
   }, [elections, searchQuery, statusFilter, sortKey]);
+
+  const totalPages = Math.max(1, Math.ceil(visibleElections.length / resultsPerPage));
+  const currentPage = Math.min(page, totalPages);
+  const startIndex = (currentPage - 1) * resultsPerPage;
+  const pageElections = visibleElections.slice(startIndex, startIndex + resultsPerPage);
+
+  // Page count depends on the filtered/sorted set, not the raw fetch, so
+  // every filter/sort/page-size change resets to page 1 here (rather than
+  // via an effect) — otherwise a since-cleared filter could snap back to
+  // whatever page number was left over from the narrower view.
+  function handleSearchQueryChange(next: string) {
+    setSearchQuery(next);
+    setPage(1);
+  }
+
+  function handleStatusFilterChange(next: StatusFilter) {
+    setStatusFilter(next);
+    setPage(1);
+  }
+
+  function handleSortKeyChange(next: SortKey) {
+    setSortKey(next);
+    setPage(1);
+  }
+
+  function handleResultsPerPageChange(next: number) {
+    setResultsPerPage(next);
+    setPage(1);
+  }
 
   if (isInitialLoading) {
     return <LoadingSkeleton />;
@@ -92,11 +114,11 @@ export function ElectionList({ initialData }: { initialData?: GetElectionsResult
     <>
       <ElectionFilters
         searchQuery={searchQuery}
-        onSearchQueryChange={setSearchQuery}
+        onSearchQueryChange={handleSearchQueryChange}
         statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
+        onStatusFilterChange={handleStatusFilterChange}
         sortKey={sortKey}
-        onSortKeyChange={setSortKey}
+        onSortKeyChange={handleSortKeyChange}
       />
 
       {visibleElections.length === 0 ? (
@@ -107,27 +129,35 @@ export function ElectionList({ initialData }: { initialData?: GetElectionsResult
           </p>
         </div>
       ) : (
-        <div className="event-grid">
-          {visibleElections.map((election) => (
-            <ElectionCard key={election.id} election={election} />
-          ))}
-        </div>
+        <>
+          <div className="event-grid">
+            {pageElections.map((election) => (
+              <ElectionCard key={election.id} election={election} />
+            ))}
+          </div>
+
+          <div className="elections-pagination">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              perPageId="elections-per-page-select"
+              perPageLabel="Results per page"
+              perPageValue={resultsPerPage}
+              perPageOptions={RESULTS_PER_PAGE_OPTIONS}
+              onPerPageChange={handleResultsPerPageChange}
+              ariaLabel="Elections pages"
+            />
+          </div>
+        </>
       )}
 
-      <div className="elections-per-page">
-        <PerPageSelect
-          id="elections-per-page-select"
-          label="Results per page"
-          value={resultsPerPage}
-          options={RESULTS_PER_PAGE_OPTIONS}
-          onChange={changeResultsPerPage}
-        />
-      </div>
-
-      {hasMore && <LoadMoreButton onClick={loadMore} isLoading={isLoadingMore} />}
-      {loadMoreError && (
+      {hasBackgroundError && (
         <p className="elections-notice__text" role="alert">
-          Couldn&apos;t load more elections. Please try again.
+          Couldn&apos;t refresh the elections list.{' '}
+          <button type="button" onClick={() => retry()}>
+            Retry
+          </button>
         </p>
       )}
     </>

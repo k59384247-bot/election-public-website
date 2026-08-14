@@ -1,16 +1,23 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import { useQuery, type Query } from '@tanstack/react-query';
 import { getElections, type GetElectionsResult } from './api';
 import type { ElectionSummary, PublicElectionStatus } from '@/lib/types';
 
-const DEFAULT_PAGE_SIZE = 12;
-export const RESULTS_PER_PAGE_OPTIONS = [12, 24, 48] as const;
 const POLL_INTERVAL_IDLE_MS = 60_000;
 const POLL_INTERVAL_ACTIVE_MS = 25_000;
 
-export const PAGE1_QUERY_KEY = ['elections', 'page1'] as const;
+// Batch size while looping the cursor to build the complete list (not a
+// user-facing page size — see ElectionList for that). The list endpoint has
+// no total-count/offset support, so a large batch keeps the loop short.
+const FETCH_BATCH_SIZE = 50;
+
+// Safety valve: if the API ever misreports hasMore and never terminates,
+// stop after this many requests rather than looping forever.
+const MAX_FETCH_PAGES = 50;
+
+export const ELECTIONS_QUERY_KEY = ['elections', 'all'] as const;
 
 // The API returns elections in its own (creation-order) sequence, with no
 // notion of "open elections matter more" — sort client-side so a closed
@@ -54,18 +61,28 @@ function hasOpenVoting(elections: ElectionSummary[]): boolean {
 }
 
 /**
- * Page 1 is always authoritative for the ids it currently returns — a
- * background refetch simply replaces `page1` wholesale (handled by React
- * Query itself). Pages loaded via loadMore() are kept in separate state so
- * they survive that refetch; we only dedupe here in case an id now also
- * appears in the fresh page-1 response.
+ * Loops the cursor to completion and returns every election as one flat
+ * list. Elections are few (tens, not thousands), so paying for the full
+ * list up front is cheap and lets the home page use real page-number
+ * navigation (Build spec §7.1 mock) instead of a Load More button — the
+ * list endpoint itself still only exposes cursor pagination, this just
+ * exhausts it internally rather than exposing it to the UI.
  */
-function mergeById(
-  page1: ElectionSummary[],
-  additionalPages: ElectionSummary[]
-): ElectionSummary[] {
-  const page1Ids = new Set(page1.map((election) => election.id));
-  return [...page1, ...additionalPages.filter((election) => !page1Ids.has(election.id))];
+async function fetchAllElections(): Promise<GetElectionsResult> {
+  let cursor: string | undefined;
+  let all: ElectionSummary[] = [];
+
+  for (let page = 0; page < MAX_FETCH_PAGES; page += 1) {
+    const { data, meta } = await getElections({ cursor, limit: FETCH_BATCH_SIZE });
+    all = all.concat(data);
+    if (!meta.hasMore || !meta.nextCursor) {
+      return { data: all, meta: { hasMore: false, nextCursor: null } };
+    }
+    cursor = meta.nextCursor;
+  }
+
+  console.error('[useElections] Stopped after', MAX_FETCH_PAGES, 'pages — API may not be terminating hasMore.');
+  return { data: all, meta: { hasMore: false, nextCursor: null } };
 }
 
 export interface UseElectionsOptions {
@@ -74,104 +91,36 @@ export interface UseElectionsOptions {
 }
 
 export function useElections({ initialData }: UseElectionsOptions = {}) {
-  const [additionalPages, setAdditionalPages] = useState<ElectionSummary[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(
-    initialData?.meta.nextCursor ?? null
-  );
-  const [hasMore, setHasMore] = useState<boolean>(initialData?.meta.hasMore ?? false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [loadMoreError, setLoadMoreError] = useState<Error | null>(null);
-  const [resultsPerPage, setResultsPerPage] = useState(DEFAULT_PAGE_SIZE);
-
-  // react-query evaluates `refetchInterval` outside the render cycle, so a
-  // plain closure over `additionalPages` would see a stale empty array.
-  const additionalPagesRef = useRef<ElectionSummary[]>(additionalPages);
-  additionalPagesRef.current = additionalPages;
-
-  // Read synchronously (not from the `resultsPerPage` state closure) so a
-  // page-size change can force-refetch with the new limit in the same tick
-  // it's set, rather than one render behind.
-  const resultsPerPageRef = useRef(resultsPerPage);
-  resultsPerPageRef.current = resultsPerPage;
-
-  const page1Query = useQuery({
-    queryKey: PAGE1_QUERY_KEY,
-    queryFn: () => getElections({ limit: resultsPerPageRef.current }),
+  const query = useQuery({
+    queryKey: ELECTIONS_QUERY_KEY,
+    queryFn: fetchAllElections,
     initialData,
     // Without this, staleTime defaults to 0 and refetchOnMount fires a
     // client fetch the instant ElectionList mounts — which can resolve and
     // setState while React is still hydrating, producing a hydration
     // mismatch even when `initialData` and the SSR HTML agree. A few
     // seconds of grace lets hydration finish before the first background
-    // refetch; refetchInterval below still keeps the list live afterward.
+    // refetch (which also completes the full list beyond initialData's
+    // single SSR page); refetchInterval below keeps it live afterward.
     staleTime: 5_000,
     refetchIntervalInBackground: false,
     refetchInterval: (query: Query<GetElectionsResult, Error>) => {
-      const page1Elections = query.state.data?.data ?? [];
-      const loaded = mergeById(page1Elections, additionalPagesRef.current);
+      const loaded = query.state.data?.data ?? [];
       if (loaded.length === 0) return false;
       return hasOpenVoting(loaded) ? POLL_INTERVAL_ACTIVE_MS : POLL_INTERVAL_IDLE_MS;
     },
   });
 
-  const page1Data = page1Query.data?.data ?? [];
-
-  // Seed/refresh the loadMore cursor from page 1 only while the user hasn't
-  // paginated yet. Once additionalPages is non-empty, a background page-1
-  // refetch must not reset how far the user has scrolled (build spec §7.1).
-  useEffect(() => {
-    if (!page1Query.data) return;
-    if (additionalPages.length > 0) return;
-    setNextCursor(page1Query.data.meta.nextCursor);
-    setHasMore(page1Query.data.meta.hasMore);
-  }, [page1Query.data, additionalPages.length]);
-
-  const loadMore = useCallback(async () => {
-    if (!hasMore || isLoadingMore || !nextCursor) return;
-
-    setIsLoadingMore(true);
-    setLoadMoreError(null);
-    try {
-      const result = await getElections({ cursor: nextCursor, limit: resultsPerPageRef.current });
-      setAdditionalPages((current) => [...current, ...result.data]);
-      setNextCursor(result.meta.nextCursor);
-      setHasMore(result.meta.hasMore);
-    } catch (err) {
-      setLoadMoreError(err instanceof Error ? err : new Error('Failed to load more elections'));
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [hasMore, isLoadingMore, nextCursor]);
-
-  // Changing page size starts over from a fresh page 1 at the new limit —
-  // the pages already scrolled past no longer line up with the new batch
-  // size, so there's nothing sensible to preserve from `additionalPages`.
-  const changeResultsPerPage = useCallback(
-    (nextSize: number) => {
-      if (nextSize === resultsPerPageRef.current) return;
-      resultsPerPageRef.current = nextSize;
-      setResultsPerPage(nextSize);
-      setAdditionalPages([]);
-      setLoadMoreError(null);
-      page1Query.refetch();
-    },
-    [page1Query]
-  );
-
-  const elections = sortByStatus(mergeById(page1Data, additionalPages));
+  const elections = useMemo(() => sortByStatus(query.data?.data ?? []), [query.data]);
 
   return {
     elections,
-    hasMore,
-    loadMore,
-    isLoadingMore,
-    loadMoreError,
-    resultsPerPage,
-    changeResultsPerPage,
-    /** True only for the very first page-1 fetch — never for background polls. */
-    isInitialLoading: page1Query.isLoading,
-    isError: page1Query.isError && elections.length === 0,
-    error: page1Query.error,
-    retry: page1Query.refetch,
+    /** True only for the very first fetch — never for background polls. */
+    isInitialLoading: query.isLoading,
+    isError: query.isError && elections.length === 0,
+    error: query.error,
+    /** A background refetch failed but earlier data is still on screen. */
+    hasBackgroundError: query.isError && elections.length > 0,
+    retry: query.refetch,
   };
 }

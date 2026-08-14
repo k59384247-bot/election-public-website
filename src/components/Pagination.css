@@ -1,0 +1,83 @@
+/* ----- Pagination (shared) ------------------------------------------------
+   Same visual language as vote.css's .pagination (main voting page), kept
+   as a separate declaration here rather than imported cross-feature so the
+   elections-home bundle and the vote-flow bundle don't couple to each
+   other's CSS. */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-3) var(--space-6) var(--space-4);
+}
+
+.pagination__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 1px 2px 0 rgba(10, 13, 18, 0.05);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-neutral-900);
+}
+
+.pagination__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination__btn-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.pagination__btn--prev .pagination__btn-icon {
+  transform: rotate(180deg);
+}
+
+.pagination__center {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.pagination__numbers {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.pagination__page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  border-radius: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  color: #717680;
+  text-align: center;
+}
+
+.pagination__page--current {
+  background-color: #f9f5ff;
+  color: #7f56d9;
+}
+
+@media (max-width: 640px) {
+  .pagination {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+}
