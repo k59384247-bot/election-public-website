@@ -134,9 +134,14 @@
   max-width: 100%;
 }
 
-/* Two cards per row at full width; each keeps the shared card's look. */
+/* Two cards per row at full width; each keeps the shared card's look.
+   max-width caps growth at exactly half the two-card column so a lone
+   card (list of 1, or an odd trailing card) doesn't stretch to fill both
+   columns' worth of space — it stays the same size a card would be with
+   a sibling on the row, left-aligned with the other half left empty. */
 .event-grid .event-card {
   flex: 1 1 480px;
+  max-width: calc((var(--content-max) - var(--space-6)) / 2);
 }
 
 /* Scopes the shared Pagination component (100%-width nav) to the same
