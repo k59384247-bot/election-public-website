@@ -74,7 +74,7 @@ export function VoteFlowLayout({
           <ArrowRight
             className="btn__icon"
             aria-hidden="true"
-            style={{ color: 'var(--color-neutral-900)', transform: 'rotate(180deg)' }}
+            style={{ transform: 'rotate(180deg)' }}
           />
           Back to Elections
         </Link>
