@@ -15,6 +15,7 @@ import { useVotingSession } from '../VotingSessionContext';
 import { useRequireStep } from '../guards/requireStep';
 
 const OTP_LENGTH = 6;
+const RESEND_COOLDOWN_SECONDS = 30;
 
 function maskEmail(email: string): string {
   const atIndex = email.indexOf('@');
@@ -27,6 +28,12 @@ function formatCountdown(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function formatCooldown(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
 /** Screen 3 (Verify Email Page). Renders as the center card of VoteFlowLayout's first row. */
@@ -66,6 +73,30 @@ export function OtpEntryForm() {
     }, 1000);
     return () => clearInterval(id);
   }, [countdownGeneration, otpExpiresInSeconds]);
+
+  // Local to this screen, not the reducer/session — a resend-spam guard
+  // only, independent of the server's own RATE_LIMITED enforcement.
+  // resendGeneration is bumped only when a resend actually SUCCEEDS: a
+  // failed attempt (network error, RATE_LIMITED, ...) shouldn't cost the
+  // user the 30s wait on top of whatever already went wrong. Mirrors the
+  // countdownGeneration/secondsLeft pair above: resendCooldownGeneration
+  // is the synced copy that the effect keys off, corrected during render
+  // (not inside the effect) whenever resendGeneration moves ahead of it.
+  const [resendGeneration, setResendGeneration] = useState(0);
+  const [resendCooldownGeneration, setResendCooldownGeneration] = useState(0);
+  const [resendSecondsLeft, setResendSecondsLeft] = useState<number | null>(null);
+  if (resendGeneration !== resendCooldownGeneration) {
+    setResendCooldownGeneration(resendGeneration);
+    setResendSecondsLeft(RESEND_COOLDOWN_SECONDS);
+  }
+
+  useEffect(() => {
+    if (resendCooldownGeneration === 0) return;
+    const id = setInterval(() => {
+      setResendSecondsLeft((prev) => (prev === null ? null : Math.max(0, prev - 1)));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [resendCooldownGeneration]);
 
   const matricNumber = state.matricNumber ?? '';
   const email = state.email ?? '';
@@ -152,7 +183,7 @@ export function OtpEntryForm() {
   }
 
   async function handleResend() {
-    if (isResending) return;
+    if (isResending || (resendSecondsLeft !== null && resendSecondsLeft > 0)) return;
     setResendErrorCode(null);
     setIsResending(true);
     try {
@@ -160,6 +191,7 @@ export function OtpEntryForm() {
       setVerifyErrorCode(null);
       setDigits(Array(OTP_LENGTH).fill(''));
       inputRefs.current[0]?.focus();
+      setResendGeneration((generation) => generation + 1);
     } catch (err) {
       setResendErrorCode(err instanceof ApiRequestError ? err.code : NETWORK_ERROR_CODE);
     } finally {
@@ -257,9 +289,13 @@ export function OtpEntryForm() {
                 className="verify-email__resend verify-email__meta-value"
                 type="button"
                 onClick={handleResend}
-                disabled={isResending}
+                disabled={isResending || (resendSecondsLeft !== null && resendSecondsLeft > 0)}
               >
-                {isResending ? 'Resending…' : 'Resend Code'}
+                {isResending
+                  ? 'Resending…'
+                  : resendSecondsLeft !== null && resendSecondsLeft > 0
+                    ? `Resend Code (${formatCooldown(resendSecondsLeft)})`
+                    : 'Resend Code'}
               </button>
             </p>
           </div>
