@@ -5,6 +5,7 @@ import { Check, ChevronDown, Download, Video } from 'lucide-react';
 import type { Position } from '@/lib/types';
 import type { BallotDraftAction } from '../useBallotDraft';
 import { PositionHeader } from './PositionHeader';
+import { CandidateAvatar } from './CandidateAvatar';
 
 /**
  * Renders one position's candidate list for the ballot screen. The control
@@ -121,10 +122,10 @@ export function PositionControl({
               onKeyDown={(event) => handleCandidateKeyDown(event, candidate.id, isDisabled)}
             >
               <div className="candidate__row">
-                <img
-                  className="candidate__avatar"
-                  src={candidate.photoUrl ?? '/assets/images/candidate-avatar.jpg'}
-                  alt={candidate.name}
+                <CandidateAvatar
+                  id={candidate.id}
+                  name={candidate.name}
+                  photoUrl={candidate.photoUrl}
                 />
                 <div className="candidate__info">
                   <div className="candidate__identity">

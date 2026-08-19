@@ -525,6 +525,16 @@
   object-fit: cover;
 }
 
+.candidate__avatar--initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-body-lg);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
 .candidate__info {
   display: flex;
   flex: 1 1 0;

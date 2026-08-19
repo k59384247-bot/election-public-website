@@ -8,6 +8,7 @@ import { ElectionHead } from './ElectionHead';
 import { PositionHeader } from './PositionHeader';
 import { NoticeCard } from './NoticeCard';
 import { AssistanceCard } from './AssistanceCard';
+import { CandidateAvatar } from './CandidateAvatar';
 
 const VOTING_NOTICE_ITEMS = [
   { icon: UserCog, text: 'You can review and edit your selections before submitting.' },
@@ -115,10 +116,10 @@ export function VoteReviewPage({
                             className={'candidate candidate--selected' + (isOpen ? ' is-open' : '')}
                           >
                             <div className="candidate__row">
-                              <img
-                                className="candidate__avatar"
-                                src={candidate.photoUrl ?? '/assets/images/candidate-avatar.jpg'}
-                                alt={candidate.name}
+                              <CandidateAvatar
+                                id={candidate.id}
+                                name={candidate.name}
+                                photoUrl={candidate.photoUrl}
                               />
                               <div className="candidate__info">
                                 <div className="candidate__identity">
