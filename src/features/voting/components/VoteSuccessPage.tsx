@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { ArrowRight, Ban, Check, FileCheck2, Lock } from 'lucide-react';
 import type { Election } from '@/lib/types';
 import { formatElectionDate, formatTime } from '@/features/election/format';
@@ -23,6 +24,16 @@ const WHAT_HAPPENS_NEXT_ITEMS = [
  */
 export function VoteSuccessPage({ election }: { election: Election }) {
   const { state, reset } = useVotingSession();
+
+  // Reset on unmount rather than on the Link's click: dispatching RESET
+  // synchronously in onClick flips step back to 'idle' while this route is
+  // still mounted (Next's client-side nav hasn't swapped the page yet),
+  // which briefly re-renders the identity-verification form before the
+  // navigation to "/" completes. Resetting on unmount defers it until after
+  // the route has actually changed, so nothing flashes.
+  useEffect(() => {
+    return () => reset();
+  }, [reset]);
 
   return (
     <>
@@ -84,7 +95,7 @@ export function VoteSuccessPage({ election }: { election: Election }) {
         )}
       </section>
 
-      <Link className="pagination__btn success-cta" href="/" onClick={() => reset()}>
+      <Link className="pagination__btn success-cta" href="/">
         Return to Election Information
         <ArrowRight className="pagination__btn-icon" style={{ color: 'var(--color-neutral-900)' }} aria-hidden="true" />
       </Link>
@@ -109,6 +120,13 @@ export function RejectedElectionState() {
   const { state, reset } = useVotingSession();
   const isNetworkFailure = state.rejectionReason === 'network';
 
+  // See the matching comment in VoteSuccessPage — reset on unmount, not on
+  // the Link's click, so the identity form doesn't flash before navigation
+  // to "/" completes.
+  useEffect(() => {
+    return () => reset();
+  }, [reset]);
+
   return (
     <section className="card rejected-card" aria-labelledby="rejected-title" role="alert">
       <h2 className="card__title" id="rejected-title">
@@ -119,7 +137,7 @@ export function RejectedElectionState() {
           ? "We couldn't reach the server to confirm your submission, even after retrying. Please start again from the Home Page."
           : 'Voting for this election was closed or paused after you started. Your selections were not submitted.'}
       </p>
-      <Link className="btn btn--gold" href="/" onClick={() => reset()}>
+      <Link className="btn btn--gold" href="/">
         Back to Home Page
       </Link>
     </section>
