@@ -3,11 +3,11 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, Calendar, Clock, ShieldCheck, UserCog, VenetianMask, Waves } from 'lucide-react';
+import { ArrowRight, ShieldCheck, UserCog, VenetianMask, Waves } from 'lucide-react';
 import type { PublicElectionStatus } from '@/lib/types';
 import { useElection } from '@/features/election/useElection';
 import { getElectionById } from '@/features/election/api';
-import { formatElectionDate, formatElectionTimeRange } from '@/features/election/format';
+import { ElectionMeta } from '@/features/election/components/ElectionMeta';
 import { AssistanceCard } from './AssistanceCard';
 
 const STATUS_LABEL: Record<PublicElectionStatus, string> = {
@@ -97,26 +97,7 @@ export function VoteFlowLayout({
               {election && <p className="hero__description">{election.description}</p>}
             </div>
 
-            {election && (
-              <div className="hero__meta">
-                <span className="hero__meta-item">
-                  <Calendar
-                    className="hero__meta-icon"
-                    style={{ color: 'var(--color-header-text)' }}
-                    aria-hidden="true"
-                  />
-                  {formatElectionDate(election.startDate)}
-                </span>
-                <span className="hero__meta-item">
-                  <Clock
-                    className="hero__meta-icon"
-                    style={{ color: 'var(--color-header-text)' }}
-                    aria-hidden="true"
-                  />
-                  {formatElectionTimeRange(election.startDate, election.endDate)}
-                </span>
-              </div>
-            )}
+            {election && <ElectionMeta startDate={election.startDate} endDate={election.endDate} />}
           </section>
 
           {children}

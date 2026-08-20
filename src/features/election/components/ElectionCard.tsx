@@ -3,7 +3,12 @@ import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Calendar, Clock } from 'lucide-react';
 import type { ElectionSummary, PublicElectionStatus } from '@/lib/types';
-import { formatElectionDate, formatElectionTimeRange } from '../format';
+import {
+  formatElectionDate,
+  formatElectionDateTimeRange,
+  formatElectionTimeRange,
+  isMultiDayElection,
+} from '../format';
 import { getElectionById } from '../api';
 
 export const STATUS_CONFIG: Record<PublicElectionStatus, { label: string; pillClass: string }> = {
@@ -68,22 +73,35 @@ export function ElectionCard({ election }: { election: ElectionSummary }) {
 
         <div className="event-card__footer">
           <div className="event-card__meta">
-            <span className="event-card__meta-item">
-              <Calendar
-                className="event-card__meta-icon"
-                style={{ color: 'var(--color-header-text)' }}
-                aria-hidden="true"
-              />
-              {formatElectionDate(election.startDate)}
-            </span>
-            <span className="event-card__meta-item">
-              <Clock
-                className="event-card__meta-icon"
-                style={{ color: 'var(--color-header-text)' }}
-                aria-hidden="true"
-              />
-              {formatElectionTimeRange(election.startDate, election.endDate)}
-            </span>
+            {isMultiDayElection(election.startDate, election.endDate) ? (
+              <span className="event-card__meta-item event-card__meta-item--wrap">
+                <Calendar
+                  className="event-card__meta-icon"
+                  style={{ color: 'var(--color-header-text)' }}
+                  aria-hidden="true"
+                />
+                {formatElectionDateTimeRange(election.startDate, election.endDate)}
+              </span>
+            ) : (
+              <>
+                <span className="event-card__meta-item">
+                  <Calendar
+                    className="event-card__meta-icon"
+                    style={{ color: 'var(--color-header-text)' }}
+                    aria-hidden="true"
+                  />
+                  {formatElectionDate(election.startDate)}
+                </span>
+                <span className="event-card__meta-item">
+                  <Clock
+                    className="event-card__meta-icon"
+                    style={{ color: 'var(--color-header-text)' }}
+                    aria-hidden="true"
+                  />
+                  {formatElectionTimeRange(election.startDate, election.endDate)}
+                </span>
+              </>
+            )}
           </div>
 
           {/* election.status is computed server-side from wall-clock time and

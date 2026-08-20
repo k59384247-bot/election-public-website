@@ -502,6 +502,14 @@
     line-height: var(--lh-title);
   }
 
+  /* Multi-day election's merged date+time string (ElectionMeta) — long
+     enough on some elections to overflow a narrow screen if held to one
+     line like every other meta item. */
+  .hero__meta-item--wrap {
+    white-space: normal;
+    text-align: center;
+  }
+
   .hero__description {
     font-size: var(--fs-sm);
     line-height: var(--lh-sm);
@@ -925,6 +933,12 @@
   .event-card__meta {
     width: 100%;
     justify-content: space-between;
+  }
+
+  /* Multi-day election's merged date+time string — let it wrap instead of
+     overflowing the card at narrow widths. */
+  .event-card__meta-item--wrap {
+    white-space: normal;
   }
 
   .event-card__status {

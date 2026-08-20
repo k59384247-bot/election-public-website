@@ -1,9 +1,9 @@
 'use client';
 
-import { Calendar, Clock, Mail, UserCheck } from 'lucide-react';
+import { Mail, UserCheck } from 'lucide-react';
 import type { Election, PublicElectionStatus } from '@/lib/types';
 import { useVotingSession } from '../VotingSessionContext';
-import { formatElectionDate, formatElectionTimeRange } from '@/features/election/format';
+import { ElectionMeta } from '@/features/election/components/ElectionMeta';
 
 const STATUS_LABEL: Record<PublicElectionStatus, string> = {
   voting_open: 'VOTING IN PROGRESS',
@@ -30,16 +30,7 @@ export function ElectionHead({ election }: { election: Election }) {
         {election.title}
       </h1>
 
-      <div className="hero__meta">
-        <span className="hero__meta-item">
-          <Calendar className="hero__meta-icon" style={{ color: 'var(--color-header-text)' }} aria-hidden="true" />
-          {formatElectionDate(election.startDate)}
-        </span>
-        <span className="hero__meta-item">
-          <Clock className="hero__meta-icon" style={{ color: 'var(--color-header-text)' }} aria-hidden="true" />
-          {formatElectionTimeRange(election.startDate, election.endDate)}
-        </span>
-      </div>
+      <ElectionMeta startDate={election.startDate} endDate={election.endDate} />
 
       {(state.matricNumber || state.email) && (
         <div className="voter-tags">

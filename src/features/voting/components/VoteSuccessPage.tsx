@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 import { ArrowRight, Ban, Check, FileCheck2, Lock } from 'lucide-react';
 import type { Election } from '@/lib/types';
-import { formatElectionDate, formatTime } from '@/features/election/format';
+import { formatElectionDate, formatTime, isToday } from '@/features/election/format';
 import { useVotingSession } from '../VotingSessionContext';
 import { ElectionHead } from './ElectionHead';
 import { NoticeCard } from './NoticeCard';
@@ -91,7 +91,10 @@ export function VoteSuccessPage({ election }: { election: Election }) {
         )}
 
         {!state.alreadyVoted && (
-          <p className="success-card__note">Voting closes today by {formatTime(election.endDate)}.</p>
+          <p className="success-card__note">
+            Voting closes {isToday(election.endDate) ? 'today' : formatElectionDate(election.endDate)} by{' '}
+            {formatTime(election.endDate)}.
+          </p>
         )}
       </section>
 
