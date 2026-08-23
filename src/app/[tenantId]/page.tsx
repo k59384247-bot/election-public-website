@@ -38,10 +38,6 @@ export default async function ElectionsHomePage({
   }
 
   const logoUrl = tenant.logoUrl ?? '/assets/images/amsul-logo.png';
-  const tenantDescription =
-    tenant.description ??
-    `Welcome to ${tenant.name} Elections. Eligible voters can securely verify their identity, access the ballot, and cast their vote.`;
-
   return (
     <div className="elections-home">
       <header className="elections-hero">
@@ -66,7 +62,10 @@ export default async function ElectionsHomePage({
             ELECTIONS
           </span>
           <h1 className="elections-hero__title">Make Your Voice Count</h1>
-          <p className="elections-hero__subtitle">{tenantDescription}</p>
+          <p className="elections-hero__subtitle">
+            Welcome to AMSUL Elections. Eligible voters can securely verify their identity, access
+            the ballot, and cast their vote. All ballots remain anonymous and every vote counts.
+          </p>
         </div>
       </header>
 
