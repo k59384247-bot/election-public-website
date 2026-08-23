@@ -8,6 +8,7 @@ import { ApiRequestError } from '@/lib/apiClient';
 import { getErrorDescriptor, NETWORK_ERROR_CODE, type ClientErrorCode } from '@/lib/errors';
 import { useVotingSession } from '../VotingSessionContext';
 import { useRequireStep } from '../guards/requireStep';
+import { useTenant } from '@/features/tenant/TenantContext';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -33,6 +34,7 @@ function validate(matricNumber: string, email: string): FieldErrors {
 export function VerifyIdentityForm() {
   useRequireStep(['idle']);
   const { electionId } = useParams<{ electionId: string }>();
+  const { tenantId } = useTenant();
   const { submitIdentity, lockoutNotice, dismissLockoutNotice } = useVotingSession();
 
   const [matricNumber, setMatricNumber] = useState('');
@@ -75,7 +77,7 @@ export function VerifyIdentityForm() {
             </h2>
             <p className="verify-form__subtitle">{descriptor.userMessage}</p>
           </div>
-          <Link className="btn btn--gold" href="/">
+          <Link className="btn btn--gold" href={`/${tenantId}`}>
             Return to Home
           </Link>
         </div>

@@ -2,8 +2,8 @@
  * The ONLY place in the app allowed to call fetch() against the election
  * API. Every other module must go through `apiRequest`.
  *
- * Responsibilities: build the URL (base + tenantId), enforce a request
- * timeout, unwrap the success/failure envelope, and retry transient
+ * Responsibilities: build the URL (base + explicit tenantId when needed),
+ * enforce a request timeout, unwrap the success/failure envelope, and retry transient
  * failures. It does NOT decide how errors are presented — that's
  * errors.ts's job. This module only returns data or throws a typed error.
  *
@@ -40,6 +40,10 @@ export interface ApiRequestOptions {
   headers?: Record<string, string>;
   /** Bearer token for authenticated calls (e.g. cast-vote). */
   token?: string;
+  /** Tenant context for tenant-scoped REST endpoints. */
+  tenantId?: string;
+  /** Fetch cache mode, primarily `no-store` for public tenant configuration. */
+  cache?: RequestCache;
   /**
    * Next.js ISR window in seconds for this request, forwarded as
    * `next: { revalidate }`. Only meaningful for GETs made from a Server
@@ -61,15 +65,11 @@ function getApiBaseUrl(): string {
   return baseUrl;
 }
 
-function getTenantId(): string {
-  const tenantId = process.env.NEXT_PUBLIC_TENANT_ID;
-  if (!tenantId) {
-    throw new Error('NEXT_PUBLIC_TENANT_ID is not configured');
-  }
-  return tenantId;
-}
-
-function buildUrl(path: string, query?: ApiRequestOptions['query']): string {
+function buildUrl(
+  path: string,
+  query?: ApiRequestOptions['query'],
+  tenantId?: string
+): string {
   const url = new URL(path.replace(/^\//, ''), ensureTrailingSlash(getApiBaseUrl()));
 
   if (query) {
@@ -80,7 +80,9 @@ function buildUrl(path: string, query?: ApiRequestOptions['query']): string {
     }
   }
 
-  url.searchParams.set('tenantId', getTenantId());
+  if (tenantId) {
+    url.searchParams.set('tenantId', tenantId);
+  }
   return url.toString();
 }
 
@@ -141,7 +143,7 @@ export async function apiRequest<T, M = undefined>(
   path: string,
   options: ApiRequestOptions = {}
 ): Promise<ApiResult<T, M>> {
-  const url = buildUrl(path, options.query);
+  const url = buildUrl(path, options.query, options.tenantId);
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -156,6 +158,7 @@ export async function apiRequest<T, M = undefined>(
     method: options.method ?? 'GET',
     headers,
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+    ...(options.cache !== undefined ? { cache: options.cache } : {}),
     ...(options.revalidate !== undefined ? { next: { revalidate: options.revalidate } } : {}),
   };
 

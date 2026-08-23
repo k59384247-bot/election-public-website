@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { getElectionById } from './api';
+import { useTenant } from '@/features/tenant/TenantContext';
 
 /**
  * Full election detail (positions + candidates) for the ballot/review/
@@ -20,9 +21,10 @@ import { getElectionById } from './api';
  * refetchable one; it's never THIS hook mounted early.
  */
 export function useFullElection(electionId: string) {
+  const { tenantId } = useTenant();
   const query = useQuery({
-    queryKey: ['election-full', electionId],
-    queryFn: () => getElectionById(electionId),
+    queryKey: ['election-full', tenantId, electionId],
+    queryFn: () => getElectionById(tenantId, electionId),
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

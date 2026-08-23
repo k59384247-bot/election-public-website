@@ -9,6 +9,7 @@ import { useVotingSession } from '../VotingSessionContext';
 import { ElectionHead } from './ElectionHead';
 import { NoticeCard } from './NoticeCard';
 import { AssistanceCard } from './AssistanceCard';
+import { useTenant } from '@/features/tenant/TenantContext';
 
 const WHAT_HAPPENS_NEXT_ITEMS = [
   { icon: Lock, text: 'Your vote has been encrypted.' },
@@ -23,6 +24,7 @@ const WHAT_HAPPENS_NEXT_ITEMS = [
  * without a code instead of an error or a blank field.
  */
 export function VoteSuccessPage({ election }: { election: Election }) {
+  const { tenantId } = useTenant();
   const { state, reset } = useVotingSession();
 
   // Reset on unmount rather than on the Link's click: dispatching RESET
@@ -98,7 +100,7 @@ export function VoteSuccessPage({ election }: { election: Election }) {
         )}
       </section>
 
-      <Link className="pagination__btn success-cta" href="/">
+      <Link className="pagination__btn success-cta" href={`/${tenantId}`}>
         Return to Election Information
         <ArrowRight className="pagination__btn-icon" style={{ color: 'var(--color-neutral-900)' }} aria-hidden="true" />
       </Link>
@@ -120,6 +122,7 @@ export function VoteSuccessPage({ election }: { election: Election }) {
  * network retry reads as a submission failure the voter can retry.
  */
 export function RejectedElectionState() {
+  const { tenantId } = useTenant();
   const { state, reset } = useVotingSession();
   const isNetworkFailure = state.rejectionReason === 'network';
 
@@ -140,7 +143,7 @@ export function RejectedElectionState() {
           ? "We couldn't reach the server to confirm your submission, even after retrying. Please start again from the Home Page."
           : 'Voting for this election was closed or paused after you started. Your selections were not submitted.'}
       </p>
-      <Link className="btn btn--gold" href="/">
+      <Link className="btn btn--gold" href={`/${tenantId}`}>
         Back to Home Page
       </Link>
     </section>

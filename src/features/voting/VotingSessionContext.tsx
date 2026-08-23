@@ -73,7 +73,13 @@ export interface VotingSessionContextValue {
 
 const VotingSessionContext = createContext<VotingSessionContextValue | null>(null);
 
-export function VotingSessionProvider({ children }: { children: ReactNode }) {
+export function VotingSessionProvider({
+  tenantId,
+  children,
+}: {
+  tenantId: string;
+  children: ReactNode;
+}) {
   const [state, dispatch] = useReducer(votingSessionReducer, initialVotingSessionState);
   const [otpExpiresInSeconds, setOtpExpiresInSeconds] = useState<number | null>(null);
   const [otpSendCount, setOtpSendCount] = useState(0);
@@ -83,7 +89,7 @@ export function VotingSessionProvider({ children }: { children: ReactNode }) {
     // Failure here has no reducer transition (build spec §8 only defines a
     // success edge out of idle) — the caller catches and shows the
     // VOTER_INELIGIBLE/ALREADY_VOTED/etc. state itself via errors.ts.
-    const result = await validateVoter({ electionId, matricNumber, email });
+    const result = await validateVoter({ tenantId, electionId, matricNumber, email });
     setOtpExpiresInSeconds(result.expiresInSeconds);
     setOtpSendCount((count) => count + 1);
     // Guarded to a no-op by the reducer when step isn't 'idle' — this same
@@ -91,12 +97,12 @@ export function VotingSessionProvider({ children }: { children: ReactNode }) {
     // still needs the validateVoter() call and the refreshed countdown
     // above without re-triggering the idle -> otp_pending transition.
     dispatch({ type: 'SUBMIT_IDENTITY_SUCCESS', matricNumber, email });
-  }, []);
+  }, [tenantId]);
 
   const submitOtpAndExchangeToken = useCallback(async (electionId: string, matricNumber: string, otp: string) => {
     let customToken: string;
     try {
-      const result = await verifyOtp({ electionId, matricNumber, otp });
+      const result = await verifyOtp({ tenantId, electionId, matricNumber, otp });
       customToken = result.customToken;
     } catch (err) {
       if (err instanceof ApiRequestError && isOtpFailureCode(err.code)) {
@@ -117,7 +123,7 @@ export function VotingSessionProvider({ children }: { children: ReactNode }) {
     const userCredential = await signInWithCustomToken(auth, customToken);
     const idToken = await getIdToken(userCredential.user);
     dispatch({ type: 'VERIFY_OTP_SUCCESS', idToken });
-  }, []);
+  }, [tenantId]);
 
   const getFreshIdToken = useCallback(async () => {
     const user = auth.currentUser;

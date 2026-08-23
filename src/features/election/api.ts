@@ -10,6 +10,7 @@ import type { Election, ElectionSummary, PaginationMeta } from '@/lib/types';
 const DEFAULT_LIMIT = 12;
 
 export interface GetElectionsParams {
+  tenantId: string;
   cursor?: string;
   limit?: number;
   /** Forwarded to apiRequest for ISR on the initial server-rendered fetch. */
@@ -22,14 +23,16 @@ export interface GetElectionsResult {
 }
 
 export async function getElections({
+  tenantId,
   cursor,
   limit = DEFAULT_LIMIT,
   revalidate,
-}: GetElectionsParams = {}): Promise<GetElectionsResult> {
+}: GetElectionsParams): Promise<GetElectionsResult> {
   const { data, meta } = await apiRequest<ElectionSummary[], PaginationMeta>(
     '/v1/elections',
     {
       query: { limit, cursor },
+      tenantId,
       revalidate,
     }
   );
@@ -45,7 +48,9 @@ export async function getElections({
  * candidates. Used by the ballot/review/receipt screens, which need data
  * `ElectionSummary` deliberately excludes.
  */
-export async function getElectionById(electionId: string): Promise<Election> {
-  const { data } = await apiRequest<Election>(`/v1/elections/${electionId}`);
+export async function getElectionById(tenantId: string, electionId: string): Promise<Election> {
+  const { data } = await apiRequest<Election>(`/v1/elections/${encodeURIComponent(electionId)}`, {
+    tenantId,
+  });
   return data;
 }

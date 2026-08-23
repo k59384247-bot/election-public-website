@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Calendar, Clock } from 'lucide-react';
 import type { ElectionSummary, PublicElectionStatus } from '@/lib/types';
@@ -10,6 +10,7 @@ import {
   isMultiDayElection,
 } from '../format';
 import { getElectionById } from '../api';
+import { useTenant } from '@/features/tenant/TenantContext';
 
 export const STATUS_CONFIG: Record<PublicElectionStatus, { label: string; pillClass: string }> = {
   voting_open: { label: 'Voting In Progress', pillClass: 'event-card__status--live' },
@@ -24,6 +25,7 @@ export const STATUS_CONFIG: Record<PublicElectionStatus, { label: string; pillCl
 
 export function ElectionCard({ election }: { election: ElectionSummary }) {
   const status = STATUS_CONFIG[election.status];
+  const { tenantId } = useTenant();
   const queryClient = useQueryClient();
 
   // getElectionById is ~1s against the current staging backend, and the
@@ -35,8 +37,8 @@ export function ElectionCard({ election }: { election: ElectionSummary }) {
   // warms the ballot screen's cache for later in the flow.
   function prefetchFullElection() {
     queryClient.prefetchQuery({
-      queryKey: ['election-full', election.id],
-      queryFn: () => getElectionById(election.id),
+      queryKey: ['election-full', tenantId, election.id],
+      queryFn: () => getElectionById(tenantId, election.id),
     });
   }
 
@@ -46,10 +48,11 @@ export function ElectionCard({ election }: { election: ElectionSummary }) {
   // element appearing/disappearing, which suppressHydrationWarning can't
   // cover. Withhold it until after mount so both hydration passes render
   // nothing here, then let the client-confirmed status decide.
-  const [hasMounted, setHasMounted] = useState(false);
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
+  const hasMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   return (
     <article className="event-card">
@@ -122,7 +125,7 @@ export function ElectionCard({ election }: { election: ElectionSummary }) {
         <div className="event-card__cta-row">
           <Link
             className="event-card__cta"
-            href={`/elections/${election.id}/vote`}
+            href={`/${tenantId}/elections/${election.id}/vote`}
             onMouseEnter={prefetchFullElection}
             onFocus={prefetchFullElection}
           >

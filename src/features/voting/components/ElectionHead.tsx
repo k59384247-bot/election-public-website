@@ -4,6 +4,7 @@ import { Mail, UserCheck } from 'lucide-react';
 import type { Election, PublicElectionStatus } from '@/lib/types';
 import { useVotingSession } from '../VotingSessionContext';
 import { ElectionMeta } from '@/features/election/components/ElectionMeta';
+import { TenantLogo } from '@/features/tenant/components/TenantLogo';
 
 const STATUS_LABEL: Record<PublicElectionStatus, string> = {
   voting_open: 'VOTING IN PROGRESS',
@@ -19,7 +20,7 @@ export function ElectionHead({ election }: { election: Election }) {
 
   return (
     <section className="election-head" aria-labelledby="election-title">
-      <img className="election-head__logo" src="/assets/images/amsul-logo.png" alt="AMSUL logo" />
+      <TenantLogo className="election-head__logo" />
 
       <span className="status-pill">
         <span className="status-pill__dot" aria-hidden="true" />

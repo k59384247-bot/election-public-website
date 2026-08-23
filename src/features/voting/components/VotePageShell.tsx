@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { useTenant } from '@/features/tenant/TenantContext';
+import { TenantLogo } from '@/features/tenant/components/TenantLogo';
 
 /**
  * Shared chrome for the ballot/review/submitting/receipt screens (screens
@@ -13,14 +15,15 @@ import type { ReactNode } from 'react';
  * receipt.
  */
 export function VotePageShell({ children }: { children: ReactNode }) {
+  const { tenantId, tenant } = useTenant();
   return (
     <div className="vote">
       <header>
         <nav className="navbar" aria-label="Primary">
-          <Link className="navbar__brand" href="/" aria-label="AMSUL home">
+          <Link className="navbar__brand" href={`/${tenantId}`} aria-label={`${tenant.name} home`}>
             {/* eslint-disable-next-line @next/next/no-img-element -- matches
                 screens-html, which uses plain <img> throughout. */}
-            <img className="navbar__logo" src="/assets/images/amsul-logo.png" alt="AMSUL logo" />
+            <TenantLogo className="navbar__logo" />
           </Link>
         </nav>
       </header>

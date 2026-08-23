@@ -9,12 +9,12 @@ import { apiRequest, ApiRequestError } from './apiClient';
 
 async function main() {
   console.log('NEXT_PUBLIC_API_BASE_URL =', process.env.NEXT_PUBLIC_API_BASE_URL);
-  console.log('NEXT_PUBLIC_TENANT_ID =', process.env.NEXT_PUBLIC_TENANT_ID);
+  console.log('Tenant context is supplied by the URL path.');
   console.log('Calling apiRequest against placeholder base URL...\n');
 
   const startedAt = Date.now();
   try {
-    await apiRequest('/v1/elections/active');
+    await apiRequest('/v1/tenants/amsul/public', { cache: 'no-store' });
     console.log('UNEXPECTED: request succeeded against a placeholder URL.');
     process.exitCode = 1;
   } catch (err) {

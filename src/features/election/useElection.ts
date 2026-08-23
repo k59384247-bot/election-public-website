@@ -3,7 +3,8 @@
 import { useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getElections, type GetElectionsResult } from './api';
-import { ELECTIONS_QUERY_KEY } from './useElections';
+import { electionsQueryKey } from './useElections';
+import { useTenant } from '@/features/tenant/TenantContext';
 
 /**
  * Single election lookup for the vote flow's hero. There's no dedicated
@@ -15,17 +16,18 @@ import { ELECTIONS_QUERY_KEY } from './useElections';
  * the elections list entirely.
  */
 export function useElection(electionId: string) {
+  const { tenantId } = useTenant();
   const queryClient = useQueryClient();
 
   const cachedSummary = useMemo(() => {
-    const cached = queryClient.getQueryData<GetElectionsResult>(ELECTIONS_QUERY_KEY);
+    const cached = queryClient.getQueryData<GetElectionsResult>(electionsQueryKey(tenantId));
     return cached?.data.find((election) => election.id === electionId);
-  }, [queryClient, electionId]);
+  }, [queryClient, tenantId, electionId]);
 
   const listQuery = useQuery({
-    queryKey: ['election-lookup', electionId],
+    queryKey: ['election-lookup', tenantId, electionId],
     queryFn: async () => {
-      const { data } = await getElections({ limit: 50 });
+      const { data } = await getElections({ tenantId, limit: 50 });
       return data.find((election) => election.id === electionId);
     },
     enabled: cachedSummary === undefined,

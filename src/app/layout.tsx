@@ -18,8 +18,8 @@ const thurkle = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Elections — AMSUL x StruktHQ",
-  description: "AMSUL elections — browse active, upcoming, and past elections.",
+  title: 'Elections — StruktHQ',
+  description: 'Browse active, upcoming, and past elections.',
 };
 
 export default function RootLayout({

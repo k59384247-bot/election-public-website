@@ -16,24 +16,28 @@ import type {
 } from '@/lib/types';
 
 export interface ValidateVoterParams {
+  tenantId: string;
   electionId: string;
   matricNumber: string;
   email: string;
 }
 
 export async function validateVoter({
+  tenantId,
   electionId,
   matricNumber,
   email,
 }: ValidateVoterParams): Promise<ValidateVoterResponse> {
   const { data } = await apiRequest<ValidateVoterResponse>('/v1/elections/validate-voter', {
     method: 'POST',
+    tenantId,
     body: { electionId, matricNumber, email },
   });
   return data;
 }
 
 export interface VerifyOtpParams {
+  tenantId: string;
   electionId: string;
   matricNumber: string;
   otp: string;
@@ -45,12 +49,14 @@ export interface VerifyOtpParams {
  * this module's.
  */
 export async function verifyOtp({
+  tenantId,
   electionId,
   matricNumber,
   otp,
 }: VerifyOtpParams): Promise<VerifyOtpResponse> {
   const { data } = await apiRequest<VerifyOtpResponse>('/v1/elections/verify-otp', {
     method: 'POST',
+    tenantId,
     body: { electionId, matricNumber, otp },
   });
   return data;

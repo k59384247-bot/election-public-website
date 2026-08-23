@@ -41,6 +41,8 @@ export type ApiErrorCode =
   | 'INVALID_OTP'
   | 'OTP_EXPIRED'
   | 'OTP_LOCKED'
+  | 'INVALID_TENANT'
+  | 'TENANT_NOT_FOUND'
   | 'NOT_FOUND'
   | 'RATE_LIMITED'
   | 'INTERNAL';
@@ -119,6 +121,16 @@ export interface ElectionSummary {
 export interface PaginationMeta {
   hasMore: boolean;
   nextCursor: string | null;
+}
+
+// Public tenant configuration returned by GET /v1/tenants/:tenantId/public.
+export interface TenantPublicInfo {
+  id: string;
+  tenantId: string;
+  name: string;
+  logoUrl: string | null;
+  primaryColor: string | null;
+  description: string | null;
 }
 
 // ---------------------------------------------------------------------------

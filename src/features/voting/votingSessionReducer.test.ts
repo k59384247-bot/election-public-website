@@ -7,6 +7,7 @@ import {
 } from './votingSessionReducer';
 
 const otpPendingState: VotingSessionState = {
+  ...initialVotingSessionState,
   step: 'otp_pending',
   matricNumber: '123456789',
   email: 'voter@example.com',
@@ -63,6 +64,7 @@ describe('votingSessionReducer', () => {
 
   it('otp_pending --VERIFY_OTP fails (OTP_LOCKED)--> idle, clearing matric/email/token/attempts', () => {
     const dirtyState: VotingSessionState = {
+      ...initialVotingSessionState,
       step: 'otp_pending',
       matricNumber: '123456789',
       email: 'voter@example.com',
@@ -101,6 +103,7 @@ describe('votingSessionReducer', () => {
 
   it('token_acquired --PROCEED_TO_BALLOT--> ballot_in_progress (no-op stub transition)', () => {
     const tokenAcquiredState: VotingSessionState = {
+      ...initialVotingSessionState,
       step: 'token_acquired',
       matricNumber: '123456789',
       email: 'voter@example.com',
@@ -116,6 +119,7 @@ describe('votingSessionReducer', () => {
 
   it('RESET returns to idle and clears matric/email/token/attemptsRemaining from any state', () => {
     const messyState: VotingSessionState = {
+      ...initialVotingSessionState,
       step: 'ballot_in_progress',
       matricNumber: '123456789',
       email: 'voter@example.com',

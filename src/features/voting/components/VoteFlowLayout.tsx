@@ -9,6 +9,8 @@ import { useElection } from '@/features/election/useElection';
 import { getElectionById } from '@/features/election/api';
 import { ElectionMeta } from '@/features/election/components/ElectionMeta';
 import { AssistanceCard } from './AssistanceCard';
+import { useTenant } from '@/features/tenant/TenantContext';
+import { TenantLogo } from '@/features/tenant/components/TenantLogo';
 
 const STATUS_LABEL: Record<PublicElectionStatus, string> = {
   voting_open: 'VOTING IN PROGRESS',
@@ -33,6 +35,7 @@ export function VoteFlowLayout({
   electionId: string;
   children: ReactNode;
 }) {
+  const { tenantId, tenant } = useTenant();
   const { election } = useElection(electionId);
 
   // Separate from the hero fetch above and deliberately NOT the
@@ -53,24 +56,24 @@ export function VoteFlowLayout({
   // query's own default staleTime only governs refetching while this
   // component is still mounted, pre-auth.
   const { data: fullElection } = useQuery({
-    queryKey: ['election-full', electionId],
-    queryFn: () => getElectionById(electionId),
+    queryKey: ['election-full', tenantId, electionId],
+    queryFn: () => getElectionById(tenantId, electionId),
   });
 
   return (
     <div className="verify">
       <header>
         <nav className="navbar" aria-label="Primary">
-          <Link className="navbar__brand" href="/" aria-label="AMSUL home">
+          <Link className="navbar__brand" href={`/${tenantId}`} aria-label={`${tenant.name} home`}>
             {/* eslint-disable-next-line @next/next/no-img-element -- matches
                 screens-html, which uses plain <img> throughout. */}
-            <img className="navbar__logo" src="/assets/images/amsul-logo.png" alt="AMSUL logo" />
+            <TenantLogo className="navbar__logo" />
           </Link>
         </nav>
       </header>
 
       <main className="verify__main">
-        <Link className="btn btn--ghost" href="/">
+        <Link className="btn btn--ghost" href={`/${tenantId}`}>
           <ArrowRight
             className="btn__icon"
             aria-hidden="true"
@@ -81,7 +84,7 @@ export function VoteFlowLayout({
 
         <div className="verify__row">
           <section className="verify__col hero" aria-labelledby="election-title">
-            <img className="hero__logo" src="/assets/images/amsul-logo.png" alt="AMSUL logo" />
+            <TenantLogo className="hero__logo" />
 
             {election && (
               <span className="status-pill">

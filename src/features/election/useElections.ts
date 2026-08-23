@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useQuery, type Query } from '@tanstack/react-query';
 import { getElections, type GetElectionsResult } from './api';
 import type { ElectionSummary, PublicElectionStatus } from '@/lib/types';
+import { useTenant } from '@/features/tenant/TenantContext';
 
 const POLL_INTERVAL_IDLE_MS = 60_000;
 const POLL_INTERVAL_ACTIVE_MS = 25_000;
@@ -17,7 +18,9 @@ const FETCH_BATCH_SIZE = 50;
 // stop after this many requests rather than looping forever.
 const MAX_FETCH_PAGES = 50;
 
-export const ELECTIONS_QUERY_KEY = ['elections', 'all'] as const;
+export function electionsQueryKey(tenantId: string) {
+  return ['elections', tenantId, 'all'] as const;
+}
 
 // The API returns elections in its own (creation-order) sequence, with no
 // notion of "open elections matter more" — sort client-side so a closed
@@ -68,12 +71,12 @@ function hasOpenVoting(elections: ElectionSummary[]): boolean {
  * list endpoint itself still only exposes cursor pagination, this just
  * exhausts it internally rather than exposing it to the UI.
  */
-async function fetchAllElections(): Promise<GetElectionsResult> {
+async function fetchAllElections(tenantId: string): Promise<GetElectionsResult> {
   let cursor: string | undefined;
   let all: ElectionSummary[] = [];
 
   for (let page = 0; page < MAX_FETCH_PAGES; page += 1) {
-    const { data, meta } = await getElections({ cursor, limit: FETCH_BATCH_SIZE });
+    const { data, meta } = await getElections({ tenantId, cursor, limit: FETCH_BATCH_SIZE });
     all = all.concat(data);
     if (!meta.hasMore || !meta.nextCursor) {
       return { data: all, meta: { hasMore: false, nextCursor: null } };
@@ -91,9 +94,10 @@ export interface UseElectionsOptions {
 }
 
 export function useElections({ initialData }: UseElectionsOptions = {}) {
+  const { tenantId } = useTenant();
   const query = useQuery({
-    queryKey: ELECTIONS_QUERY_KEY,
-    queryFn: fetchAllElections,
+    queryKey: electionsQueryKey(tenantId),
+    queryFn: () => fetchAllElections(tenantId),
     initialData,
     // Without this, staleTime defaults to 0 and refetchOnMount fires a
     // client fetch the instant ElectionList mounts — which can resolve and
