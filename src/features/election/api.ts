@@ -1,11 +1,12 @@
 /**
  * The ONLY module allowed to know that election summaries live at
  * GET /v1/elections. Everything else (hooks, components) goes through
- * `getElections`.
+ * `getElections` or the complete-snapshot helper below.
  */
 
 import { apiRequest } from '@/lib/apiClient';
 import type { Election, ElectionSummary, PaginationMeta } from '@/lib/types';
+import { fetchAllCursorPages } from './pagination';
 
 const DEFAULT_LIMIT = 12;
 
@@ -41,6 +42,19 @@ export async function getElections({
     data,
     meta: meta ?? { hasMore: false, nextCursor: null },
   };
+}
+
+/** Fetch a complete list snapshot by following the API cursor. */
+export async function getAllElections({
+  tenantId,
+  revalidate,
+}: {
+  tenantId: string;
+  revalidate?: number;
+}): Promise<GetElectionsResult> {
+  return fetchAllCursorPages(({ cursor, limit }) =>
+    getElections({ tenantId, cursor, limit, revalidate })
+  );
 }
 
 /**

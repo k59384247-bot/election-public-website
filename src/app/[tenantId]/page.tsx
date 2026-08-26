@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import '@/app/elections-home.css';
-import { getElections, type GetElectionsResult } from '@/features/election/api';
+import { getAllElections, type GetElectionsResult } from '@/features/election/api';
 import { ElectionList } from '@/features/election/components/ElectionList';
 import { getTenantPublicInfo } from '@/features/tenant/api';
 import { ApiRequestError } from '@/lib/apiClient';
@@ -31,7 +31,7 @@ export default async function ElectionsHomePage({
 
   let initialData: GetElectionsResult | undefined;
   try {
-    initialData = await getElections({ tenantId, revalidate: 0 });
+    initialData = await getAllElections({ tenantId, revalidate: 0 });
   } catch (err) {
     console.error('[ElectionsHomePage] initial server-side fetch failed:', err);
     initialData = undefined;

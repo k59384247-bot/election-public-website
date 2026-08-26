@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getElections, type GetElectionsResult } from './api';
+import { getAllElections, type GetElectionsResult } from './api';
 import { electionsQueryKey } from './useElections';
 import { useTenant } from '@/features/tenant/TenantContext';
 
@@ -27,7 +27,7 @@ export function useElection(electionId: string) {
   const listQuery = useQuery({
     queryKey: ['election-lookup', tenantId, electionId],
     queryFn: async () => {
-      const { data } = await getElections({ tenantId, limit: 50 });
+      const { data } = await getAllElections({ tenantId });
       return data.find((election) => election.id === electionId);
     },
     enabled: cachedSummary === undefined,

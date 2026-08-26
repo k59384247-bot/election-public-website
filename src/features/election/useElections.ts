@@ -2,21 +2,12 @@
 
 import { useMemo } from 'react';
 import { useQuery, type Query } from '@tanstack/react-query';
-import { getElections, type GetElectionsResult } from './api';
+import { getAllElections, type GetElectionsResult } from './api';
 import type { ElectionSummary, PublicElectionStatus } from '@/lib/types';
 import { useTenant } from '@/features/tenant/TenantContext';
 
 const POLL_INTERVAL_IDLE_MS = 60_000;
 const POLL_INTERVAL_ACTIVE_MS = 25_000;
-
-// Batch size while looping the cursor to build the complete list (not a
-// user-facing page size — see ElectionList for that). The list endpoint has
-// no total-count/offset support, so a large batch keeps the loop short.
-const FETCH_BATCH_SIZE = 50;
-
-// Safety valve: if the API ever misreports hasMore and never terminates,
-// stop after this many requests rather than looping forever.
-const MAX_FETCH_PAGES = 50;
 
 export function electionsQueryKey(tenantId: string) {
   return ['elections', tenantId, 'all'] as const;
@@ -63,31 +54,6 @@ function hasOpenVoting(elections: ElectionSummary[]): boolean {
   return elections.some((election) => election.status === 'voting_open');
 }
 
-/**
- * Loops the cursor to completion and returns every election as one flat
- * list. Elections are few (tens, not thousands), so paying for the full
- * list up front is cheap and lets the home page use real page-number
- * navigation (Build spec §7.1 mock) instead of a Load More button — the
- * list endpoint itself still only exposes cursor pagination, this just
- * exhausts it internally rather than exposing it to the UI.
- */
-async function fetchAllElections(tenantId: string): Promise<GetElectionsResult> {
-  let cursor: string | undefined;
-  let all: ElectionSummary[] = [];
-
-  for (let page = 0; page < MAX_FETCH_PAGES; page += 1) {
-    const { data, meta } = await getElections({ tenantId, cursor, limit: FETCH_BATCH_SIZE });
-    all = all.concat(data);
-    if (!meta.hasMore || !meta.nextCursor) {
-      return { data: all, meta: { hasMore: false, nextCursor: null } };
-    }
-    cursor = meta.nextCursor;
-  }
-
-  console.error('[useElections] Stopped after', MAX_FETCH_PAGES, 'pages — API may not be terminating hasMore.');
-  return { data: all, meta: { hasMore: false, nextCursor: null } };
-}
-
 export interface UseElectionsOptions {
   /** Seed data from the server-rendered initial fetch in app/page.tsx. */
   initialData?: GetElectionsResult;
@@ -97,15 +63,15 @@ export function useElections({ initialData }: UseElectionsOptions = {}) {
   const { tenantId } = useTenant();
   const query = useQuery({
     queryKey: electionsQueryKey(tenantId),
-    queryFn: () => fetchAllElections(tenantId),
+    queryFn: () => getAllElections({ tenantId }),
     initialData,
     // Without this, staleTime defaults to 0 and refetchOnMount fires a
     // client fetch the instant ElectionList mounts — which can resolve and
     // setState while React is still hydrating, producing a hydration
     // mismatch even when `initialData` and the SSR HTML agree. A few
     // seconds of grace lets hydration finish before the first background
-    // refetch (which also completes the full list beyond initialData's
-    // single SSR page); refetchInterval below keeps it live afterward.
+    // refetch; refetchInterval below keeps the complete snapshot live
+    // afterward.
     staleTime: 5_000,
     refetchIntervalInBackground: false,
     refetchInterval: (query: Query<GetElectionsResult, Error>) => {
