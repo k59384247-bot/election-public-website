@@ -7,6 +7,11 @@ import { ElectionList } from '@/features/election/components/ElectionList';
 import { getTenantPublicInfo } from '@/features/tenant/api';
 import { ApiRequestError } from '@/lib/apiClient';
 
+// The UI still paginates the complete snapshot locally. A larger API batch
+// makes the initial server seed a single request for normal-sized tenants,
+// while getAllElections continues following the cursor for larger lists.
+const INITIAL_ELECTIONS_BATCH_SIZE = 50;
+
 async function getTenant(tenantId: string) {
   try {
     return await getTenantPublicInfo(tenantId);
@@ -31,7 +36,11 @@ export default async function ElectionsHomePage({
 
   let initialData: GetElectionsResult | undefined;
   try {
-    initialData = await getAllElections({ tenantId, revalidate: 0 });
+    initialData = await getAllElections({
+      tenantId,
+      limit: INITIAL_ELECTIONS_BATCH_SIZE,
+      revalidate: 0,
+    });
   } catch (err) {
     console.error('[ElectionsHomePage] initial server-side fetch failed:', err);
     initialData = undefined;

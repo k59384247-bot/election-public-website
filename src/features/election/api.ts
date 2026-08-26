@@ -47,13 +47,18 @@ export async function getElections({
 /** Fetch a complete list snapshot by following the API cursor. */
 export async function getAllElections({
   tenantId,
+  limit,
   revalidate,
 }: {
   tenantId: string;
+  /** API page size used while building the complete snapshot. */
+  limit?: number;
   revalidate?: number;
 }): Promise<GetElectionsResult> {
-  return fetchAllCursorPages(({ cursor, limit }) =>
-    getElections({ tenantId, cursor, limit, revalidate })
+  return fetchAllCursorPages(
+    ({ cursor, limit: pageLimit }) =>
+      getElections({ tenantId, cursor, limit: pageLimit, revalidate }),
+    { limit }
   );
 }
 
