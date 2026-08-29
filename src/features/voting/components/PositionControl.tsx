@@ -19,12 +19,14 @@ export function PositionControl({
   positionNumber,
   inverted,
   selectedCandidateIds,
+  isWithheld,
   dispatch,
 }: {
   position: Position;
   positionNumber: number;
   inverted: boolean;
   selectedCandidateIds: string[];
+  isWithheld: boolean;
   dispatch: Dispatch<BallotDraftAction>;
 }) {
   const [openCandidateIds, setOpenCandidateIds] = useState<Set<string>>(new Set());
@@ -74,7 +76,7 @@ export function PositionControl({
   }
 
   function handleWithhold() {
-    dispatch({ type: 'CLEAR_POSITION', positionId: position.id });
+    dispatch({ type: 'SELECT_WITHHELD', positionId: position.id });
   }
 
   function handleCandidateKeyDown(event: KeyboardEvent<HTMLDivElement>, candidateId: string, disabled: boolean) {
@@ -83,8 +85,6 @@ export function PositionControl({
       handleSelect(candidateId, disabled);
     }
   }
-
-  const isWithheld = selectedCandidateIds.length === 0;
 
   return (
     <section className="position-group" aria-labelledby={titleId}>

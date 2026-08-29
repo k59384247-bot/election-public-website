@@ -18,8 +18,9 @@ const VOTING_NOTICE_ITEMS = [
 
 /**
  * Screen 6 (Vote Review Page) — read-only summary of the current ballot
- * draft. Positions with zero selections are shown explicitly as "No
- * selection", never hidden and never treated as blocking. "Submit My Vote"
+ * draft. Explicit withheld positions are shown as "Withhold Vote". Positions
+ * with zero selections are shown as "No selection" as a defensive fallback.
+ * "Submit My Vote"
  * only opens ConfirmSubmissionModal (via onSubmit) — it must never call the
  * API itself.
  */
@@ -81,7 +82,8 @@ export function VoteReviewPage({
       <div className="vote__ballot">
         <div className="vote__positions">
           {positions.map((position, index) => {
-            const selectedIds = draft[position.id] ?? [];
+            const selectedIds = draft.selections[position.id] ?? [];
+            const isWithheld = draft.withheldPositionIds.includes(position.id);
             const selectedCandidates = position.candidates.filter((candidate) =>
               selectedIds.includes(candidate.id)
             );
@@ -103,7 +105,9 @@ export function VoteReviewPage({
                     {selectedCandidates.length === 0 ? (
                       <div className="candidate candidate--withhold">
                         <div className="candidate__row">
-                          <span className="candidate__withhold-label">No selection</span>
+                          <span className="candidate__withhold-label">
+                            {isWithheld ? 'Withhold Vote' : 'No selection'}
+                          </span>
                         </div>
                       </div>
                     ) : (

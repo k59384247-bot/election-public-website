@@ -10,7 +10,7 @@ import { clearBallotDraft, type BallotDraft } from '../useBallotDraft';
 
 function draftToVotes(draft: BallotDraft): CastVoteEntry[] {
   const votes: CastVoteEntry[] = [];
-  for (const [positionId, candidateIds] of Object.entries(draft)) {
+  for (const [positionId, candidateIds] of Object.entries(draft.selections)) {
     for (const candidateId of candidateIds) {
       votes.push({ positionId, candidateId });
     }

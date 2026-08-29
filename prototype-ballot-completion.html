@@ -1,0 +1,742 @@
+<!doctype html>
+<!--
+  THROWAWAY PROTOTYPE — ballot completion and explicit withheld vote
+  Question: does the voter understand which positions still need an option?
+  Open this file directly in a browser. No persistence and no production code.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ballot completion prototype</title>
+    <style>
+      :root {
+        --page-bg: #111111;
+        --wine: #900000;
+        --wine-dark: #5e0807;
+        --card: #faf9f7;
+        --card-muted: #f1f0ed;
+        --body-text: #d1ccc5;
+        --black: #090909;
+        --gold: #ffe8a9;
+        --gold-deep: #b68100;
+        --muted: #77736d;
+        --line: #d8d5cf;
+        --success: #17633d;
+        --radius-card: 24px;
+        --radius-pill: 999px;
+        --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --font-heading: Georgia, serif;
+      }
+
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        min-width: 320px;
+        margin: 0;
+        background: var(--page-bg);
+        color: var(--body-text);
+        font-family: var(--font-body);
+        font-size: 16px;
+        line-height: 1.5;
+      }
+      button { font: inherit; cursor: pointer; }
+      button:focus-visible { outline: 3px solid #ffd666; outline-offset: 3px; }
+      h1, h2, h3, p { margin: 0; }
+
+      .prototype-header,
+      .prototype-main {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+      }
+      .prototype-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 24px 0;
+      }
+      .brand {
+        display: grid;
+        width: 56px;
+        height: 56px;
+        place-items: center;
+        border: 1px solid rgba(250, 249, 247, .35);
+        border-radius: 50%;
+        color: var(--card);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .08em;
+      }
+      .prototype-label {
+        color: var(--gold);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+      .prototype-main {
+        display: grid;
+        gap: 24px;
+        padding: 32px 0 150px;
+      }
+      .prototype-intro { display: grid; gap: 8px; max-width: 720px; }
+      .prototype-intro h1 {
+        color: var(--card);
+        font-family: var(--font-heading);
+        font-size: clamp(32px, 5vw, 52px);
+        font-weight: 400;
+        line-height: 1.1;
+      }
+      .prototype-intro p { color: var(--body-text); }
+      .state-caption { color: #aaa39a; font-size: 13px; }
+      .state-caption strong { color: var(--gold); font-weight: 600; }
+
+      .flow {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 24px;
+        align-items: start;
+      }
+      .screen {
+        display: grid;
+        gap: 20px;
+        padding: 32px;
+        background: var(--card);
+        border-radius: var(--radius-card);
+        color: var(--black);
+      }
+      .election-head {
+        display: grid;
+        justify-items: center;
+        gap: 12px;
+        padding-bottom: 8px;
+        text-align: center;
+      }
+      .election-mark {
+        display: grid;
+        width: 76px;
+        height: 76px;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--wine);
+        color: var(--gold);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .05em;
+      }
+      .election-head h2 {
+        color: #2b2b2b;
+        font-family: var(--font-heading);
+        font-size: clamp(28px, 4vw, 40px);
+        font-weight: 400;
+        line-height: 1.1;
+      }
+      .voter-tags { color: var(--muted); font-size: 13px; }
+      .section-title {
+        color: #2b2b2b;
+        font-family: var(--font-heading);
+        font-size: 24px;
+        font-weight: 400;
+        line-height: 1.2;
+        text-align: center;
+      }
+      .progress {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .progress strong { color: var(--wine); }
+      .progress-bar {
+        flex: 1;
+        height: 8px;
+        overflow: hidden;
+        border-radius: var(--radius-pill);
+        background: #e3e0da;
+      }
+      .progress-bar span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--wine);
+        transition: width .2s ease;
+      }
+
+      .validation {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 18px;
+        border: 1px solid var(--gold-deep);
+        border-radius: 14px;
+        background: #fff8df;
+        color: #3b3020;
+      }
+      .validation:focus { outline: 3px solid rgba(144, 0, 0, .3); outline-offset: 3px; }
+      .validation__icon {
+        display: grid;
+        width: 24px;
+        height: 24px;
+        flex: 0 0 auto;
+        place-items: center;
+        border: 2px solid var(--wine);
+        border-radius: 50%;
+        color: var(--wine);
+        font-weight: 700;
+      }
+      .validation h3 { font-size: 17px; line-height: 1.3; }
+      .validation p, .validation ul { font-size: 14px; line-height: 1.45; }
+      .validation p { margin-top: 3px; }
+      .validation ul { margin: 7px 0 0; padding-left: 20px; }
+
+      .positions { display: grid; gap: 28px; }
+      .position { display: grid; gap: 10px; }
+      .position__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 9px 14px;
+        border-radius: 10px;
+        background: var(--wine);
+        color: var(--card);
+      }
+      .position:nth-child(even) .position__head { background: #171717; }
+      .position__title { font-weight: 600; }
+      .position__limit { color: var(--gold); font-size: 12px; }
+      .candidate-list { display: grid; gap: 8px; }
+      .candidate {
+        display: grid;
+        gap: 0;
+        padding: 13px 15px;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        background: #fff;
+        text-align: left;
+        transition: border-color .15s ease, background .15s ease;
+      }
+      .candidate:hover { border-color: var(--gold-deep); }
+      .candidate.is-selected { border-color: var(--wine); background: #fffaf0; }
+      .candidate__row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .candidate__avatar {
+        display: grid;
+        width: 42px;
+        height: 42px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 50%;
+        background: #e5d9c8;
+        color: #4d3422;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .candidate__info { flex: 1; min-width: 0; }
+      .candidate__name { display: block; color: #2b2b2b; font-weight: 600; }
+      .candidate__details {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--wine);
+        font-size: 12px;
+        text-decoration: underline;
+      }
+      .candidate__details-panel {
+        display: none;
+        margin: 12px 0 0 54px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .candidate.is-open .candidate__details-panel { display: block; }
+      .choice {
+        display: grid;
+        width: 25px;
+        height: 25px;
+        flex: 0 0 auto;
+        place-items: center;
+        border: 1.5px solid #aaa49c;
+        border-radius: 50%;
+      }
+      .choice--multi { border-radius: 6px; }
+      .is-selected .choice { border-color: var(--wine); background: var(--wine); }
+      .is-selected .choice::after {
+        width: 9px;
+        height: 5px;
+        border-bottom: 2px solid #fff;
+        border-left: 2px solid #fff;
+        content: "";
+        transform: rotate(-45deg) translate(1px, -1px);
+      }
+      .withhold {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 15px;
+        border: 1px dashed #aaa49c;
+        border-radius: 13px;
+        background: var(--card-muted);
+        color: #2b2b2b;
+        font-weight: 600;
+        text-align: left;
+      }
+      .withhold.is-selected { border-color: var(--wine); background: #fffaf0; }
+      .empty-note { color: var(--muted); font-size: 13px; }
+
+      .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-top: 8px;
+      }
+      .pager-button,
+      .review-button {
+        min-height: 44px;
+        padding: 9px 17px;
+        border: 1px solid #bdb8b0;
+        border-radius: var(--radius-pill);
+        background: #fff;
+        color: #2b2b2b;
+        font-weight: 600;
+      }
+      .pager-button--primary,
+      .review-button--primary { border-color: transparent; background: var(--gold); color: #000; }
+      .pager-button:disabled { cursor: not-allowed; opacity: .4; }
+      .page-numbers { display: flex; gap: 5px; }
+      .page-number {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--muted);
+      }
+      .page-number.is-current { background: var(--wine); color: #fff; }
+
+      .side-panel {
+        display: grid;
+        gap: 16px;
+        color: var(--body-text);
+      }
+      .side-card {
+        display: grid;
+        gap: 10px;
+        padding: 20px;
+        border: 1px solid #393939;
+        border-radius: 16px;
+        background: #191919;
+      }
+      .side-card h2 { color: var(--gold); font-size: 15px; }
+      .side-card p, .side-card li { color: #aaa39a; font-size: 13px; }
+      .side-card ul { display: grid; gap: 7px; margin: 0; padding-left: 18px; }
+      .state-inspector pre {
+        max-height: 220px;
+        margin: 0;
+        overflow: auto;
+        color: #d4c9b7;
+        font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .review-list { display: grid; gap: 10px; }
+      .review-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 15px;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+      }
+      .review-row span { color: var(--muted); font-size: 13px; }
+      .review-row strong { color: #2b2b2b; text-align: right; }
+      .review-row strong.withheld { color: var(--wine); }
+      .review-actions { display: flex; justify-content: space-between; gap: 12px; padding-top: 8px; }
+
+      .prototype-switcher {
+        position: fixed;
+        z-index: 5;
+        right: 50%;
+        bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        max-width: calc(100vw - 24px);
+        padding: 8px 10px;
+        transform: translateX(50%);
+        border: 1px solid #454545;
+        border-radius: var(--radius-pill);
+        background: rgba(20, 20, 20, .96);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, .4);
+      }
+      .switcher-tab {
+        padding: 8px 11px;
+        border: 0;
+        border-radius: var(--radius-pill);
+        background: transparent;
+        color: var(--card);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+      .switcher-tab[aria-current="true"] { background: var(--gold); color: #000; }
+
+      @media (max-width: 850px) {
+        .prototype-header, .prototype-main { width: min(100% - 32px, 680px); }
+        .flow { grid-template-columns: 1fr; }
+        .side-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 560px) {
+        .prototype-header, .prototype-main { width: min(100% - 24px, 680px); }
+        .prototype-header { padding: 18px 0; }
+        .prototype-main { padding-top: 24px; }
+        .screen { padding: 22px 16px; border-radius: 18px; }
+        .side-panel { grid-template-columns: 1fr; }
+        .pagination { flex-wrap: wrap; }
+        .page-numbers { order: -1; width: 100%; justify-content: center; }
+        .review-actions { flex-direction: column; }
+        .review-actions button { width: 100%; }
+        .prototype-switcher { gap: 3px; padding: 6px; }
+        .switcher-tab { padding: 7px 6px; font-size: 10px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="prototype-header">
+      <div class="brand" aria-label="AMSUL">AMSUL</div>
+      <div class="prototype-label">Throwaway prototype</div>
+    </header>
+
+    <main class="prototype-main">
+      <div class="prototype-intro">
+        <h1>Every position needs an answer.</h1>
+        <p>Try the empty state, make a partial ballot, and see how the voter is softly blocked before Review.</p>
+        <div class="state-caption" aria-live="polite">Showing: <strong id="state-name">Empty ballot</strong></div>
+      </div>
+
+      <div class="flow">
+        <section class="screen" id="screen" aria-label="Voting prototype"></section>
+
+        <aside class="side-panel">
+          <section class="side-card">
+            <h2>What to try</h2>
+            <ul>
+              <li>Leave positions untouched.</li>
+              <li>Choose Withhold Vote.</li>
+              <li>Click Proceed to Review with missing positions.</li>
+              <li>Complete the list, then use Edit Vote.</li>
+            </ul>
+          </section>
+          <section class="side-card">
+            <h2>Interaction decision</h2>
+            <p>Withhold Vote is not selected by default. It only completes a position after the voter explicitly chooses it.</p>
+          </section>
+          <section class="side-card state-inspector">
+            <h2>Prototype state</h2>
+            <pre id="state-json"></pre>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <nav class="prototype-switcher" aria-label="Guided prototype states">
+      <button class="switcher-tab" type="button" data-scenario="empty">1 · Empty</button>
+      <button class="switcher-tab" type="button" data-scenario="blocked">2 · Blocked</button>
+      <button class="switcher-tab" type="button" data-scenario="complete">3 · Complete</button>
+      <button class="switcher-tab" type="button" data-scenario="freeplay">Free play</button>
+    </nav>
+
+    <script>
+      const positions = [
+        {
+          id: 'president',
+          title: 'President',
+          max: 1,
+          candidates: [
+            { id: 'ada', name: 'Ada Okafor', initials: 'AO', manifesto: 'A student-first platform for clearer representation.' },
+            { id: 'tunde', name: 'Tunde Bello', initials: 'TB', manifesto: 'A platform focused on practical welfare and accountability.' },
+          ],
+        },
+        {
+          id: 'secretary',
+          title: 'General Secretary',
+          max: 1,
+          candidates: [
+            { id: 'zainab', name: 'Zainab Musa', initials: 'ZM', manifesto: 'A transparent and accessible union for every student.' },
+            { id: 'chidi', name: 'Chidi Eze', initials: 'CE', manifesto: 'Better communication between students and faculty.' },
+          ],
+        },
+        {
+          id: 'treasurer',
+          title: 'Financial Secretary',
+          max: 2,
+          candidates: [
+            { id: 'ife', name: 'Ife Adebayo', initials: 'IA', manifesto: 'Simple, visible reporting on every union expense.' },
+            { id: 'sade', name: 'Sade Williams', initials: 'SW', manifesto: 'Responsible budgeting with student priorities first.' },
+            { id: 'kunle', name: 'Kunle James', initials: 'KJ', manifesto: 'A more sustainable fund for student initiatives.' },
+          ],
+        },
+        {
+          id: 'welfare',
+          title: 'Welfare Officer',
+          max: 1,
+          candidates: [
+            { id: 'amara', name: 'Amara Nwosu', initials: 'AN', manifesto: 'A stronger support network for students who need help.' },
+            { id: 'yusuf', name: 'Yusuf Ahmed', initials: 'YA', manifesto: 'More responsive welfare services across departments.' },
+          ],
+        },
+      ];
+
+      const state = {
+        page: 0,
+        perPage: 2,
+        selections: {},
+        withheld: [],
+        review: false,
+        validationAttempt: 0,
+        openDetails: [],
+      };
+
+      const screen = document.getElementById('screen');
+      const stateName = document.getElementById('state-name');
+      const stateJson = document.getElementById('state-json');
+      const scenarios = ['empty', 'blocked', 'complete', 'freeplay'];
+      let activeScenario = 'empty';
+
+      function complete(positionId) {
+        return (state.selections[positionId] || []).length > 0 || state.withheld.includes(positionId);
+      }
+
+      function incompletePositions() {
+        return positions.filter((position) => !complete(position.id));
+      }
+
+      function resetDraft() {
+        state.page = 0;
+        state.selections = {};
+        state.withheld = [];
+        state.review = false;
+        state.validationAttempt = 0;
+        state.openDetails = [];
+      }
+
+      function applyScenario(scenario) {
+        activeScenario = scenario;
+        resetDraft();
+        if (scenario === 'blocked') {
+          state.selections.president = ['ada'];
+          state.withheld = ['secretary'];
+          state.page = 1;
+          state.validationAttempt = 1;
+        }
+        if (scenario === 'complete') {
+          state.selections.president = ['ada'];
+          state.withheld = ['secretary', 'welfare'];
+          state.selections.treasurer = ['ife', 'sade'];
+          state.page = 1;
+        }
+        render();
+      }
+
+      function toggleCandidate(position, candidateId) {
+        const current = state.selections[position.id] || [];
+        state.withheld = state.withheld.filter((id) => id !== position.id);
+        if (position.max === 1) {
+          state.selections[position.id] = current[0] === candidateId ? current : [candidateId];
+        } else if (current.includes(candidateId)) {
+          state.selections[position.id] = current.filter((id) => id !== candidateId);
+        } else if (current.length < position.max) {
+          state.selections[position.id] = [...current, candidateId];
+        }
+        activeScenario = 'freeplay';
+        render();
+      }
+
+      function chooseWithhold(positionId) {
+        delete state.selections[positionId];
+        if (!state.withheld.includes(positionId)) state.withheld.push(positionId);
+        activeScenario = 'freeplay';
+        render();
+      }
+
+      function toggleDetails(candidateId) {
+        state.openDetails = state.openDetails.includes(candidateId)
+          ? state.openDetails.filter((id) => id !== candidateId)
+          : [...state.openDetails, candidateId];
+        render();
+      }
+
+      function showValidation() {
+        state.validationAttempt += 1;
+        activeScenario = 'freeplay';
+        render();
+        requestAnimationFrame(() => document.getElementById('validation')?.focus());
+      }
+
+      function goToReview() {
+        if (incompletePositions().length > 0) {
+          showValidation();
+          return;
+        }
+        state.review = true;
+        render();
+      }
+
+      function pagePositions() {
+        const start = state.page * state.perPage;
+        return positions.slice(start, start + state.perPage);
+      }
+
+      function candidateMarkup(position, candidate) {
+        const selected = (state.selections[position.id] || []).includes(candidate.id);
+        const open = state.openDetails.includes(candidate.id);
+        const multiClass = position.max > 1 ? ' choice--multi' : '';
+        return `
+          <div class="candidate${selected ? ' is-selected' : ''}${open ? ' is-open' : ''}">
+            <div class="candidate__row">
+              <button class="candidate__row" style="padding:0;border:0;background:transparent;flex:1;text-align:left" type="button" data-action="candidate" data-position="${position.id}" data-candidate="${candidate.id}">
+                <span class="candidate__avatar" aria-hidden="true">${candidate.initials}</span>
+                <span class="candidate__info"><span class="candidate__name">${candidate.name}</span></span>
+              </button>
+              <button class="candidate__details" type="button" data-action="details" data-candidate="${candidate.id}" aria-expanded="${open}">View Details</button>
+              <span class="choice${multiClass}" aria-hidden="true"></span>
+            </div>
+            <div class="candidate__details-panel">${candidate.manifesto}</div>
+          </div>`;
+      }
+
+      function positionMarkup(position, index) {
+        const selectedIds = state.selections[position.id] || [];
+        const isWithheld = state.withheld.includes(position.id);
+        return `
+          <section class="position" aria-labelledby="position-${position.id}">
+            <div class="position__head">
+              <span class="position__title" id="position-${position.id}">${index + 1}. ${position.title}</span>
+              <span class="position__limit">Max. ${position.max}</span>
+            </div>
+            <div class="candidate-list">
+              ${position.candidates.map((candidate) => candidateMarkup(position, candidate)).join('')}
+              <button class="withhold${isWithheld ? ' is-selected' : ''}" type="button" data-action="withhold" data-position="${position.id}" aria-pressed="${isWithheld}">
+                <span>Withhold Vote</span><span class="choice" aria-hidden="true"></span>
+              </button>
+            </div>
+            ${!complete(position.id) ? '<p class="empty-note">No option selected yet.</p>' : ''}
+          </section>`;
+      }
+
+      function validationMarkup() {
+        const missing = incompletePositions();
+        if (state.validationAttempt === 0 || missing.length === 0) return '';
+        return `
+          <div class="validation" id="validation" role="alert" tabindex="-1" aria-labelledby="validation-title">
+            <span class="validation__icon" aria-hidden="true">!</span>
+            <div>
+              <h3 id="validation-title">Complete your ballot</h3>
+              <p>Please select a candidate or Withhold Vote for these positions before reviewing your ballot:</p>
+              <ul>${missing.map((position) => `<li>${position.title}</li>`).join('')}</ul>
+            </div>
+          </div>`;
+      }
+
+      function electionHead() {
+        return `
+          <div class="election-head">
+            <div class="election-mark">AMSUL</div>
+            <h2>Departmental Students’ Union Election</h2>
+            <p class="voter-tags">Voter: 123456789 · Anonymous voting</p>
+          </div>`;
+      }
+
+      function ballotMarkup() {
+        const shown = pagePositions();
+        const pageCount = Math.ceil(positions.length / state.perPage);
+        const completedCount = positions.filter((position) => complete(position.id)).length;
+        return `
+          ${electionHead()}
+          <h2 class="section-title">VOTE YOUR CANDIDATES</h2>
+          <div class="progress"><span><strong>${completedCount}</strong> of ${positions.length} positions complete</span><div class="progress-bar"><span style="width:${(completedCount / positions.length) * 100}%"></span></div></div>
+          ${validationMarkup()}
+          <div class="positions">${shown.map((position, index) => positionMarkup(position, state.page * state.perPage + index)).join('')}</div>
+          ${shown.length === 0 ? '<p class="empty-note">No positions on this page.</p>' : ''}
+          <nav class="pagination" aria-label="Ballot pages">
+            <button class="pager-button" type="button" data-action="previous" ${state.page === 0 ? 'disabled' : ''}>← Previous</button>
+            <div class="page-numbers">${Array.from({ length: pageCount }, (_, index) => `<button class="page-number${index === state.page ? ' is-current' : ''}" type="button" data-action="page" data-page="${index}" aria-current="${index === state.page ? 'page' : 'false'}">${index + 1}</button>`).join('')}</div>
+            <button class="pager-button pager-button--primary" type="button" data-action="next">${state.page === pageCount - 1 ? 'Proceed to Review →' : 'Next →'}</button>
+          </nav>`;
+      }
+
+      function reviewMarkup() {
+        return `
+          ${electionHead()}
+          <h2 class="section-title">REVIEW YOUR VOTES</h2>
+          <div class="review-list">${positions.map((position) => {
+            const selected = (state.selections[position.id] || []).map((id) => position.candidates.find((candidate) => candidate.id === id)?.name).filter(Boolean);
+            const value = state.withheld.includes(position.id) ? 'Withhold Vote' : selected.join(', ');
+            return `<div class="review-row"><span>${position.title}</span><strong class="${state.withheld.includes(position.id) ? 'withheld' : ''}">${value}</strong></div>`;
+          }).join('')}</div>
+          <p class="empty-note">You’ve completed all positions. Once submitted, your ballot cannot be changed.</p>
+          <div class="review-actions"><button class="review-button" type="button" data-action="edit">← Edit Vote</button><button class="review-button review-button--primary" type="button">Submit My Vote →</button></div>`;
+      }
+
+      function updateCaption() {
+        const names = {
+          empty: 'Empty ballot',
+          blocked: 'Blocked before Review',
+          complete: 'All positions completed',
+          freeplay: state.review ? 'Review your votes' : 'Free-play ballot',
+        };
+        stateName.textContent = names[activeScenario];
+        stateJson.textContent = JSON.stringify({
+          page: state.page + 1,
+          review: state.review,
+          selections: state.selections,
+          withheldPositionIds: state.withheld,
+          incompletePositions: incompletePositions().map((position) => position.title),
+        }, null, 2);
+        document.querySelectorAll('.switcher-tab').forEach((tab) => {
+          tab.setAttribute('aria-current', String(tab.dataset.scenario === activeScenario));
+        });
+      }
+
+      function render() {
+        screen.innerHTML = state.review ? reviewMarkup() : ballotMarkup();
+        updateCaption();
+      }
+
+      screen.addEventListener('click', (event) => {
+        const target = event.target.closest('[data-action]');
+        if (!target) return;
+        const action = target.dataset.action;
+        if (action === 'candidate') {
+          const position = positions.find((item) => item.id === target.dataset.position);
+          if (position) toggleCandidate(position, target.dataset.candidate);
+        }
+        if (action === 'withhold') chooseWithhold(target.dataset.position);
+        if (action === 'details') toggleDetails(target.dataset.candidate);
+        if (action === 'previous') { state.page = Math.max(0, state.page - 1); render(); }
+        if (action === 'page') { state.page = Number(target.dataset.page); render(); }
+        if (action === 'next') {
+          const lastPage = Math.ceil(positions.length / state.perPage) - 1;
+          if (state.page === lastPage) goToReview();
+          else { state.page += 1; render(); }
+        }
+        if (action === 'edit') { state.review = false; activeScenario = 'freeplay'; render(); }
+      });
+
+      document.querySelectorAll('.switcher-tab').forEach((tab) => {
+        tab.addEventListener('click', () => applyScenario(tab.dataset.scenario));
+      });
+
+      applyScenario('empty');
+    </script>
+  </body>
+</html>
