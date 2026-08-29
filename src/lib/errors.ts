@@ -63,11 +63,12 @@ const BASE_TABLE: Partial<Record<ClientErrorCode, UiErrorDescriptor>> = {
 
   // Intentionally generic: the server does not reveal whether the
   // matric number or the email was the problem, so the UI must not
-  // hint at one or the other either.
+  // identify one field as incorrect. The recovery hint stays on the
+  // identity screen; the OTP screen is only for delivery and resend.
   VOTER_INELIGIBLE: {
     severity: 'error',
     userMessage:
-      'We could not verify your eligibility to vote with the details provided.',
+      'We couldn’t verify these details. Check your matric number and registered email, then try again.',
     recoveryAction: 'retry',
   },
 
