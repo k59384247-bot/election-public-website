@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { ArrowRight } from 'lucide-react';
 import './Pagination.css';
 import { PerPageSelect } from './PerPageSelect';
+import { resetPaginationScroll } from '@/lib/paginationScroll';
 
 /**
  * Real page-number navigation — Previous / 1 2 3.. / Next — plus a
@@ -31,8 +33,26 @@ export function Pagination({
   onPerPageChange: (value: number) => void;
   ariaLabel: string;
 }) {
+  const previousStateRef = useRef({ currentPage, perPageValue });
+
+  // The event handlers reset immediately. This effect is a safeguard for
+  // callers that update pagination state from another event or async result.
+  useEffect(() => {
+    const previousState = previousStateRef.current;
+    if (previousState.currentPage !== currentPage || previousState.perPageValue !== perPageValue) {
+      resetPaginationScroll();
+    }
+    previousStateRef.current = { currentPage, perPageValue };
+  }, [currentPage, perPageValue]);
+
   function goToPage(next: number) {
+    resetPaginationScroll();
     onPageChange(Math.min(Math.max(1, next), totalPages));
+  }
+
+  function handlePerPageChange(next: number) {
+    resetPaginationScroll();
+    onPerPageChange(next);
   }
 
   return (
@@ -53,7 +73,7 @@ export function Pagination({
           label={perPageLabel}
           value={perPageValue}
           options={perPageOptions}
-          onChange={onPerPageChange}
+          onChange={handlePerPageChange}
         />
         <div className="pagination__numbers">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (

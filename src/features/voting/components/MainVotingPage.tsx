@@ -9,6 +9,7 @@ import { ElectionHead } from './ElectionHead';
 import { PositionControl } from './PositionControl';
 import { NoticeCard } from './NoticeCard';
 import { AssistanceCard } from './AssistanceCard';
+import { resetPaginationScroll } from '@/lib/paginationScroll';
 
 const PER_PAGE_OPTIONS = [3, 5, 10] as const;
 const DEFAULT_POSITIONS_PER_PAGE = 5;
@@ -48,6 +49,7 @@ export function MainVotingPage({
   const [positionsPerPage, setPositionsPerPage] = useState(DEFAULT_POSITIONS_PER_PAGE);
   const [validationAttempt, setValidationAttempt] = useState(0);
   const validationRef = useRef<HTMLDivElement>(null);
+  const hasMountedRef = useRef(false);
   const totalPages = Math.max(1, Math.ceil(positions.length / positionsPerPage));
   const currentPage = Math.min(page, totalPages);
   const isLastPage = currentPage === totalPages;
@@ -62,22 +64,28 @@ export function MainVotingPage({
   // so the browser never resets scroll on its own — it keeps whatever
   // offset the previous page/step left it at. Since page/step heights
   // differ, that stale offset can land the voter past the ballot, e.g. on
-  // the contact-info card at the bottom. Reset on every page change
-  // (including the initial mount, e.g. after "Edit Vote" remounts this
-  // component) so the voter always lands where they need to act.
+  // the contact-info card at the bottom. The click handlers reset immediately;
+  // this effect catches state changes after the new page has rendered without
+  // interfering with browser Back/Forward restoration on initial mount.
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
-  }, [currentPage]);
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+    resetPaginationScroll();
+  }, [currentPage, positionsPerPage]);
 
   useEffect(() => {
     if (validationAttempt > 0) validationRef.current?.focus();
   }, [validationAttempt]);
 
   function goToPage(next: number) {
+    resetPaginationScroll();
     setPage(Math.min(Math.max(1, next), totalPages));
   }
 
   function handlePerPageChange(nextSize: number) {
+    resetPaginationScroll();
     setPositionsPerPage(nextSize);
     setPage(1);
   }
@@ -92,6 +100,7 @@ export function MainVotingPage({
         setValidationAttempt((attempt) => attempt + 1);
         return;
       }
+      resetPaginationScroll();
       onProceedToReview();
       return;
     }
@@ -132,7 +141,7 @@ export function MainVotingPage({
       )}
 
       <div className="vote__ballot">
-        <div className="vote__positions">
+        <div className="vote__positions" data-pagination-scroll-container>
           {pagePositions.map((position, indexOnPage) => {
             const globalIndex = startIndex + indexOnPage;
             return (

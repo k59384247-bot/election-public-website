@@ -9,6 +9,7 @@ import { PositionHeader } from './PositionHeader';
 import { NoticeCard } from './NoticeCard';
 import { AssistanceCard } from './AssistanceCard';
 import { CandidateAvatar } from './CandidateAvatar';
+import { resetPaginationScroll } from '@/lib/paginationScroll';
 
 const VOTING_NOTICE_ITEMS = [
   { icon: UserCog, text: 'You can review and edit your selections before submitting.' },
@@ -47,7 +48,7 @@ export function VoteReviewPage({
   // Reset explicitly so the voter lands at the top of the review, not
   // wherever the (differently-sized) ballot page happened to be scrolled to.
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    resetPaginationScroll();
   }, []);
 
   function toggleDetails(candidateId: string) {
@@ -69,7 +70,10 @@ export function VoteReviewPage({
       <button
         className="pagination__btn pagination__btn--prev review-top-back"
         type="button"
-        onClick={onEdit}
+        onClick={() => {
+          resetPaginationScroll();
+          onEdit();
+        }}
       >
         <ArrowRight className="pagination__btn-icon" style={{ color: 'var(--color-neutral-900)' }} aria-hidden="true" />
         Go Back

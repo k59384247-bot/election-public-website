@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useElections } from '../useElections';
 import type { GetElectionsResult } from '../api';
 import { getElectionListModel } from '../listModel';
@@ -10,6 +10,7 @@ import { ElectionFilters, type SortKey, type StatusFilter } from './ElectionFilt
 import { EmptyState } from './EmptyState';
 import { ErrorState } from './ErrorState';
 import { LoadingSkeleton } from './LoadingSkeleton';
+import { resetPaginationScroll } from '@/lib/paginationScroll';
 
 const RESULTS_PER_PAGE_OPTIONS = [12, 24, 48] as const;
 
@@ -35,27 +36,42 @@ export function ElectionList({ initialData }: { initialData?: GetElectionsResult
       }),
     [elections, searchQuery, statusFilter, sortKey, page, resultsPerPage]
   );
+  const hasMountedRef = useRef(false);
+
+  // Protect against state changes that do not originate in Pagination (for
+  // example a filter/sort update or a refreshed result set).
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+    resetPaginationScroll();
+  }, [currentPage, resultsPerPage, searchQuery, sortKey, statusFilter]);
 
   // Page count depends on the filtered/sorted set, not the raw fetch, so
   // every filter/sort/page-size change resets to page 1 here (rather than
   // via an effect) — otherwise a since-cleared filter could snap back to
   // whatever page number was left over from the narrower view.
   function handleSearchQueryChange(next: string) {
+    resetPaginationScroll();
     setSearchQuery(next);
     setPage(1);
   }
 
   function handleStatusFilterChange(next: StatusFilter) {
+    resetPaginationScroll();
     setStatusFilter(next);
     setPage(1);
   }
 
   function handleSortKeyChange(next: SortKey) {
+    resetPaginationScroll();
     setSortKey(next);
     setPage(1);
   }
 
   function handleResultsPerPageChange(next: number) {
+    resetPaginationScroll();
     setResultsPerPage(next);
     setPage(1);
   }
@@ -92,7 +108,7 @@ export function ElectionList({ initialData }: { initialData?: GetElectionsResult
         </div>
       ) : (
         <>
-          <div className="event-grid">
+          <div className="event-grid" data-pagination-scroll-container>
             {pageElections.map((election) => (
               <ElectionCard key={election.id} election={election} />
             ))}
