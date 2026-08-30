@@ -199,7 +199,9 @@ export function OtpEntryForm() {
     }
   }
 
-  const verifyDescriptor = verifyErrorCode ? getErrorDescriptor(verifyErrorCode) : null;
+  const verifyDescriptor = verifyErrorCode
+    ? getErrorDescriptor(verifyErrorCode, 'otp_verification')
+    : null;
   const resendDescriptor = resendErrorCode ? getErrorDescriptor(resendErrorCode) : null;
   const isExpired = verifyErrorCode === 'OTP_EXPIRED';
 

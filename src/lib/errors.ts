@@ -38,7 +38,7 @@ export interface UiErrorDescriptor {
  * but "voting isn't open" on validate-voter/cast-vote). `context` lets
  * callers disambiguate; it defaults to 'default' for every other code.
  */
-export type ErrorContext = 'default' | 'results';
+export type ErrorContext = 'default' | 'results' | 'otp_verification';
 
 const DEFAULT_DESCRIPTOR: UiErrorDescriptor = {
   severity: 'error',
@@ -136,12 +136,23 @@ const RESULTS_ELECTION_CLOSED_DESCRIPTOR: UiErrorDescriptor = {
   recoveryAction: 'none',
 };
 
+const OTP_VERIFICATION_NETWORK_DESCRIPTOR: UiErrorDescriptor = {
+  severity: 'warning',
+  userMessage:
+    'We could not reach the server. Check your connection and click Resend Code to request a new verification code.',
+  recoveryAction: 'show_resend',
+};
+
 export function getErrorDescriptor(
   code: ClientErrorCode,
   context: ErrorContext = 'default'
 ): UiErrorDescriptor {
   if (code === 'ELECTION_CLOSED' && context === 'results') {
     return RESULTS_ELECTION_CLOSED_DESCRIPTOR;
+  }
+
+  if (code === NETWORK_ERROR_CODE && context === 'otp_verification') {
+    return OTP_VERIFICATION_NETWORK_DESCRIPTOR;
   }
 
   return BASE_TABLE[code] ?? DEFAULT_DESCRIPTOR;
