@@ -571,8 +571,8 @@
 
 .candidate__avatar {
   flex-shrink: 0;
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   border-radius: var(--radius-round);
   object-fit: cover;
 }
@@ -581,7 +581,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--fs-body-lg);
+  font-size: 20px;
   font-weight: 600;
   letter-spacing: 0.02em;
   user-select: none;
@@ -1246,8 +1246,8 @@
   }
 
   .candidate__avatar {
-    width: 72px;
-    height: 72px;
+    width: 94px;
+    height: 94px;
   }
 
   .candidate__name {
@@ -1365,5 +1365,15 @@
 
   .modal__actions {
     flex-direction: column;
+  }
+}
+
+/* Keep the requested 94px mobile avatar at 320px and above. On unusually
+   narrow screens, preserve the candidate row's readable text/control layout
+   by falling back to the desktop-sized 80px avatar. */
+@media (max-width: 319px) {
+  .candidate__avatar {
+    width: 80px;
+    height: 80px;
   }
 }
