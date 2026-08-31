@@ -89,7 +89,7 @@
 /* Disabled gold button (e.g. "Verify & Continue" before code is complete) */
 .btn--gold:disabled,
 .btn--gold.is-disabled {
-  background-color: rgba(255, 232, 169, 0.5); /* gold-100 @ 50% */
+  background-color: var(--color-accent-muted);
   color: #b6b6b6;
   cursor: not-allowed;
 }
@@ -316,6 +316,16 @@
 
 .verify__mobile-back {
   display: none;
+}
+
+/* The verification flow keeps a separate mobile back link so it can sit
+   directly beneath the centered hero logo. Desktop uses the top-level back
+   link instead and does not show the secondary hero-side logo/link pair. */
+@media (min-width: 641px) {
+  .verify--mobile-centered-logo .hero__logo,
+  .verify--mobile-centered-logo .verify__mobile-back {
+    display: none !important;
+  }
 }
 
 .hero__heading {
@@ -622,7 +632,7 @@
   flex: 1 1 var(--event-card-min, 480px);
   min-width: 0;
   padding: var(--space-1) var(--space-1) var(--space-4);
-  background-color: rgba(244, 201, 93, 0.05); /* gold @ 5% */
+  background-color: var(--color-accent-subtle);
   border-radius: var(--radius-md);
 }
 
@@ -649,7 +659,7 @@
   align-items: center;
   gap: var(--space-1);
   padding: 6px var(--space-2) 6px 6px;
-  background-color: rgba(244, 201, 93, 0.5); /* gold @ 50% */
+  background-color: var(--color-accent-medium);
   backdrop-filter: blur(2.5px);
   -webkit-backdrop-filter: blur(2.5px);
   border-radius: var(--radius-round);
@@ -759,7 +769,7 @@
 }
 
 .event-card__status--upcoming {
-  background-color: rgba(244, 201, 93, 0.5); /* gold @ 50% */
+  background-color: var(--color-accent-medium);
 }
 
 .event-card__status--upcoming .event-card__status-dot {

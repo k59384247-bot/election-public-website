@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'r
 import { VotingSessionProvider } from '@/features/voting/VotingSessionContext';
 import { auth } from '@/lib/firebase';
 import type { TenantPublicInfo } from '@/lib/types';
+import { buildTenantTheme } from './theme';
 
 interface TenantContextValue {
   tenantId: string;
@@ -29,17 +30,14 @@ export function TenantProviders({
   }, [tenantId]);
 
   const value = useMemo(() => ({ tenantId, tenant }), [tenantId, tenant]);
+  const theme = useMemo(() => buildTenantTheme(tenant.primaryColor), [tenant.primaryColor]);
 
   return (
     <TenantContext.Provider value={value}>
       <VotingSessionProvider key={tenantId} tenantId={tenantId}>
         <div
           className="tenant-shell"
-          style={
-            tenant.primaryColor
-              ? ({ '--color-wine': tenant.primaryColor } as React.CSSProperties)
-              : undefined
-          }
+          style={theme as React.CSSProperties}
         >
           {children}
         </div>
