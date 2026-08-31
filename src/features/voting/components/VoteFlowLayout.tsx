@@ -61,7 +61,7 @@ export function VoteFlowLayout({
   });
 
   return (
-    <div className="verify">
+    <div className="verify verify--mobile-centered-logo">
       <header>
         <nav className="navbar" aria-label="Primary">
           <Link className="navbar__brand" href={`/${tenantId}`} aria-label={`${tenant.name} home`}>
@@ -73,7 +73,7 @@ export function VoteFlowLayout({
       </header>
 
       <main className="verify__main">
-        <Link className="btn btn--ghost" href={`/${tenantId}`}>
+        <Link className="btn btn--ghost verify__desktop-back" href={`/${tenantId}`}>
           <ArrowRight
             className="btn__icon"
             aria-hidden="true"
@@ -85,6 +85,15 @@ export function VoteFlowLayout({
         <div className="verify__row">
           <section className="verify__col hero" aria-labelledby="election-title">
             <TenantLogo className="hero__logo" />
+
+            <Link className="btn btn--ghost verify__mobile-back" href={`/${tenantId}`}>
+              <ArrowRight
+                className="btn__icon"
+                aria-hidden="true"
+                style={{ transform: 'rotate(180deg)' }}
+              />
+              Back to Elections
+            </Link>
 
             {election && (
               <span className="status-pill">

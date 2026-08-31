@@ -314,6 +314,10 @@
   object-fit: cover;
 }
 
+.verify__mobile-back {
+  display: none;
+}
+
 .hero__heading {
   display: flex;
   flex-direction: column;
@@ -479,6 +483,24 @@
 }
 
 @media (max-width: 640px) {
+  .verify--mobile-centered-logo > header,
+  .vote--mobile-centered-logo > header {
+    display: none;
+  }
+
+  .verify__desktop-back {
+    display: none;
+  }
+
+  .verify--mobile-centered-logo .hero__logo,
+  .verify__mobile-back {
+    align-self: center;
+  }
+
+  .verify__mobile-back {
+    display: inline-flex;
+  }
+
   .verify__main {
     padding: var(--space-12) var(--space-5);
     gap: var(--space-10);

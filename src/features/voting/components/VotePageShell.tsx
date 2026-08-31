@@ -14,10 +14,16 @@ import { TenantLogo } from '@/features/tenant/components/TenantLogo';
  * active, so nav never remounts between ballot -> review -> submitting ->
  * receipt.
  */
-export function VotePageShell({ children }: { children: ReactNode }) {
+export function VotePageShell({
+  children,
+  mobileCenteredLogo = false,
+}: {
+  children: ReactNode;
+  mobileCenteredLogo?: boolean;
+}) {
   const { tenantId, tenant } = useTenant();
   return (
-    <div className="vote">
+    <div className={mobileCenteredLogo ? 'vote vote--mobile-centered-logo' : 'vote'}>
       <header>
         <nav className="navbar" aria-label="Primary">
           <Link className="navbar__brand" href={`/${tenantId}`} aria-label={`${tenant.name} home`}>

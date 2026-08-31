@@ -103,7 +103,13 @@ function BallotFlow({ electionId }: { electionId: string }) {
     );
   }
 
-  return <VotePageShell>{content}</VotePageShell>;
+  const hasCenteredLogo =
+    Boolean(election) &&
+    !isLoading &&
+    state.step !== 'submitting' &&
+    state.step !== 'rejected_election_state';
+
+  return <VotePageShell mobileCenteredLogo={hasCenteredLogo}>{content}</VotePageShell>;
 }
 
 export default function VotePage() {
