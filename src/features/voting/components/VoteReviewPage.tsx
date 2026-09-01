@@ -125,7 +125,6 @@ export function VoteReviewPage({
                           >
                             <div className="candidate__row">
                               <CandidateAvatar
-                                id={candidate.id}
                                 name={candidate.name}
                                 photoUrl={candidate.photoUrl}
                               />
