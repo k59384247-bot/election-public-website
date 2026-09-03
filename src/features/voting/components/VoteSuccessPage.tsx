@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { ArrowRight, Ban, Check, FileCheck2, Lock } from 'lucide-react';
 import type { Election } from '@/lib/types';
 import { formatElectionDate, formatTime, isToday } from '@/features/election/format';
@@ -16,6 +16,32 @@ const WHAT_HAPPENS_NEXT_ITEMS = [
   { icon: Ban, text: 'Your ballot cannot be changed.' },
   { icon: FileCheck2, text: 'Results will be published after voting closes.' },
 ];
+
+/**
+ * Reset the session only after a genuine unmount.
+ *
+ * Next's App Router enables React Strict Mode by default. In development,
+ * Strict Mode runs an effect's cleanup immediately after its first setup as a
+ * lifecycle probe, even though the component is still on screen. Resetting
+ * directly from that cleanup sends the freshly successful session back to
+ * `idle` before the receipt can render. Deferring the reset by one microtask
+ * lets the real effect setup mark the component as mounted again during that
+ * probe, while a real route change still resets the session.
+ */
+function useResetOnActualUnmount(reset: () => void) {
+  const mountedRef = useRef(false);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    return () => {
+      mountedRef.current = false;
+      queueMicrotask(() => {
+        if (!mountedRef.current) reset();
+      });
+    };
+  }, [reset]);
+}
 
 /**
  * Screen 8 (Vote Successful Page). Reads receiptCode/alreadyVoted from the
@@ -33,9 +59,7 @@ export function VoteSuccessPage({ election }: { election: Election }) {
   // which briefly re-renders the identity-verification form before the
   // navigation to "/" completes. Resetting on unmount defers it until after
   // the route has actually changed, so nothing flashes.
-  useEffect(() => {
-    return () => reset();
-  }, [reset]);
+  useResetOnActualUnmount(reset);
 
   return (
     <>
@@ -129,9 +153,7 @@ export function RejectedElectionState() {
   // See the matching comment in VoteSuccessPage — reset on unmount, not on
   // the Link's click, so the identity form doesn't flash before navigation
   // to "/" completes.
-  useEffect(() => {
-    return () => reset();
-  }, [reset]);
+  useResetOnActualUnmount(reset);
 
   return (
     <section className="card rejected-card" aria-labelledby="rejected-title" role="alert">

@@ -14,9 +14,19 @@ import { resetPaginationScroll } from '@/lib/paginationScroll';
 
 const RESULTS_PER_PAGE_OPTIONS = [12, 24, 48] as const;
 
-export function ElectionList({ initialData }: { initialData?: GetElectionsResult }) {
+export function ElectionList({
+  initialData,
+  initialCacheVersion,
+  initialRefreshError = false,
+}: {
+  initialData?: GetElectionsResult;
+  initialCacheVersion?: number;
+  initialRefreshError?: boolean;
+}) {
   const { elections, isInitialLoading, isError, error, hasBackgroundError, retry } = useElections({
     initialData,
+    initialCacheVersion,
+    initialRefreshError,
   });
 
   const [searchQuery, setSearchQuery] = useState('');

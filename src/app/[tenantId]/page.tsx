@@ -2,15 +2,11 @@ import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import '@/app/elections-home.css';
-import { getAllElections, type GetElectionsResult } from '@/features/election/api';
+import type { GetElectionsResult } from '@/features/election/api';
 import { ElectionList } from '@/features/election/components/ElectionList';
+import { getCachedElectionList } from '@/features/election/server/cachedElections';
 import { getTenantPublicInfo } from '@/features/tenant/api';
 import { ApiRequestError } from '@/lib/apiClient';
-
-// The UI still paginates the complete snapshot locally. A larger API batch
-// makes the initial server seed a single request for normal-sized tenants,
-// while getAllElections continues following the cursor for larger lists.
-const INITIAL_ELECTIONS_BATCH_SIZE = 50;
 
 async function getTenant(tenantId: string) {
   try {
@@ -35,12 +31,13 @@ export default async function ElectionsHomePage({
   const tenant = await getTenant(tenantId);
 
   let initialData: GetElectionsResult | undefined;
+  let initialCacheVersion: number | undefined;
+  let initialRefreshError = false;
   try {
-    initialData = await getAllElections({
-      tenantId,
-      limit: INITIAL_ELECTIONS_BATCH_SIZE,
-      revalidate: 0,
-    });
+    const cached = await getCachedElectionList(tenantId);
+    initialData = cached.data;
+    initialCacheVersion = cached.version;
+    initialRefreshError = cached.refreshError !== null;
   } catch (err) {
     console.error('[ElectionsHomePage] initial server-side fetch failed:', err);
     initialData = undefined;
@@ -80,7 +77,11 @@ export default async function ElectionsHomePage({
 
       <main>
         <section className="elections-list" aria-label={`${tenant.name} elections`}>
-          <ElectionList initialData={initialData} />
+          <ElectionList
+            initialData={initialData}
+            initialCacheVersion={initialCacheVersion}
+            initialRefreshError={initialRefreshError}
+          />
         </section>
       </main>
 

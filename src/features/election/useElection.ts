@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getAllElections, type GetElectionsResult } from './api';
-import { electionsQueryKey } from './useElections';
+import { electionsQueryPrefix } from './clientQuery';
 import { useTenant } from '@/features/tenant/TenantContext';
 
 /**
@@ -20,8 +20,14 @@ export function useElection(electionId: string) {
   const queryClient = useQueryClient();
 
   const cachedSummary = useMemo(() => {
-    const cached = queryClient.getQueryData<GetElectionsResult>(electionsQueryKey(tenantId));
-    return cached?.data.find((election) => election.id === electionId);
+    const snapshots = queryClient.getQueriesData<GetElectionsResult>({
+      queryKey: electionsQueryPrefix(tenantId),
+    });
+    for (let index = snapshots.length - 1; index >= 0; index -= 1) {
+      const summary = snapshots[index][1]?.data.find((election) => election.id === electionId);
+      if (summary) return summary;
+    }
+    return undefined;
   }, [queryClient, tenantId, electionId]);
 
   const listQuery = useQuery({

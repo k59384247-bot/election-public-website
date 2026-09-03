@@ -1,17 +1,13 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useQuery, type Query } from '@tanstack/react-query';
-import { getAllElections, type GetElectionsResult } from './api';
+import { useQuery } from '@tanstack/react-query';
+import type { GetElectionsResult } from './api';
 import type { ElectionSummary, PublicElectionStatus } from '@/lib/types';
 import { useTenant } from '@/features/tenant/TenantContext';
+import { electionListQueryOptions } from './clientQuery';
 
-const POLL_INTERVAL_IDLE_MS = 60_000;
-const POLL_INTERVAL_ACTIVE_MS = 25_000;
-
-export function electionsQueryKey(tenantId: string) {
-  return ['elections', tenantId, 'all'] as const;
-}
+export { electionsQueryKey } from './clientQuery';
 
 // The API returns elections in its own (creation-order) sequence, with no
 // notion of "open elections matter more" — sort client-side so a closed
@@ -50,36 +46,27 @@ function sortByStatus(elections: ElectionSummary[]): ElectionSummary[] {
   });
 }
 
-function hasOpenVoting(elections: ElectionSummary[]): boolean {
-  return elections.some((election) => election.status === 'voting_open');
-}
-
 export interface UseElectionsOptions {
   /** Seed data from the server-rendered initial fetch in app/page.tsx. */
   initialData?: GetElectionsResult;
+  initialCacheVersion?: number;
+  initialRefreshError?: boolean;
 }
 
-export function useElections({ initialData }: UseElectionsOptions = {}) {
+export function useElections({
+  initialData,
+  initialCacheVersion,
+  initialRefreshError = false,
+}: UseElectionsOptions = {}) {
   const { tenantId } = useTenant();
-  const query = useQuery({
-    queryKey: electionsQueryKey(tenantId),
-    queryFn: () => getAllElections({ tenantId }),
-    initialData,
-    // Without this, staleTime defaults to 0 and refetchOnMount fires a
-    // client fetch the instant ElectionList mounts — which can resolve and
-    // setState while React is still hydrating, producing a hydration
-    // mismatch even when `initialData` and the SSR HTML agree. A few
-    // seconds of grace lets hydration finish before the first background
-    // refetch; refetchInterval below keeps the complete snapshot live
-    // afterward.
-    staleTime: 5_000,
-    refetchIntervalInBackground: false,
-    refetchInterval: (query: Query<GetElectionsResult, Error>) => {
-      const loaded = query.state.data?.data ?? [];
-      if (loaded.length === 0) return false;
-      return hasOpenVoting(loaded) ? POLL_INTERVAL_ACTIVE_MS : POLL_INTERVAL_IDLE_MS;
-    },
-  });
+  const query = useQuery(
+    electionListQueryOptions(
+      tenantId,
+      initialData,
+      initialRefreshError,
+      initialCacheVersion
+    )
+  );
 
   const elections = useMemo(() => sortByStatus(query.data?.data ?? []), [query.data]);
 
@@ -90,7 +77,8 @@ export function useElections({ initialData }: UseElectionsOptions = {}) {
     isError: query.isError && elections.length === 0,
     error: query.error,
     /** A background refetch failed but earlier data is still on screen. */
-    hasBackgroundError: query.isError && elections.length > 0,
+    hasBackgroundError:
+      (query.isError && elections.length > 0) || Boolean(query.data?.refreshError),
     retry: query.refetch,
   };
 }
