@@ -93,6 +93,12 @@
   color: var(--color-section-bg);
 }
 
+.verify-email__note {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-alt-bg);
+}
+
 .verify-email__otp {
   display: flex;
   flex-direction: column;
@@ -207,6 +213,11 @@
     font-size: var(--fs-body-lg);
     line-height: var(--lh-body-lg);
     letter-spacing: normal;
+  }
+
+  .verify-email__note {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-sm);
   }
 
   .verify-email__otp-label {

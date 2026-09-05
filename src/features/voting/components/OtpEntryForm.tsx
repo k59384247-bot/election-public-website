@@ -220,6 +220,9 @@ export function OtpEntryForm() {
 
         <form className="verify-email__section" onSubmit={handleSubmit} noValidate>
           <p className="verify-email__email">{maskEmail(email)}</p>
+          <p className="verify-email__note">
+            Can&apos;t find the verification code? Please check your spam or junk folder.
+          </p>
 
           <div className="verify-email__otp">
             <label className="verify-email__otp-label" htmlFor="otp-1">
