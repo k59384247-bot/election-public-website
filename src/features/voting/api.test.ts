@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { ApiRequestError } from '@/lib/apiClient';
 import { NETWORK_ERROR_CODE } from '@/lib/errors';
+import { validateVoter } from './api';
 
 const apiRequestMock = vi.fn();
 
@@ -109,5 +110,37 @@ describe('castVote', () => {
 
     await expect(castVote(ELECTION_ID, VOTES, ID_TOKEN)).rejects.toMatchObject({ code: 'ELECTION_CLOSED' });
     expect(apiRequestMock).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('validateVoter', () => {
+  beforeEach(() => {
+    apiRequestMock.mockReset();
+  });
+
+  it('keeps the existing matricNumber request field for every tenant type', async () => {
+    apiRequestMock.mockResolvedValueOnce({
+      data: { message: 'OTP sent', expiresInSeconds: 300 },
+    });
+
+    await validateVoter({
+      tenantId: 'general-tenant',
+      electionId: ELECTION_ID,
+      matricNumber: 'general-id-123',
+      email: 'voter@example.com',
+    });
+
+    expect(apiRequestMock).toHaveBeenCalledWith(
+      '/v1/elections/validate-voter',
+      expect.objectContaining({
+        method: 'POST',
+        tenantId: 'general-tenant',
+        body: {
+          electionId: ELECTION_ID,
+          matricNumber: 'general-id-123',
+          email: 'voter@example.com',
+        },
+      })
+    );
   });
 });

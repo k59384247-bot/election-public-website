@@ -69,6 +69,8 @@ export interface CandidateSocialLinks {
 export interface Candidate {
   id: string;
   name: string;
+  /** Optional future-facing display data; never included in ballot payloads. */
+  matricNumber?: string;
   nickname: string | null;
   manifesto: string;
   photoUrl: string | null;
@@ -76,6 +78,8 @@ export interface Candidate {
   manifestoDocumentUrl: string | null;
   socialLinks: CandidateSocialLinks;
 }
+
+export type OrganizationType = 'student' | 'general';
 
 export interface Position {
   id: string;
@@ -131,6 +135,8 @@ export interface TenantPublicInfo {
   logoUrl: string | null;
   primaryColor: string | null;
   description: string | null;
+  /** Optional for backwards compatibility with older tenant responses. */
+  organizationType?: OrganizationType;
 }
 
 // ---------------------------------------------------------------------------

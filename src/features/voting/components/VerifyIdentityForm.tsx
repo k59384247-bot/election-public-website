@@ -9,6 +9,7 @@ import { getErrorDescriptor, NETWORK_ERROR_CODE, type ClientErrorCode } from '@/
 import { useVotingSession } from '../VotingSessionContext';
 import { useRequireStep } from '../guards/requireStep';
 import { useTenant } from '@/features/tenant/TenantContext';
+import { getTenantTerminology } from '@/features/tenant/terminology';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -17,10 +18,10 @@ interface FieldErrors {
   email?: string;
 }
 
-function validate(matricNumber: string, email: string): FieldErrors {
+function validate(identifier: string, email: string, identifierLabel: string): FieldErrors {
   const errors: FieldErrors = {};
-  if (!matricNumber.trim()) {
-    errors.matricNumber = 'Enter your matriculation number.';
+  if (!identifier.trim()) {
+    errors.matricNumber = `Enter your ${identifierLabel.toLowerCase()}.`;
   }
   if (!email.trim()) {
     errors.email = 'Enter your email address.';
@@ -34,7 +35,8 @@ function validate(matricNumber: string, email: string): FieldErrors {
 export function VerifyIdentityForm() {
   useRequireStep(['idle']);
   const { electionId } = useParams<{ electionId: string }>();
-  const { tenantId } = useTenant();
+  const { tenantId, tenant } = useTenant();
+  const terminology = getTenantTerminology(tenant.organizationType);
   const { submitIdentity, lockoutNotice, dismissLockoutNotice } = useVotingSession();
 
   const [matricNumber, setMatricNumber] = useState('');
@@ -47,7 +49,7 @@ export function VerifyIdentityForm() {
     event.preventDefault();
     if (isSubmitting) return;
 
-    const errors = validate(matricNumber, email);
+    const errors = validate(matricNumber, email, terminology.identifierLabel);
     setFieldErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
@@ -95,7 +97,7 @@ export function VerifyIdentityForm() {
             Verify your identity
           </h2>
           <p className="verify-form__subtitle">
-            Please verify your matric number and registered email address that matches
+            Please verify your {terminology.identifierLabel.toLowerCase()} and registered email address that matches
             the information registered with the Electoral Committee.
           </p>
         </div>
@@ -109,7 +111,7 @@ export function VerifyIdentityForm() {
         <form className="verify-form__fields" onSubmit={handleSubmit} noValidate>
           <div className={fieldErrors.matricNumber ? 'field field--error' : 'field'}>
             <label className="field__label" htmlFor="matric">
-              Matriculation Number
+              {terminology.identifierLabel}
             </label>
             <div className="field__control">
               <UserCheck

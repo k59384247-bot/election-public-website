@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ApiRequestError } from '@/lib/apiClient';
-import { getTenantPublicInfo } from '@/features/tenant/api';
+import { resolveTenantPublicInfo } from '@/features/tenant/api';
 import { TenantProviders } from '@/features/tenant/TenantContext';
 
 async function resolveTenant(tenantId: string) {
   try {
-    return await getTenantPublicInfo(tenantId);
+    return await resolveTenantPublicInfo(tenantId);
   } catch (error) {
     if (
       error instanceof ApiRequestError &&

@@ -11,6 +11,7 @@ import { ElectionMeta } from '@/features/election/components/ElectionMeta';
 import { AssistanceCard } from './AssistanceCard';
 import { useTenant } from '@/features/tenant/TenantContext';
 import { TenantLogo } from '@/features/tenant/components/TenantLogo';
+import { getTenantTerminology } from '@/features/tenant/terminology';
 
 const STATUS_LABEL: Record<PublicElectionStatus, string> = {
   voting_open: 'VOTING IN PROGRESS',
@@ -36,6 +37,7 @@ export function VoteFlowLayout({
   children: ReactNode;
 }) {
   const { tenantId, tenant } = useTenant();
+  const terminology = getTenantTerminology(tenant.organizationType);
   const { election } = useElection(electionId);
 
   // Separate from the hero fetch above and deliberately NOT the
@@ -134,7 +136,7 @@ export function VoteFlowLayout({
                   />
                 </span>
                 <p className="notice__text">
-                  You will verify your identity using your matric number and email address.
+                  You will verify your identity using your {terminology.identifierLabel.toLowerCase()} and email address.
                 </p>
               </li>
               <li className="notice__item">
