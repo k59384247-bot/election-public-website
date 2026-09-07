@@ -23,6 +23,7 @@ describe('public tenant configuration', () => {
     });
 
     expect(tenant).toEqual(createFallbackTenantPublicInfo('tenant-a'));
+    expect(tenant.name).toBe('Election Portal');
     expect(tenant.organizationType).toBe('student');
   });
 

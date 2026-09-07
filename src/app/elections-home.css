@@ -49,8 +49,8 @@
 }
 
 /* Brand mark only — the mock's full navbar (About/Careers/Resources/Contact)
-   was dropped from this page; the AMSUL logo stays, positioned where the
-   navbar used to sit. */
+   was dropped from this page; the tenant branding stays, positioned where
+   the navbar used to sit. */
 .elections-hero__brand {
   position: relative;
   z-index: 2;

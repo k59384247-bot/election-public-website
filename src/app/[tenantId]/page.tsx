@@ -6,6 +6,7 @@ import type { GetElectionsResult } from '@/features/election/api';
 import { ElectionList } from '@/features/election/components/ElectionList';
 import { getCachedElectionList } from '@/features/election/server/cachedElections';
 import { getTenantPublicInfo } from '@/features/tenant/api';
+import { TenantLogo } from '@/features/tenant/components/TenantLogo';
 import { ApiRequestError } from '@/lib/apiClient';
 
 async function getTenant(tenantId: string) {
@@ -43,7 +44,6 @@ export default async function ElectionsHomePage({
     initialData = undefined;
   }
 
-  const logoUrl = tenant.logoUrl ?? '/assets/images/amsul-logo.png';
   return (
     <div className="elections-home">
       <header className="elections-hero">
@@ -51,7 +51,7 @@ export default async function ElectionsHomePage({
 
         <div className="elections-hero__brand">
           <Link href={`/${tenantId}`} aria-label={`${tenant.name} home`}>
-            <img className="navbar__logo" src={logoUrl} alt={`${tenant.name} logo`} />
+            <TenantLogo className="navbar__logo" tenant={tenant} />
           </Link>
         </div>
 
@@ -61,7 +61,7 @@ export default async function ElectionsHomePage({
             aria-label={`${tenant.name} home`}
             className="elections-hero__brand--mobile"
           >
-            <img className="navbar__logo elections-hero__logo--mobile" src={logoUrl} alt={`${tenant.name} logo`} />
+            <TenantLogo className="navbar__logo elections-hero__logo--mobile" tenant={tenant} />
           </Link>
           <span className="highlight-pill">
             <Sparkles className="highlight-pill__icon" style={{ color: 'var(--color-amber)' }} aria-hidden="true" />
@@ -69,7 +69,7 @@ export default async function ElectionsHomePage({
           </span>
           <h1 className="elections-hero__title">Make Your Voice Count</h1>
           <p className="elections-hero__subtitle">
-            Welcome to AMSUL Elections. Eligible voters can securely verify their identity, access
+            Welcome to {tenant.name} Elections. Eligible voters can securely verify their identity, access
             the ballot, and cast their vote. All ballots remain anonymous and every vote counts.
           </p>
         </div>
@@ -87,7 +87,7 @@ export default async function ElectionsHomePage({
 
       <footer className="site-footer">
         <div className="site-footer__brand">
-          <img className="site-footer__logo" src={logoUrl} alt={`${tenant.name} logo`} />
+          <TenantLogo className="site-footer__logo" tenant={tenant} />
           <p className="site-footer__mission">{tenant.description ?? `${tenant.name} public elections.`}</p>
 
         </div>

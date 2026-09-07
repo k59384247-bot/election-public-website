@@ -1,5 +1,5 @@
 /* ==========================================================================
-   components.css — Shared components for AMSUL x StruktHQ
+   components.css — Shared components for the tenant portal and StruktHQ
    Adapted from screens-html/styles/components.css. Nav bar, buttons, event
    card, site footer (Home Page, Phase 2) plus card/field/icon-badge/
    status-pill/powered-by and the verify-flow layout shell (Verify Identity +
@@ -23,13 +23,32 @@
 .navbar__logo {
   width: 80px;
   height: 80px;
-  /* True circle, not var(--radius-logo)'s rounded square — the AMSUL mark
-     itself is circular, so a square casing clipped its corners. Validated
-     against the real hero photo in a throwaway prototype (Variant A). */
+  /* Keep uploaded tenant logos circular in the shared portal chrome. */
   border-radius: 50%;
   border: 1px solid rgba(250, 249, 247, 0.35);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
   object-fit: cover;
+}
+
+.tenant-wordmark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 80px;
+  max-width: 14rem;
+  height: auto;
+  min-height: 80px;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--color-header-text);
+  font-family: var(--font-header);
+  font-size: var(--fs-body-lg);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  text-align: center;
 }
 
 .navbar__links {
@@ -305,13 +324,16 @@
 .hero__logo {
   width: 120px;
   height: 120px;
-  /* Same circle + hairline ring treatment as .navbar__logo — see its
-     comment for why (var(--radius-logo) clips the AMSUL mark's own
-     circular artwork into a rounded square). */
+  /* Keep uploaded tenant logos circular in the election hero. */
   border-radius: 50%;
   border: 1px solid rgba(250, 249, 247, 0.35);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
   object-fit: cover;
+}
+
+.hero__logo.tenant-wordmark {
+  min-width: 120px;
+  min-height: 120px;
 }
 
 .verify__mobile-back {
@@ -824,6 +846,44 @@
   height: 64px;
   border-radius: var(--radius-logo);
   object-fit: cover;
+}
+
+.site-footer__logo.tenant-wordmark {
+  min-width: 64px;
+  min-height: 64px;
+  color: var(--color-white);
+}
+
+.tenant-error {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: var(--space-8) var(--nav-pad-x);
+  background: var(--color-page-bg);
+  color: var(--color-body-text);
+  text-align: center;
+}
+
+.tenant-error__card {
+  max-width: 34rem;
+  padding: var(--space-10);
+  border: 1px solid var(--color-neutral-800);
+  border-radius: var(--radius-card);
+  background: var(--color-alt-bg);
+}
+
+.tenant-error__title {
+  margin: 0 0 var(--space-3);
+  color: var(--color-header-text);
+  font-family: var(--font-header);
+  font-size: var(--fs-title);
+  line-height: var(--lh-title);
+}
+
+.tenant-error__message {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
 }
 
 .site-footer__mission {

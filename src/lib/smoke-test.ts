@@ -13,8 +13,11 @@ async function main() {
   console.log('Calling apiRequest against placeholder base URL...\n');
 
   const startedAt = Date.now();
+  const smokeTestTenantId = process.env.NEXT_PUBLIC_SMOKE_TEST_TENANT_ID ?? 'test-tenant';
   try {
-    await apiRequest('/v1/tenants/amsul/public', { cache: 'no-store' });
+    await apiRequest(`/v1/tenants/${encodeURIComponent(smokeTestTenantId)}/public`, {
+      cache: 'no-store',
+    });
     console.log('UNEXPECTED: request succeeded against a placeholder URL.');
     process.exitCode = 1;
   } catch (err) {

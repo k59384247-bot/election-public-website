@@ -283,13 +283,16 @@
 .election-head__logo {
   width: 120px;
   height: 120px;
-  /* True circle, not screens-html's rounded-square --radius-logo — same fix
-     as .navbar__logo/.hero__logo in components.css (the AMSUL mark itself
-     is circular artwork). */
+  /* Keep uploaded tenant logos circular in the ballot header. */
   border-radius: 50%;
   border: 1px solid rgba(250, 249, 247, 0.35);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
   object-fit: cover;
+}
+
+.election-head__logo.tenant-wordmark {
+  min-width: 120px;
+  min-height: 120px;
 }
 
 .election-head__title {

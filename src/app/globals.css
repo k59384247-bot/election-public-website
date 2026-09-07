@@ -1,8 +1,8 @@
 /* ==========================================================================
-   globals.css — shared design tokens for AMSUL x StruktHQ
+   globals.css — shared design tokens for the tenant portal and StruktHQ
    Adapted from screens-html/styles/global.css. Colors, fonts, spacing,
    radii, and base reset. Reuse these variables instead of hardcoding raw
-   values. Source of truth: Figma "AMSUL x StruktHQ" design variables.
+   values. Source of truth: the portal design variables.
 
    Font loading differs from the static export: Thurkle/DM Sans are loaded
    via next/font in app/layout.tsx, which exposes them as the --font-thurkle
@@ -41,8 +41,8 @@
   --color-selected-bg:   #fffbf1; /* selected candidate card fill  */
   --color-amber:         #ed9a00; /* "View Details" link / accent  */
 
-  /* Tenant theme derivatives. The default values preserve the AMSUL palette;
-     .tenant-shell overrides these when a tenant supplies a valid primary. */
+  /* Tenant theme derivatives. .tenant-shell overrides these when a tenant
+     supplies a valid primary. */
   --color-accent-muted:         rgba(255, 232, 169, 0.5);
   --color-accent-subtle:        rgba(244, 201, 93, 0.05);
   --color-accent-medium:        rgba(244, 201, 93, 0.5);

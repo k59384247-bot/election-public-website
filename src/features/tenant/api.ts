@@ -16,7 +16,7 @@ export function createFallbackTenantPublicInfo(tenantId: string): TenantPublicIn
   return {
     id: tenantId,
     tenantId,
-    name: tenantId,
+    name: 'Election Portal',
     logoUrl: null,
     primaryColor: null,
     description: null,

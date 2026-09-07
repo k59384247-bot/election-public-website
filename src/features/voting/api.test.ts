@@ -32,12 +32,12 @@ describe('castVote', () => {
 
   it('clean success: resolves with the receipt code from a single request', async () => {
     apiRequestMock.mockResolvedValueOnce({
-      data: { message: 'ok', receiptCode: 'AMSUL-27-8AF39D' },
+      data: { message: 'ok', receiptCode: 'VOTE-27-8AF39D' },
     });
 
     const result = await castVote(ELECTION_ID, VOTES, ID_TOKEN);
 
-    expect(result).toEqual({ success: true, receiptCode: 'AMSUL-27-8AF39D', alreadyVoted: false });
+    expect(result).toEqual({ success: true, receiptCode: 'VOTE-27-8AF39D', alreadyVoted: false });
     expect(apiRequestMock).toHaveBeenCalledTimes(1);
     expect(apiRequestMock).toHaveBeenCalledWith(
       '/v1/elections/cast-vote',
@@ -52,11 +52,11 @@ describe('castVote', () => {
   it('timeout-then-success: retries exactly once after a NETWORK_ERROR and returns the retry\'s receipt code', async () => {
     apiRequestMock
       .mockRejectedValueOnce(networkError())
-      .mockResolvedValueOnce({ data: { message: 'ok', receiptCode: 'AMSUL-27-RETRY1' } });
+      .mockResolvedValueOnce({ data: { message: 'ok', receiptCode: 'VOTE-27-RETRY1' } });
 
     const result = await castVote(ELECTION_ID, VOTES, ID_TOKEN);
 
-    expect(result).toEqual({ success: true, receiptCode: 'AMSUL-27-RETRY1', alreadyVoted: false });
+    expect(result).toEqual({ success: true, receiptCode: 'VOTE-27-RETRY1', alreadyVoted: false });
     expect(apiRequestMock).toHaveBeenCalledTimes(2);
   });
 

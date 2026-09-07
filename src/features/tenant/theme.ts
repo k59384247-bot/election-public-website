@@ -145,7 +145,7 @@ function rgba(color: RgbColor, alpha: number): string {
 
 /**
  * Builds the complete tenant palette from one valid hex primary color.
- * Invalid or missing values return an empty style so the global AMSUL tokens
+ * Invalid or missing values return an empty style so the global portal tokens
  * remain the safe fallback.
  */
 export function buildTenantTheme(primaryColor: string | null): TenantThemeStyle {

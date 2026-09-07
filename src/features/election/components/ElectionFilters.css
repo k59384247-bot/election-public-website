@@ -1,6 +1,6 @@
 /* ==========================================================================
    ElectionFilters.css — search bar + filters row for the elections home
-   page listing. Visual design copied from the Figma "AMSUL x StruktHQ" dark
+   page listing. Visual design copied from the tenant portal's dark
    search/filter frame (dark pill fields on --color-section-bg), rebuilt
    with this project's own tokens/BEM conventions; data mapping (status,
    sort) is custom to the elections list — see ElectionFilters.tsx.
