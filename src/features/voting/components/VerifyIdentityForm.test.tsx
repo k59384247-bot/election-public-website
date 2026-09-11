@@ -72,6 +72,17 @@ describe('VerifyIdentityForm terminology', () => {
     });
   });
 
+  it('allows matric numbers containing letters and slashes on mobile keyboards', () => {
+    render(<VerifyIdentityForm />);
+
+    const identifier = screen.getByLabelText('Matric Number');
+    expect(identifier.getAttribute('type')).toBe('text');
+    expect(identifier.getAttribute('inputmode')).toBe('text');
+
+    fireEvent.change(identifier, { target: { value: 'CSC/2024/001' } });
+    expect((identifier as HTMLInputElement).value).toBe('CSC/2024/001');
+  });
+
   it('shows Voter ID Number for general organizations', () => {
     mocks.tenant = tenant('general');
 

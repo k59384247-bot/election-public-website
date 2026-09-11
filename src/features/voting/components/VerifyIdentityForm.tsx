@@ -124,7 +124,7 @@ export function VerifyIdentityForm() {
                 id="matric"
                 name="matric"
                 type="text"
-                inputMode="numeric"
+                inputMode="text"
                 placeholder="123456789"
                 autoComplete="off"
                 value={matricNumber}
