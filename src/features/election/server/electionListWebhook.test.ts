@@ -99,4 +99,20 @@ describe('election list webhook verification', () => {
 
     expect(result).toMatchObject({ ok: false, status: 400 });
   });
+
+  it('requires the signed payload to provide its API base URL', () => {
+    const parsed = JSON.parse(BODY) as Record<string, unknown>;
+    delete parsed.apiBaseUrl;
+    const bodyWithoutApiBaseUrl = JSON.stringify(parsed);
+    const result = verifyElectionListWebhook({
+      rawBody: bodyWithoutApiBaseUrl,
+      secret: SECRET,
+      webhookIdHeader: 'amsul-1042',
+      timestampHeader: TIMESTAMP,
+      signatureHeader: signature(TIMESTAMP, bodyWithoutApiBaseUrl),
+      now: NOW,
+    });
+
+    expect(result).toMatchObject({ ok: false, status: 400 });
+  });
 });

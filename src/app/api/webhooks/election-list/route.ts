@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { invalidateAndPrewarmElectionList } from '@/features/election/server/cachedElections';
+import { prewarmFreshElectionList } from '@/features/election/server/freshElections';
 import {
   verifyElectionListWebhook,
   type ElectionListWebhookPayload,
@@ -39,7 +39,7 @@ async function processEvent(payload: ElectionListWebhookPayload): Promise<void> 
   const existing = inFlightEvents.get(key);
   if (existing) return existing;
 
-  const pending = invalidateAndPrewarmElectionList(payload.tenantId).then(() => {
+  const pending = prewarmFreshElectionList(payload.tenantId, payload.apiBaseUrl).then(() => {
     completedEvents.set(key, Date.now());
   });
   inFlightEvents.set(key, pending);
@@ -72,21 +72,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: verification.reason }, { status: verification.status });
   }
 
-  if (verification.payload.apiBaseUrl) {
-    const configuredBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    if (
-      !configuredBaseUrl ||
-      normalizeApiBaseUrl(verification.payload.apiBaseUrl) !== normalizeApiBaseUrl(configuredBaseUrl)
-    ) {
-      return NextResponse.json({ error: 'Webhook API base URL is not allowed' }, { status: 400 });
-    }
+  const configuredBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const payloadBaseUrl = normalizeApiBaseUrl(verification.payload.apiBaseUrl);
+  if (
+    !configuredBaseUrl ||
+    !payloadBaseUrl ||
+    payloadBaseUrl !== normalizeApiBaseUrl(configuredBaseUrl)
+  ) {
+    return NextResponse.json({ error: 'Webhook API base URL is not allowed' }, { status: 400 });
   }
 
   try {
-    await processEvent(verification.payload);
+    await processEvent({ ...verification.payload, apiBaseUrl: payloadBaseUrl });
   } catch (error) {
-    console.error('[election-list-webhook] cache invalidation failed:', error);
-    return NextResponse.json({ error: 'Unable to refresh election list cache' }, { status: 503 });
+    console.error('[election-list-webhook] election list refresh failed:', error);
+    return NextResponse.json({ error: 'Unable to refresh election list' }, { status: 503 });
   }
 
   return NextResponse.json({ accepted: true });

@@ -1,9 +1,83 @@
 import { ApiRequestError } from '@/lib/apiClient';
-import type { ApiEnvelope, ElectionSummary, PaginationMeta } from '@/lib/types';
+import type {
+  ApiErrorCode,
+  ElectionSummary,
+  PaginationMeta,
+  PublicElectionStatus,
+} from '@/lib/types';
 import type { GetElectionsResult } from '../api';
 import { fetchAllCursorPages } from '../pagination';
 
 export const ELECTION_LIST_PAGE_SIZE = 50;
+
+const ELECTION_STATUSES = new Set<PublicElectionStatus>([
+  'voting_open',
+  'voting_paused',
+  'voting_closed',
+  'results_published',
+  'upcoming',
+]);
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isElectionSummary(value: unknown): value is ElectionSummary {
+  if (!isRecord(value)) return false;
+  return (
+    typeof value.id === 'string' &&
+    typeof value.title === 'string' &&
+    typeof value.description === 'string' &&
+    (value.thumbnailUrl === null || typeof value.thumbnailUrl === 'string') &&
+    typeof value.status === 'string' &&
+    ELECTION_STATUSES.has(value.status as PublicElectionStatus) &&
+    typeof value.startDate === 'string' &&
+    typeof value.endDate === 'string' &&
+    typeof value.votesCast === 'number'
+  );
+}
+
+function parsePage(value: unknown, response: Response): {
+  data: ElectionSummary[];
+  meta: PaginationMeta;
+} {
+  if (!isRecord(value) || typeof value.success !== 'boolean') {
+    throw new Error('Election list API returned a malformed response');
+  }
+
+  if (!response.ok) {
+    throw new Error(`Election list API returned HTTP ${response.status}`);
+  }
+
+  if (!value.success) {
+    const error = isRecord(value.error) ? value.error : null;
+    if (error && typeof error.code === 'string' && typeof error.message === 'string') {
+      throw new ApiRequestError(error.code as ApiErrorCode, error.message, response.status);
+    }
+    throw new Error('Election list API returned a malformed error response');
+  }
+
+  if (!Array.isArray(value.data) || !value.data.every(isElectionSummary)) {
+    throw new Error('Election list API returned malformed election data');
+  }
+
+  const meta = value.meta;
+  if (
+    meta !== undefined &&
+    (!isRecord(meta) ||
+      typeof meta.hasMore !== 'boolean' ||
+      (meta.nextCursor !== null && typeof meta.nextCursor !== 'string'))
+  ) {
+    throw new Error('Election list API returned malformed pagination data');
+  }
+
+  return {
+    data: value.data,
+    meta: meta
+      ? { hasMore: meta.hasMore as boolean, nextCursor: meta.nextCursor as string | null }
+      : { hasMore: false, nextCursor: null },
+  };
+}
 
 function ensureTrailingSlash(value: string): string {
   return value.endsWith('/') ? value : `${value}/`;
@@ -30,16 +104,7 @@ export async function loadElectionListFromApi({
         headers: { 'Content-Type': 'application/json' },
         cache: 'no-store',
       });
-      const envelope = (await response.json()) as ApiEnvelope<ElectionSummary[], PaginationMeta>;
-
-      if (!envelope.success) {
-        throw new ApiRequestError(envelope.error.code, envelope.error.message, response.status);
-      }
-
-      return {
-        data: envelope.data,
-        meta: envelope.meta ?? { hasMore: false, nextCursor: null },
-      };
+      return parsePage(await response.json(), response);
     },
     { limit: ELECTION_LIST_PAGE_SIZE }
   );

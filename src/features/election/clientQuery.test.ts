@@ -13,7 +13,7 @@ describe('election list client query', () => {
     vi.restoreAllMocks();
   });
 
-  it('does not make 30-second requests while mounted or after cached navigation', async () => {
+  it('refreshes a mounted list every three seconds and always refreshes after navigation', async () => {
     const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -36,15 +36,14 @@ describe('election list client query', () => {
     const unsubscribeFirst = firstObserver.subscribe(() => {});
 
     await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
-    await vi.advanceTimersByTimeAsync(600_000);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(3_000);
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
 
     unsubscribeFirst();
     const navigationObserver = new QueryObserver(client, options);
     const unsubscribeNavigation = navigationObserver.subscribe(() => {});
-    await vi.advanceTimersByTimeAsync(1_000);
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
     unsubscribeNavigation();
     client.clear();
   });

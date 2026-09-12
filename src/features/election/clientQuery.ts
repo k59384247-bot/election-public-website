@@ -16,7 +16,7 @@ export function electionsQueryKey(tenantId: string, cacheVersion?: number) {
 }
 
 async function fetchElectionList(tenantId: string): Promise<ElectionListQueryData> {
-  const query = new URLSearchParams({ tenantId, retry: '1' });
+  const query = new URLSearchParams({ tenantId });
   const response = await fetch(`/api/elections?${query.toString()}`, {
     method: 'GET',
     cache: 'no-store',
@@ -41,10 +41,10 @@ export function electionListQueryOptions(
     initialData: initialData
       ? { ...initialData, refreshError: initialRefreshError }
       : undefined,
-    staleTime: Infinity,
-    refetchInterval: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
+    staleTime: 2_000,
+    refetchInterval: 3_000,
+    refetchOnMount: 'always',
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
   });
 }

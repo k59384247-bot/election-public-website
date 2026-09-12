@@ -1,19 +1,19 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import {
-  getCachedElectionList,
-  retryCachedElectionList,
-} from '@/features/election/server/cachedElections';
+import { getFreshElectionList } from '@/features/election/server/freshElections';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   const tenantId = request.nextUrl.searchParams.get('tenantId');
   if (!tenantId) {
-    return NextResponse.json({ error: 'tenantId is required' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'tenantId is required' },
+      { status: 400, headers: { 'Cache-Control': 'no-store' } }
+    );
   }
 
   try {
-    const result = request.nextUrl.searchParams.get('retry') === '1'
-      ? await retryCachedElectionList(tenantId)
-      : await getCachedElectionList(tenantId);
+    const result = await getFreshElectionList(tenantId);
 
     return NextResponse.json(
       {

@@ -6,7 +6,7 @@ export const ELECTION_LIST_WEBHOOK_MAX_BODY_BYTES = 32 * 1_024;
 export interface ElectionListWebhookPayload {
   eventId: string;
   tenantId: string;
-  apiBaseUrl?: string;
+  apiBaseUrl: string;
   version?: number;
   operation: string;
   electionId?: string | null;
@@ -40,14 +40,12 @@ function parsePayload(rawBody: string): ElectionListWebhookPayload | null {
   if (!isRecord(value)) return null;
   if (!isNonEmptyString(value.eventId, 256)) return null;
   if (!isNonEmptyString(value.tenantId, 128) || !isValidTenantId(value.tenantId)) return null;
-  if (value.apiBaseUrl !== undefined) {
-    if (!isNonEmptyString(value.apiBaseUrl, 2_048)) return null;
-    try {
-      const parsedApiBaseUrl = new URL(value.apiBaseUrl);
-      if (parsedApiBaseUrl.protocol !== 'http:' && parsedApiBaseUrl.protocol !== 'https:') return null;
-    } catch {
-      return null;
-    }
+  if (!isNonEmptyString(value.apiBaseUrl, 2_048)) return null;
+  try {
+    const parsedApiBaseUrl = new URL(value.apiBaseUrl);
+    if (parsedApiBaseUrl.protocol !== 'http:' && parsedApiBaseUrl.protocol !== 'https:') return null;
+  } catch {
+    return null;
   }
   if (
     value.version !== undefined &&
@@ -64,7 +62,7 @@ function parsePayload(rawBody: string): ElectionListWebhookPayload | null {
   return {
     eventId: value.eventId,
     tenantId: value.tenantId,
-    apiBaseUrl: value.apiBaseUrl as string | undefined,
+    apiBaseUrl: value.apiBaseUrl,
     version: value.version as number | undefined,
     operation: value.operation,
     electionId: value.electionId as string | null | undefined,

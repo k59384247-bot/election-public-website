@@ -4,10 +4,12 @@ import { notFound } from 'next/navigation';
 import '@/app/elections-home.css';
 import type { GetElectionsResult } from '@/features/election/api';
 import { ElectionList } from '@/features/election/components/ElectionList';
-import { getCachedElectionList } from '@/features/election/server/cachedElections';
+import { getFreshElectionList } from '@/features/election/server/freshElections';
 import { getTenantPublicInfo } from '@/features/tenant/api';
 import { TenantLogo } from '@/features/tenant/components/TenantLogo';
 import { ApiRequestError } from '@/lib/apiClient';
+
+export const dynamic = 'force-dynamic';
 
 async function getTenant(tenantId: string) {
   try {
@@ -35,10 +37,10 @@ export default async function ElectionsHomePage({
   let initialCacheVersion: number | undefined;
   let initialRefreshError = false;
   try {
-    const cached = await getCachedElectionList(tenantId);
-    initialData = cached.data;
-    initialCacheVersion = cached.version;
-    initialRefreshError = cached.refreshError !== null;
+    const fresh = await getFreshElectionList(tenantId);
+    initialData = fresh.data;
+    initialCacheVersion = fresh.version;
+    initialRefreshError = false;
   } catch (err) {
     console.error('[ElectionsHomePage] initial server-side fetch failed:', err);
     initialData = undefined;
