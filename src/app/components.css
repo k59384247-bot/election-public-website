@@ -249,6 +249,30 @@
   border-radius: var(--radius-pill);
 }
 
+.status-pill--upcoming {
+  background-color: rgba(255, 214, 102, 0.22);
+}
+
+.status-pill--upcoming .status-pill__dot {
+  background-color: var(--color-gold);
+}
+
+.status-pill--paused {
+  background-color: rgba(191, 191, 191, 0.24);
+}
+
+.status-pill--paused .status-pill__dot {
+  background-color: var(--color-neutral-400);
+}
+
+.status-pill--closed {
+  background-color: rgba(92, 92, 92, 0.34);
+}
+
+.status-pill--closed .status-pill__dot {
+  background-color: var(--color-neutral-500);
+}
+
 /* ----- Powered-by note --------------------------------------------------- */
 .powered-by {
   display: flex;
@@ -648,6 +672,7 @@
    with a category tag, then a title/description body with a meta + status row.
    ========================================================================== */
 .event-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -656,6 +681,18 @@
   padding: var(--space-1) var(--space-1) var(--space-4);
   background-color: var(--color-accent-subtle);
   border-radius: var(--radius-md);
+}
+
+.event-card__link {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+}
+
+.event-card__link:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 4px;
 }
 
 .event-card__media {

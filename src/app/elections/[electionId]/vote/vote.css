@@ -52,6 +52,119 @@
   color: var(--color-alt-bg);
 }
 
+/* ----- Election access state --------------------------------------------- */
+.election-access-gate {
+  position: relative;
+  isolation: isolate;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+}
+
+.election-access-gate__content {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.election-access-gate__content > .verify__col {
+  flex: 1 1 0;
+  width: 100%;
+}
+
+.election-access-gate--locked .election-access-gate__content {
+  filter: blur(8px);
+  transform: scale(1.015);
+  user-select: none;
+}
+
+.election-access-gate__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-10);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: inherit;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 0 0 48px rgba(255, 255, 255, 0.2),
+    0 18px 50px rgba(20, 24, 28, 0.14);
+  backdrop-filter: blur(24px) saturate(135%) brightness(108%);
+  -webkit-backdrop-filter: blur(24px) saturate(135%) brightness(108%);
+  color: var(--color-neutral-1100);
+  text-align: center;
+}
+
+.election-access-gate__overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.42), transparent 38%),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.18), transparent 45%);
+  pointer-events: none;
+}
+
+.election-access-gate__lock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: var(--space-2);
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  border-radius: var(--radius-round);
+  box-shadow: 0 12px 32px rgba(32, 34, 36, 0.22);
+  color: var(--color-neutral-1100);
+}
+
+.election-access-gate__lock svg {
+  width: 34px;
+  height: 34px;
+}
+
+.election-access-gate__eyebrow,
+.election-access-gate__title,
+.election-access-gate__message {
+  margin: 0;
+}
+
+.election-access-gate__eyebrow {
+  padding: var(--space-2) var(--space-4);
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.election-access-gate__title {
+  font-family: var(--font-header);
+  font-weight: 400;
+  font-size: var(--fs-title);
+  line-height: var(--lh-title);
+}
+
+.election-access-gate__message {
+  max-width: 390px;
+  font-size: var(--fs-body-lg);
+  line-height: var(--lh-body-lg);
+  color: rgba(38, 38, 38, 0.86);
+}
+
 /* ----- Verify email (OTP) card --------------------------------------------- */
 .verify-email {
   gap: var(--space-10);
@@ -175,7 +288,40 @@
 }
 
 /* ----- Responsive ----------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .election-access-gate {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+}
+
 @media (max-width: 640px) {
+  .election-access-gate__overlay {
+    gap: var(--space-2);
+    min-height: 400px;
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .election-access-gate__lock {
+    width: 64px;
+    height: 64px;
+  }
+
+  .election-access-gate__lock svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .election-access-gate__title {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .election-access-gate__message {
+    font-size: var(--fs-sm);
+    line-height: var(--lh-sm);
+  }
+
   .verify-form {
     gap: var(--space-6);
     padding: var(--space-5) var(--space-4) var(--space-6);

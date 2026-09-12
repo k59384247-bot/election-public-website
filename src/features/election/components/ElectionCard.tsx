@@ -17,9 +17,6 @@ export const STATUS_CONFIG: Record<PublicElectionStatus, { label: string; pillCl
   upcoming: { label: 'Upcoming', pillClass: 'event-card__status--upcoming' },
   voting_paused: { label: 'Voting Paused', pillClass: 'event-card__status--paused' },
   voting_closed: { label: 'Voting Closed', pillClass: 'event-card__status--closed' },
-  // Results page doesn't exist yet (build spec §7.1 open question) — same
-  // "no CTA" treatment as voting_closed, distinct label since we already
-  // have the accurate status from the API.
   results_published: { label: 'Results Published', pillClass: 'event-card__status--closed' },
 };
 
@@ -56,6 +53,16 @@ export function ElectionCard({ election }: { election: ElectionSummary }) {
 
   return (
     <article className="event-card">
+      <Link
+        className="event-card__link"
+        href={`/${tenantId}/elections/${election.id}/vote`}
+        aria-label={`Open ${election.title}`}
+        onMouseEnter={prefetchFullElection}
+        onFocus={prefetchFullElection}
+      >
+        <span aria-hidden="true" />
+      </Link>
+
       <div className="event-card__media">
         {election.thumbnailUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- matches
@@ -123,22 +130,15 @@ export function ElectionCard({ election }: { election: ElectionSummary }) {
 
       {hasMounted && election.status === 'voting_open' && (
         <div className="event-card__cta-row">
-          <Link
-            className="event-card__cta"
-            href={`/${tenantId}/elections/${election.id}/vote`}
-            onMouseEnter={prefetchFullElection}
-            onFocus={prefetchFullElection}
-          >
-            Vote Now
-          </Link>
+          <span className="event-card__cta">Vote Now</span>
         </div>
       )}
 
       {hasMounted && election.status === 'voting_paused' && (
         <div className="event-card__cta-row">
-          <button className="event-card__cta event-card__cta--disabled" type="button" disabled>
+          <span className="event-card__cta event-card__cta--disabled">
             Vote Now
-          </button>
+          </span>
           <p className="event-card__cta-note">Voting is temporarily paused for this election.</p>
         </div>
       )}

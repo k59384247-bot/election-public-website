@@ -12,13 +12,14 @@ import { AssistanceCard } from './AssistanceCard';
 import { useTenant } from '@/features/tenant/TenantContext';
 import { TenantLogo } from '@/features/tenant/components/TenantLogo';
 import { getTenantTerminology } from '@/features/tenant/terminology';
+import { ElectionAccessGate } from './ElectionAccessGate';
 
-const STATUS_LABEL: Record<PublicElectionStatus, string> = {
-  voting_open: 'VOTING IN PROGRESS',
-  voting_paused: 'VOTING PAUSED',
-  voting_closed: 'VOTING CLOSED',
-  results_published: 'RESULTS PUBLISHED',
-  upcoming: 'UPCOMING',
+const STATUS_CONFIG: Record<PublicElectionStatus, { label: string; pillClass: string }> = {
+  voting_open: { label: 'VOTING IN PROGRESS', pillClass: 'status-pill--open' },
+  voting_paused: { label: 'VOTING PAUSED', pillClass: 'status-pill--paused' },
+  voting_closed: { label: 'VOTING CLOSED', pillClass: 'status-pill--closed' },
+  results_published: { label: 'RESULTS PUBLISHED', pillClass: 'status-pill--closed' },
+  upcoming: { label: 'UPCOMING', pillClass: 'status-pill--upcoming' },
 };
 
 /**
@@ -61,14 +62,19 @@ export function VoteFlowLayout({
     queryKey: ['election-full', tenantId, electionId],
     queryFn: () => getElectionById(tenantId, electionId),
   });
+  // Prefer the election-list status because that query is explicitly
+  // refreshed for status correctness. The detail payload may have been
+  // prefetched while the election was still open and can remain in React
+  // Query's one-minute cache after the dashboard changes the status.
+  const displayedElection = fullElection ?? election;
+  const electionStatus = election?.status ?? fullElection?.status;
+  const status = electionStatus ? STATUS_CONFIG[electionStatus] : undefined;
 
   return (
     <div className="verify verify--mobile-centered-logo">
       <header>
         <nav className="navbar" aria-label="Primary">
           <Link className="navbar__brand" href={`/${tenantId}`} aria-label={`${tenant.name} home`}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- matches
-                screens-html, which uses plain <img> throughout. */}
             <TenantLogo className="navbar__logo" />
           </Link>
         </nav>
@@ -97,24 +103,31 @@ export function VoteFlowLayout({
               Back to Elections
             </Link>
 
-            {election && (
-              <span className="status-pill">
+            {status && (
+              <span className={`status-pill ${status.pillClass}`}>
                 <span className="status-pill__dot" aria-hidden="true" />
-                {STATUS_LABEL[election.status]}
+                {status.label}
               </span>
             )}
 
             <div className="hero__heading">
               <h1 className="hero__title" id="election-title">
-                {election?.title ?? 'Election'}
+                {displayedElection?.title ?? 'Election'}
               </h1>
-              {election && <p className="hero__description">{election.description}</p>}
+              {displayedElection && (
+                <p className="hero__description">{displayedElection.description}</p>
+              )}
             </div>
 
-            {election && <ElectionMeta startDate={election.startDate} endDate={election.endDate} />}
+            {displayedElection && (
+              <ElectionMeta
+                startDate={displayedElection.startDate}
+                endDate={displayedElection.endDate}
+              />
+            )}
           </section>
 
-          {children}
+          <ElectionAccessGate status={electionStatus}>{children}</ElectionAccessGate>
         </div>
 
         <div className="verify__row">
