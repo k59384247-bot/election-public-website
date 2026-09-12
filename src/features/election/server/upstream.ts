@@ -22,19 +22,52 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function isElectionSummary(value: unknown): value is ElectionSummary {
-  if (!isRecord(value)) return false;
-  return (
-    typeof value.id === 'string' &&
-    typeof value.title === 'string' &&
-    typeof value.description === 'string' &&
-    (value.thumbnailUrl === null || typeof value.thumbnailUrl === 'string') &&
-    typeof value.status === 'string' &&
-    ELECTION_STATUSES.has(value.status as PublicElectionStatus) &&
-    typeof value.startDate === 'string' &&
-    typeof value.endDate === 'string' &&
-    typeof value.votesCast === 'number'
-  );
+function normalizeElectionSummary(value: unknown): ElectionSummary | null {
+  if (!isRecord(value)) return null;
+  if (
+    typeof value.id !== 'string' ||
+    !value.id ||
+    typeof value.title !== 'string' ||
+    typeof value.status !== 'string' ||
+    !ELECTION_STATUSES.has(value.status as PublicElectionStatus) ||
+    typeof value.startDate !== 'string' ||
+    typeof value.endDate !== 'string'
+  ) {
+    return null;
+  }
+
+  if (
+    value.description !== undefined &&
+    value.description !== null &&
+    typeof value.description !== 'string'
+  ) {
+    return null;
+  }
+  if (
+    value.thumbnailUrl !== undefined &&
+    value.thumbnailUrl !== null &&
+    typeof value.thumbnailUrl !== 'string'
+  ) {
+    return null;
+  }
+  if (
+    value.votesCast !== undefined &&
+    value.votesCast !== null &&
+    (typeof value.votesCast !== 'number' || !Number.isFinite(value.votesCast))
+  ) {
+    return null;
+  }
+
+  return {
+    id: value.id,
+    title: value.title,
+    description: typeof value.description === 'string' ? value.description : '',
+    thumbnailUrl: typeof value.thumbnailUrl === 'string' ? value.thumbnailUrl : null,
+    status: value.status as PublicElectionStatus,
+    startDate: value.startDate,
+    endDate: value.endDate,
+    votesCast: typeof value.votesCast === 'number' ? value.votesCast : 0,
+  };
 }
 
 function parsePage(value: unknown, response: Response): {
@@ -57,7 +90,11 @@ function parsePage(value: unknown, response: Response): {
     throw new Error('Election list API returned a malformed error response');
   }
 
-  if (!Array.isArray(value.data) || !value.data.every(isElectionSummary)) {
+  if (!Array.isArray(value.data)) {
+    throw new Error('Election list API returned malformed election data');
+  }
+  const data = value.data.map(normalizeElectionSummary);
+  if (data.some((election): election is null => election === null)) {
     throw new Error('Election list API returned malformed election data');
   }
 
@@ -72,7 +109,7 @@ function parsePage(value: unknown, response: Response): {
   }
 
   return {
-    data: value.data,
+    data: data as ElectionSummary[],
     meta: meta
       ? { hasMore: meta.hasMore as boolean, nextCursor: meta.nextCursor as string | null }
       : { hasMore: false, nextCursor: null },
