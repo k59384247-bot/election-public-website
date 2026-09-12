@@ -42,7 +42,7 @@ export function electionListQueryOptions(
       ? { ...initialData, refreshError: initialRefreshError }
       : undefined,
     staleTime: 2_000,
-    refetchInterval: 3_000,
+    refetchInterval: false,
     refetchOnMount: 'always',
     refetchOnReconnect: true,
     refetchOnWindowFocus: true,
