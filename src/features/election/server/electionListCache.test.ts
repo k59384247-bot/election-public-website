@@ -97,6 +97,33 @@ describe('election list server cache', () => {
     expect(duringRefresh.data.data.map(({ id }) => id)).toEqual(['old']);
   });
 
+  it('force-refreshes an invalidated tenant and preserves the old list on failure', async () => {
+    const traversal = vi
+      .fn()
+      .mockResolvedValueOnce({
+        data: [election('old')],
+        meta: { hasMore: false, nextCursor: null },
+      })
+      .mockResolvedValueOnce({
+        data: [election('new')],
+        meta: { hasMore: false, nextCursor: null },
+      });
+    const cache = createElectionListCache({ load: traversal });
+
+    await cache.get('https://elections.example/api', 'tenant-a');
+    const refreshed = await cache.refreshNow('https://elections.example/api', 'tenant-a');
+
+    expect(refreshed.data.data.map(({ id }) => id)).toEqual(['new']);
+    expect(traversal).toHaveBeenCalledTimes(2);
+
+    traversal.mockRejectedValueOnce(new Error('temporary failure'));
+    await expect(cache.refreshNow('https://elections.example/api', 'tenant-a')).rejects.toThrow(
+      'temporary failure'
+    );
+    const stale = await cache.get('https://elections.example/api', 'tenant-a');
+    expect(stale.data.data.map(({ id }) => id)).toEqual(['new']);
+  });
+
   it('reuses data for re-renders and navigation during the freshness window', async () => {
     const traversal = vi.fn().mockResolvedValue({
       data: [election('one')],

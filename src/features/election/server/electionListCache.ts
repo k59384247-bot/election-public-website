@@ -58,6 +58,12 @@ export function createElectionListCache({
   function refresh(apiBaseUrl: string, tenantId: string, entry: CacheEntry): void {
     if (entry.refreshPromise || Date.now() < entry.nextRefreshAt) return;
 
+    startRefresh(apiBaseUrl, tenantId, entry);
+  }
+
+  function startRefresh(apiBaseUrl: string, tenantId: string, entry: CacheEntry): void {
+    if (entry.refreshPromise) return;
+
     entry.nextRefreshAt = Date.now() + ELECTION_LIST_FRESH_MS;
     entry.refreshPromise = load(apiBaseUrl, tenantId)
       .then((data) => {
@@ -77,6 +83,23 @@ export function createElectionListCache({
   }
 
   return {
+    /**
+     * Synchronize a process-local fallback with a snapshot read from the
+     * deployment-shared framework cache. A newer shared snapshot always wins;
+     * an older one cannot overwrite a locally fresher value.
+     */
+    seed(apiBaseUrl: string, tenantId: string, data: GetElectionsResult, loadedAt: number): void {
+      const key = cacheKey(apiBaseUrl, tenantId);
+      const existing = entries.get(key);
+      if (existing && existing.loadedAt > loadedAt) return;
+      entries.set(key, {
+        data,
+        loadedAt,
+        refreshError: null,
+        nextRefreshAt: loadedAt + ELECTION_LIST_FRESH_MS,
+      });
+    },
+
     async get(apiBaseUrl: string, tenantId: string): Promise<ElectionListCacheResult> {
       const key = cacheKey(apiBaseUrl, tenantId);
       let entry = entries.get(key);
@@ -101,6 +124,26 @@ export function createElectionListCache({
 
       entries.delete(key);
       entry = await loadMiss(apiBaseUrl, tenantId, key);
+      return { data: entry.data, version: entry.loadedAt, isStale: false, refreshError: null };
+    },
+
+    /**
+     * Force a tenant refresh while retaining the last valid snapshot if the
+     * upstream request fails. Used by the signed dashboard webhook after it
+     * invalidates the framework cache tag.
+     */
+    async refreshNow(apiBaseUrl: string, tenantId: string): Promise<ElectionListCacheResult> {
+      const key = cacheKey(apiBaseUrl, tenantId);
+      let entry = entries.get(key);
+      if (!entry) {
+        entry = await loadMiss(apiBaseUrl, tenantId, key);
+        return { data: entry.data, version: entry.loadedAt, isStale: false, refreshError: null };
+      }
+
+      if (!entry.refreshPromise) startRefresh(apiBaseUrl, tenantId, entry);
+      await entry.refreshPromise;
+
+      if (entry.refreshError) throw entry.refreshError;
       return { data: entry.data, version: entry.loadedAt, isStale: false, refreshError: null };
     },
 
