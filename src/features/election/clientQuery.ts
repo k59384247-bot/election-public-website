@@ -41,10 +41,10 @@ export function electionListQueryOptions(
     initialData: initialData
       ? { ...initialData, refreshError: initialRefreshError }
       : undefined,
-    staleTime: 2_000,
+    staleTime: Infinity,
     refetchInterval: false,
-    refetchOnMount: 'always',
-    refetchOnReconnect: true,
-    refetchOnWindowFocus: true,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
   });
 }

@@ -13,7 +13,7 @@ describe('election list client query', () => {
     vi.restoreAllMocks();
   });
 
-  it('does not poll while mounted and still refreshes after navigation', async () => {
+  it('only fetches on the initial load and stays quiet through idle time and navigation', async () => {
     const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -42,7 +42,8 @@ describe('election list client query', () => {
     unsubscribeFirst();
     const navigationObserver = new QueryObserver(client, options);
     const unsubscribeNavigation = navigationObserver.subscribe(() => {});
-    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
 
     unsubscribeNavigation();
     client.clear();
