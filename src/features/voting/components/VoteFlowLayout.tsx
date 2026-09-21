@@ -11,7 +11,7 @@ import { ElectionMeta } from '@/features/election/components/ElectionMeta';
 import { AssistanceCard } from './AssistanceCard';
 import { useTenant } from '@/features/tenant/TenantContext';
 import { TenantLogo } from '@/features/tenant/components/TenantLogo';
-import { getTenantTerminology } from '@/features/tenant/terminology';
+import { getEligibleVoterNoticeText, getTenantTerminology } from '@/features/tenant/terminology';
 import { ElectionAccessGate } from './ElectionAccessGate';
 
 const STATUS_CONFIG: Record<PublicElectionStatus, { label: string; pillClass: string }> = {
@@ -172,7 +172,7 @@ export function VoteFlowLayout({
                     aria-hidden="true"
                   />
                 </span>
-                <p className="notice__text">Each eligible student can vote only once.</p>
+                <p className="notice__text">{getEligibleVoterNoticeText(tenant.organizationType)}</p>
               </li>
               <li className="notice__item">
                 <span className="icon-badge">

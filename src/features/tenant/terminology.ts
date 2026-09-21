@@ -6,6 +6,7 @@ export interface TenantTerminology {
   candidateIdentifierLabel: string;
   academicSessionLabel: string;
   levelLabel: string;
+  eligibleVoterLabel: 'student' | 'voter';
   showLevel: boolean;
   classOptional: boolean;
   classHelperText: string | null;
@@ -17,6 +18,7 @@ const STUDENT_TERMINOLOGY: TenantTerminology = {
   candidateIdentifierLabel: 'Matric Number',
   academicSessionLabel: 'Academic Session',
   levelLabel: 'Level',
+  eligibleVoterLabel: 'student',
   showLevel: true,
   classOptional: false,
   classHelperText: null,
@@ -28,6 +30,7 @@ const GENERAL_TERMINOLOGY: TenantTerminology = {
   candidateIdentifierLabel: 'Candidate ID Number',
   academicSessionLabel: 'Year',
   levelLabel: 'N/A',
+  eligibleVoterLabel: 'voter',
   showLevel: false,
   classOptional: true,
   classHelperText: 'Optional; intended for student organizations.',
@@ -43,4 +46,8 @@ export function getTenantTerminology(value?: unknown): TenantTerminology {
   return normalizeOrganizationType(value) === 'general'
     ? GENERAL_TERMINOLOGY
     : STUDENT_TERMINOLOGY;
+}
+
+export function getEligibleVoterNoticeText(value?: unknown): string {
+  return `Each eligible ${getTenantTerminology(value).eligibleVoterLabel} can vote only once.`;
 }

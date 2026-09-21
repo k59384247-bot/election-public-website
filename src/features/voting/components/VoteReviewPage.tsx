@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, Check, ChevronDown, Download, Pencil, UserCog, VenetianMask, Video, Waves } from 'lucide-react';
 import type { Election } from '@/lib/types';
+import { useTenant } from '@/features/tenant/TenantContext';
+import { getEligibleVoterNoticeText } from '@/features/tenant/terminology';
 import type { BallotDraft } from '../useBallotDraft';
 import { ElectionHead } from './ElectionHead';
 import { PositionHeader } from './PositionHeader';
@@ -10,12 +12,6 @@ import { NoticeCard } from './NoticeCard';
 import { AssistanceCard } from './AssistanceCard';
 import { CandidateAvatar } from './CandidateAvatar';
 import { resetPaginationScroll } from '@/lib/paginationScroll';
-
-const VOTING_NOTICE_ITEMS = [
-  { icon: UserCog, text: 'You can review and edit your selections before submitting.' },
-  { icon: Waves, text: 'Each eligible student can vote only once.' },
-  { icon: VenetianMask, text: 'Your vote remains anonymous throughout the election process.' },
-];
 
 /**
  * Screen 6 (Vote Review Page) — read-only summary of the current ballot
@@ -36,6 +32,12 @@ export function VoteReviewPage({
   onEdit: () => void;
   onSubmit: () => void;
 }) {
+  const { tenant } = useTenant();
+  const votingNoticeItems = [
+    { icon: UserCog, text: 'You can review and edit your selections before submitting.' },
+    { icon: Waves, text: getEligibleVoterNoticeText(tenant.organizationType) },
+    { icon: VenetianMask, text: 'Your vote remains anonymous throughout the election process.' },
+  ];
   const positions = useMemo(
     () => [...election.positions].sort((a, b) => a.order - b.order),
     [election.positions]
@@ -227,7 +229,7 @@ export function VoteReviewPage({
       </div>
 
       <div className="verify__row">
-        <NoticeCard title="VOTING NOTICE" lead="Before you begin, please note:" items={VOTING_NOTICE_ITEMS} />
+        <NoticeCard title="VOTING NOTICE" lead="Before you begin, please note:" items={votingNoticeItems} />
         <AssistanceCard election={election} />
       </div>
     </>

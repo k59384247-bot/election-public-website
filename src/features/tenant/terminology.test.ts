@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { getTenantTerminology, normalizeOrganizationType } from './terminology';
+import {
+  getEligibleVoterNoticeText,
+  getTenantTerminology,
+  normalizeOrganizationType,
+} from './terminology';
 
 describe('tenant terminology', () => {
   it('uses student terminology for a student tenant', () => {
@@ -10,6 +14,7 @@ describe('tenant terminology', () => {
       academicSessionLabel: 'Academic Session',
       levelLabel: 'Level',
       showLevel: true,
+      eligibleVoterLabel: 'student',
     });
   });
 
@@ -22,6 +27,7 @@ describe('tenant terminology', () => {
       levelLabel: 'N/A',
       showLevel: false,
       classOptional: true,
+      eligibleVoterLabel: 'voter',
     });
     expect(getTenantTerminology('general').classHelperText).toContain('student organizations');
   });
@@ -30,5 +36,10 @@ describe('tenant terminology', () => {
     expect(normalizeOrganizationType(undefined)).toBe('student');
     expect(getTenantTerminology()).toEqual(getTenantTerminology('student'));
     expect(getTenantTerminology('legacy-value')).toEqual(getTenantTerminology('student'));
+  });
+
+  it('uses organization-aware voter wording in the voting notice', () => {
+    expect(getEligibleVoterNoticeText('student')).toBe('Each eligible student can vote only once.');
+    expect(getEligibleVoterNoticeText('general')).toBe('Each eligible voter can vote only once.');
   });
 });
