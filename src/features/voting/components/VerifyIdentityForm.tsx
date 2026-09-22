@@ -69,7 +69,7 @@ export function VerifyIdentityForm() {
   // ALREADY_VOTED is terminal for this form — no dedicated screen exists in
   // the 8-screen inventory, so this routes back toward Home with a message.
   if (submitErrorCode === 'ALREADY_VOTED') {
-    const descriptor = getErrorDescriptor(submitErrorCode);
+    const descriptor = getErrorDescriptor(submitErrorCode, 'default', terminology.identifierLabel);
     return (
       <section className="verify__col card verify-form" aria-labelledby="verify-title">
         <div className="verify-form__body">
@@ -87,7 +87,9 @@ export function VerifyIdentityForm() {
     );
   }
 
-  const descriptor = submitErrorCode ? getErrorDescriptor(submitErrorCode) : null;
+  const descriptor = submitErrorCode
+    ? getErrorDescriptor(submitErrorCode, 'default', terminology.identifierLabel)
+    : null;
 
   return (
     <section className="verify__col card verify-form" aria-labelledby="verify-title">

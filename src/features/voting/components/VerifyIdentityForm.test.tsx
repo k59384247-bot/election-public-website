@@ -2,6 +2,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ApiRequestError } from '@/lib/apiClient';
 import type { TenantPublicInfo } from '@/lib/types';
 
 const mocks = vi.hoisted(() => ({
@@ -91,6 +92,29 @@ describe('VerifyIdentityForm terminology', () => {
     expect(screen.getByLabelText('Voter ID Number')).toBeTruthy();
     expect(screen.queryByLabelText('Matric Number')).toBeNull();
     expect(screen.getAllByText(/voter id number/i)).toHaveLength(2);
+  });
+
+  it('uses Voter ID wording for a general-tenant verification failure', async () => {
+    mocks.tenant = tenant('general');
+    mocks.submitIdentity.mockRejectedValueOnce(
+      new ApiRequestError('VOTER_INELIGIBLE', 'The voter could not be verified')
+    );
+
+    render(<VerifyIdentityForm />);
+
+    fireEvent.change(screen.getByLabelText('Voter ID Number'), {
+      target: { value: '2026-004' },
+    });
+    fireEvent.change(screen.getByLabelText('Email Address'), {
+      target: { value: 'voter@example.com' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(
+      await screen.findByText(
+        'We couldn’t verify these details. Check your voter id number and registered email, then try again.'
+      )
+    ).toBeTruthy();
   });
 
   it('keeps legacy student terminology when organizationType is missing', () => {

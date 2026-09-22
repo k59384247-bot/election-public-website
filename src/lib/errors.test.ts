@@ -16,4 +16,12 @@ describe('getErrorDescriptor', () => {
       recoveryAction: 'retry',
     });
   });
+
+  it('uses the tenant-specific identifier in voter-ineligible messages', () => {
+    expect(getErrorDescriptor('VOTER_INELIGIBLE', 'default', 'Voter ID Number')).toMatchObject({
+      userMessage:
+        'We couldn’t verify these details. Check your voter id number and registered email, then try again.',
+      recoveryAction: 'retry',
+    });
+  });
 });

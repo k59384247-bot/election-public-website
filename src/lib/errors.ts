@@ -40,6 +40,12 @@ export interface UiErrorDescriptor {
  */
 export type ErrorContext = 'default' | 'results' | 'otp_verification';
 
+const DEFAULT_IDENTIFIER_LABEL = 'Matric Number';
+
+function getVoterIneligibleMessage(identifierLabel: string): string {
+  return `We couldn’t verify these details. Check your ${identifierLabel.toLowerCase()} and registered email, then try again.`;
+}
+
 const DEFAULT_DESCRIPTOR: UiErrorDescriptor = {
   severity: 'error',
   userMessage: 'Something went wrong. Please try again.',
@@ -67,8 +73,7 @@ const BASE_TABLE: Partial<Record<ClientErrorCode, UiErrorDescriptor>> = {
   // identity screen; the OTP screen is only for delivery and resend.
   VOTER_INELIGIBLE: {
     severity: 'error',
-    userMessage:
-      'We couldn’t verify these details. Check your matric number and registered email, then try again.',
+    userMessage: getVoterIneligibleMessage(DEFAULT_IDENTIFIER_LABEL),
     recoveryAction: 'retry',
   },
 
@@ -145,7 +150,8 @@ const OTP_VERIFICATION_NETWORK_DESCRIPTOR: UiErrorDescriptor = {
 
 export function getErrorDescriptor(
   code: ClientErrorCode,
-  context: ErrorContext = 'default'
+  context: ErrorContext = 'default',
+  identifierLabel: string = DEFAULT_IDENTIFIER_LABEL
 ): UiErrorDescriptor {
   if (code === 'ELECTION_CLOSED' && context === 'results') {
     return RESULTS_ELECTION_CLOSED_DESCRIPTOR;
@@ -155,5 +161,13 @@ export function getErrorDescriptor(
     return OTP_VERIFICATION_NETWORK_DESCRIPTOR;
   }
 
-  return BASE_TABLE[code] ?? DEFAULT_DESCRIPTOR;
+  const descriptor = BASE_TABLE[code] ?? DEFAULT_DESCRIPTOR;
+  if (code === 'VOTER_INELIGIBLE') {
+    return {
+      ...descriptor,
+      userMessage: getVoterIneligibleMessage(identifierLabel),
+    };
+  }
+
+  return descriptor;
 }
