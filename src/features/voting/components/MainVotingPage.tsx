@@ -14,7 +14,7 @@ import { AssistanceCard } from './AssistanceCard';
 import { resetPaginationScroll } from '@/lib/paginationScroll';
 
 const PER_PAGE_OPTIONS = [3, 5, 10] as const;
-const DEFAULT_POSITIONS_PER_PAGE = 5;
+const DEFAULT_POSITIONS_PER_PAGE = 10;
 
 /**
  * Screens 4/5 (Main Voting Page) — ONE component rendered at every data
@@ -174,7 +174,7 @@ export function MainVotingPage({
           <div className="pagination__center">
             <PerPageSelect
               id="positions-per-page"
-              label="Results per page"
+              label="Positions per page"
               value={positionsPerPage}
               options={PER_PAGE_OPTIONS}
               onChange={handlePerPageChange}
