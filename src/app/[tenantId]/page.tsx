@@ -49,8 +49,6 @@ export default async function ElectionsHomePage({
   return (
     <div className="elections-home">
       <header className="elections-hero">
-        <div className="elections-hero__bg" aria-hidden="true" />
-
         <div className="elections-hero__brand">
           <Link href={`/${tenantId}`} aria-label={`${tenant.name} home`}>
             <TenantLogo className="navbar__logo" tenant={tenant} />

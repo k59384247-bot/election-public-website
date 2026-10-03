@@ -45,9 +45,8 @@ function useResetOnActualUnmount(reset: () => void) {
 
 /**
  * Screen 8 (Vote Successful Page). Reads receiptCode/alreadyVoted from the
- * reducer — receiptCode is null on the ALREADY_VOTED-treated-as-success
- * path (build spec §9.3), in which case this shows the success message
- * without a code instead of an error or a blank field.
+ * reducer — the ALREADY_VOTED-treated-as-success path may include a receipt
+ * code when the API provides one, and still renders as a completed vote.
  */
 export function VoteSuccessPage({ election }: { election: Election }) {
   const { tenantId } = useTenant();

@@ -10,6 +10,8 @@ import { useVotingSession } from '../VotingSessionContext';
 import { useRequireStep } from '../guards/requireStep';
 import { useTenant } from '@/features/tenant/TenantContext';
 import { getTenantTerminology } from '@/features/tenant/terminology';
+import type { Election, ElectionVisibility } from '@/lib/types';
+import { PublicRegistrationForm } from './PublicRegistrationForm';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -32,7 +34,15 @@ function validate(identifier: string, email: string, identifierLabel: string): F
 }
 
 /** Screen 2 (Verify Identity Page). Renders as the center card of VoteFlowLayout's first row. */
-export function VerifyIdentityForm() {
+export function VerifyIdentityForm({
+  election,
+  electionLoading = false,
+  electionVisibility,
+}: {
+  election?: Election;
+  electionLoading?: boolean;
+  electionVisibility?: ElectionVisibility;
+}) {
   useRequireStep(['idle']);
   const { electionId } = useParams<{ electionId: string }>();
   const { tenantId, tenant } = useTenant();
@@ -65,6 +75,27 @@ export function VerifyIdentityForm() {
       setIsSubmitting(false);
     }
   };
+
+  if (electionVisibility === 'public' || election?.visibility === 'public') {
+    if (!election) {
+      return (
+        <section className="verify__col card status-card" aria-live="polite" aria-busy="true">
+          <h2 className="card__title">Loading registration form…</h2>
+          <p className="status-card__subtitle">Please wait while we load this election&apos;s voter requirements.</p>
+        </section>
+      );
+    }
+    return <PublicRegistrationForm election={election} />;
+  }
+
+  if (electionLoading && !election && electionVisibility !== 'private') {
+    return (
+      <section className="verify__col card status-card" aria-live="polite" aria-busy="true">
+        <h2 className="card__title">Loading registration form…</h2>
+        <p className="status-card__subtitle">Please wait while we load this election&apos;s voter requirements.</p>
+      </section>
+    );
+  }
 
   // ALREADY_VOTED is terminal for this form — no dedicated screen exists in
   // the 8-screen inventory, so this routes back toward Home with a message.

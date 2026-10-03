@@ -19,6 +19,8 @@ export interface VotingSessionState {
   step: VotingStep;
   matricNumber: string | null;
   email: string | null;
+  /** Public registration profile kept in memory and never included in ballots. */
+  registrationData: Record<string, string | number | boolean> | null;
   /** Exchanged Firebase ID token — never the raw custom token. In memory only. */
   idToken: string | null;
   /**
@@ -51,6 +53,7 @@ export const initialVotingSessionState: VotingSessionState = {
   step: 'idle',
   matricNumber: null,
   email: null,
+  registrationData: null,
   idToken: null,
   attemptsRemaining: INITIAL_ATTEMPTS_REMAINING,
   receiptCode: null,
@@ -67,7 +70,12 @@ export const initialVotingSessionState: VotingSessionState = {
 export type OtpFailureCode = 'INVALID_OTP' | 'OTP_LOCKED' | 'OTP_EXPIRED';
 
 export type VotingSessionAction =
-  | { type: 'SUBMIT_IDENTITY_SUCCESS'; matricNumber: string; email: string }
+  | {
+      type: 'SUBMIT_IDENTITY_SUCCESS';
+      matricNumber: string | null;
+      email: string;
+      registrationData?: Record<string, string | number | boolean>;
+    }
   | { type: 'VERIFY_OTP_SUCCESS'; idToken: string }
   | { type: 'VERIFY_OTP_FAILURE'; code: OtpFailureCode }
   | { type: 'PROCEED_TO_BALLOT' }
@@ -88,6 +96,7 @@ export function votingSessionReducer(
         step: 'otp_pending',
         matricNumber: action.matricNumber,
         email: action.email,
+        registrationData: action.registrationData ?? null,
         attemptsRemaining: INITIAL_ATTEMPTS_REMAINING,
       };
     }

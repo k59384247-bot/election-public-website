@@ -4,7 +4,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, ShieldCheck, UserCog, VenetianMask, Waves } from 'lucide-react';
-import type { PublicElectionStatus } from '@/lib/types';
+import type { Election, ElectionVisibility, PublicElectionStatus } from '@/lib/types';
 import { useElection } from '@/features/election/useElection';
 import { getElectionById } from '@/features/election/api';
 import { ElectionMeta } from '@/features/election/components/ElectionMeta';
@@ -35,7 +35,13 @@ export function VoteFlowLayout({
   children,
 }: {
   electionId: string;
-  children: ReactNode;
+  children:
+    | ReactNode
+    | ((
+        election: Election | undefined,
+        isLoading: boolean,
+        visibility: ElectionVisibility | undefined
+      ) => ReactNode);
 }) {
   const { tenantId, tenant } = useTenant();
   const terminology = getTenantTerminology(tenant.organizationType);
@@ -58,7 +64,7 @@ export function VoteFlowLayout({
   // (even if fetched here) as fresh forever and never refetches — this
   // query's own default staleTime only governs refetching while this
   // component is still mounted, pre-auth.
-  const { data: fullElection } = useQuery({
+  const { data: fullElection, isLoading: isFullElectionLoading } = useQuery({
     queryKey: ['election-full', tenantId, electionId],
     queryFn: () => getElectionById(tenantId, electionId),
   });
@@ -68,6 +74,7 @@ export function VoteFlowLayout({
   // Query's one-minute cache after the dashboard changes the status.
   const displayedElection = fullElection ?? election;
   const electionStatus = election?.status ?? fullElection?.status;
+  const isPublicElection = (election?.visibility ?? fullElection?.visibility) === 'public';
   const status = electionStatus ? STATUS_CONFIG[electionStatus] : undefined;
 
   return (
@@ -127,7 +134,11 @@ export function VoteFlowLayout({
             )}
           </section>
 
-          <ElectionAccessGate status={electionStatus}>{children}</ElectionAccessGate>
+          <ElectionAccessGate status={electionStatus}>
+            {typeof children === 'function'
+              ? children(fullElection, isFullElectionLoading, election?.visibility ?? fullElection?.visibility)
+              : children}
+          </ElectionAccessGate>
         </div>
 
         <div className="verify__row">
@@ -149,7 +160,9 @@ export function VoteFlowLayout({
                   />
                 </span>
                 <p className="notice__text">
-                  You will verify your identity using your {terminology.identifierLabel.toLowerCase()} and email address.
+                  {isPublicElection
+                    ? 'You will register with the required details and verify your email address.'
+                    : `You will verify your identity using your ${terminology.identifierLabel.toLowerCase()} and email address.`}
                 </p>
               </li>
               <li className="notice__item">

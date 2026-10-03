@@ -4,10 +4,8 @@
    radii, and base reset. Reuse these variables instead of hardcoding raw
    values. Source of truth: the portal design variables.
 
-   Font loading differs from the static export: Thurkle/DM Sans are loaded
-   via next/font in app/layout.tsx, which exposes them as the --font-thurkle
-   / --font-dm-sans CSS variables consumed below (instead of an @font-face
-   block + a Google Fonts <link>).
+   Font loading differs from the static export: the body font and supported
+   heading fonts are loaded locally via next/font in app/layout.tsx.
    ========================================================================== */
 
 :root {
@@ -52,7 +50,8 @@
   --color-primary-overlay:      rgba(41, 8, 8, 0.8);
 
   /* ----- Typography ----------------------------------------------------- */
-  --font-header: var(--font-thurkle), "Georgia", serif;
+  --font-header: "Georgia", serif;
+  --font-brand:  var(--font-thurkle), "Georgia", serif;
   --font-body:   var(--font-dm-sans), -apple-system, "Segoe UI", Roboto, sans-serif;
   /* Nav links use "Satoshi" in Figma — not a Google Font, not sourced yet.
      Falls back to the body stack until Satoshi is sourced. */
@@ -92,6 +91,56 @@
   /* ----- Layout --------------------------------------------------------- */
   --content-max: 1248px;  /* inner content width */
   --nav-pad-x: 96px;      /* nav horizontal padding */
+}
+
+/* The selected font is a heading-only token. It is scoped to the tenant
+   wrapper so public tenant data never changes body or control typography. */
+.tenant-shell {
+  --tenant-heading-font: "Georgia", serif;
+  --font-header: var(--tenant-heading-font);
+}
+
+.tenant-shell[data-heading-font="space-grotesk"] {
+  --tenant-heading-font: var(--font-heading-space-grotesk), sans-serif;
+}
+
+.tenant-shell[data-heading-font="inter"] {
+  --tenant-heading-font: var(--font-heading-inter), sans-serif;
+}
+
+.tenant-shell[data-heading-font="manrope"] {
+  --tenant-heading-font: var(--font-heading-manrope), sans-serif;
+}
+
+.tenant-shell[data-heading-font="dm-sans"] {
+  --tenant-heading-font: var(--font-dm-sans), sans-serif;
+}
+
+.tenant-shell[data-heading-font="nunito-sans"] {
+  --tenant-heading-font: var(--font-heading-nunito-sans), sans-serif;
+}
+
+.tenant-shell[data-heading-font="rubik"] {
+  --tenant-heading-font: var(--font-heading-rubik), sans-serif;
+}
+
+.tenant-shell[data-heading-font="sora"] {
+  --tenant-heading-font: var(--font-heading-sora), sans-serif;
+}
+
+/* Internal-only option; public tenant data is normalized before it reaches
+   this attribute and cannot select Thurkle. */
+.tenant-shell[data-heading-font="thurkle"] {
+  --tenant-heading-font: var(--font-thurkle), "Georgia", serif;
+}
+
+.tenant-shell h1,
+.tenant-shell h2,
+.tenant-shell h3,
+.tenant-shell h4,
+.tenant-shell h5,
+.tenant-shell h6 {
+  font-family: var(--font-header);
 }
 
 /* ----- Base reset -------------------------------------------------------- */

@@ -24,12 +24,14 @@ const RETRY_DELAYS_MS = [1_000, 3_000, 8_000];
 export class ApiRequestError extends Error {
   readonly code: ClientErrorCode;
   readonly status?: number;
+  readonly receiptCode?: string;
 
-  constructor(code: ClientErrorCode, message: string, status?: number) {
+  constructor(code: ClientErrorCode, message: string, status?: number, receiptCode?: string) {
     super(message);
     this.name = 'ApiRequestError';
     this.code = code;
     this.status = status;
+    this.receiptCode = receiptCode;
   }
 }
 
@@ -135,7 +137,8 @@ async function performFetch<T, M>(
   throw new ApiRequestError(
     envelope.error.code as ApiErrorCode,
     envelope.error.message,
-    response.status
+    response.status,
+    envelope.error.receiptCode
   );
 }
 

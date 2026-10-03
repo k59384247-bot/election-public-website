@@ -20,6 +20,7 @@ export function createFallbackTenantPublicInfo(tenantId: string): TenantPublicIn
     logoUrl: null,
     primaryColor: null,
     description: null,
+    headingFont: 'georgia',
     organizationType: 'student',
   };
 }

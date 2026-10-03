@@ -5,6 +5,7 @@ import { VotingSessionProvider } from '@/features/voting/VotingSessionContext';
 import { auth } from '@/lib/firebase';
 import type { TenantPublicInfo } from '@/lib/types';
 import { buildTenantTheme } from './theme';
+import { normalizeHeadingFont } from './headingFont';
 
 interface TenantContextValue {
   tenantId: string;
@@ -37,6 +38,7 @@ export function TenantProviders({
       <VotingSessionProvider key={tenantId} tenantId={tenantId}>
         <div
           className="tenant-shell"
+          data-heading-font={normalizeHeadingFont(tenant.headingFont)}
           style={theme as React.CSSProperties}
         >
           {children}

@@ -34,7 +34,13 @@ export interface VotingSessionContextValue {
   state: VotingSessionState;
   dispatch: Dispatch<VotingSessionAction>;
   submitIdentity: (electionId: string, matricNumber: string, email: string) => Promise<void>;
+  submitPublicRegistration: (
+    electionId: string,
+    email: string,
+    registrationData: Record<string, string | number | boolean>
+  ) => Promise<void>;
   submitOtpAndExchangeToken: (electionId: string, matricNumber: string, otp: string) => Promise<void>;
+  submitPublicOtpAndExchangeToken: (electionId: string, email: string, otp: string) => Promise<void>;
   /**
    * Returns a freshly-minted Firebase ID token for the current voter,
    * refreshed at call time. cast-vote MUST use this rather than the
@@ -60,6 +66,7 @@ export interface VotingSessionContextValue {
    * keys its reset off of.
    */
   otpSendCount: number;
+  otpDeliveryQueued: boolean | null;
   /**
    * Also not reducer state — OTP_LOCKED clears the reducer back to idle
    * immediately, which unmounts the OTP screen before it could show why.
@@ -83,6 +90,7 @@ export function VotingSessionProvider({
   const [state, dispatch] = useReducer(votingSessionReducer, initialVotingSessionState);
   const [otpExpiresInSeconds, setOtpExpiresInSeconds] = useState<number | null>(null);
   const [otpSendCount, setOtpSendCount] = useState(0);
+  const [otpDeliveryQueued, setOtpDeliveryQueued] = useState<boolean | null>(null);
   const [lockoutNotice, setLockoutNotice] = useState<string | null>(null);
 
   const submitIdentity = useCallback(async (electionId: string, matricNumber: string, email: string) => {
@@ -91,6 +99,7 @@ export function VotingSessionProvider({
     // VOTER_INELIGIBLE/ALREADY_VOTED/etc. state itself via errors.ts.
     const result = await validateVoter({ tenantId, electionId, matricNumber, email });
     setOtpExpiresInSeconds(result.expiresInSeconds);
+    setOtpDeliveryQueued(result.deliveryQueued ?? true);
     setOtpSendCount((count) => count + 1);
     // Guarded to a no-op by the reducer when step isn't 'idle' — this same
     // function doubles as the OTP screen's "resend code" action, which
@@ -99,10 +108,36 @@ export function VotingSessionProvider({
     dispatch({ type: 'SUBMIT_IDENTITY_SUCCESS', matricNumber, email });
   }, [tenantId]);
 
+  const submitPublicRegistration = useCallback(
+    async (
+      electionId: string,
+      email: string,
+      registrationData: Record<string, string | number | boolean>
+    ) => {
+      const result = await validateVoter({ tenantId, electionId, email, registrationData });
+      setOtpExpiresInSeconds(result.expiresInSeconds);
+      setOtpDeliveryQueued(result.deliveryQueued ?? true);
+      setOtpSendCount((count) => count + 1);
+      dispatch({
+        type: 'SUBMIT_IDENTITY_SUCCESS',
+        matricNumber: null,
+        email,
+        registrationData,
+      });
+    },
+    [tenantId]
+  );
+
   const submitOtpAndExchangeToken = useCallback(async (electionId: string, matricNumber: string, otp: string) => {
     let customToken: string;
     try {
-      const result = await verifyOtp({ tenantId, electionId, matricNumber, otp });
+      const result = await verifyOtp({
+        tenantId,
+        electionId,
+        matricNumber,
+        email: state.email ?? '',
+        otp,
+      });
       customToken = result.customToken;
     } catch (err) {
       if (err instanceof ApiRequestError && isOtpFailureCode(err.code)) {
@@ -123,7 +158,30 @@ export function VotingSessionProvider({
     const userCredential = await signInWithCustomToken(auth, customToken);
     const idToken = await getIdToken(userCredential.user);
     dispatch({ type: 'VERIFY_OTP_SUCCESS', idToken });
-  }, [tenantId]);
+  }, [tenantId, state.email]);
+
+  const submitPublicOtpAndExchangeToken = useCallback(
+    async (electionId: string, email: string, otp: string) => {
+      let customToken: string;
+      try {
+        const result = await verifyOtp({ tenantId, electionId, email, otp });
+        customToken = result.customToken;
+      } catch (err) {
+        if (err instanceof ApiRequestError && isOtpFailureCode(err.code)) {
+          if (err.code === 'OTP_LOCKED') {
+            setLockoutNotice(getErrorDescriptor(err.code).userMessage);
+          }
+          dispatch({ type: 'VERIFY_OTP_FAILURE', code: err.code });
+        }
+        throw err;
+      }
+
+      const userCredential = await signInWithCustomToken(auth, customToken);
+      const idToken = await getIdToken(userCredential.user);
+      dispatch({ type: 'VERIFY_OTP_SUCCESS', idToken });
+    },
+    [tenantId]
+  );
 
   const getFreshIdToken = useCallback(async () => {
     const user = auth.currentUser;
@@ -143,6 +201,7 @@ export function VotingSessionProvider({
     dispatch({ type: 'RESET' });
     setOtpExpiresInSeconds(null);
     setOtpSendCount(0);
+    setOtpDeliveryQueued(null);
   }, []);
 
   const dismissLockoutNotice = useCallback(() => {
@@ -164,22 +223,28 @@ export function VotingSessionProvider({
       state,
       dispatch,
       submitIdentity,
+      submitPublicRegistration,
       submitOtpAndExchangeToken,
+      submitPublicOtpAndExchangeToken,
       getFreshIdToken,
       reset,
       otpExpiresInSeconds,
       otpSendCount,
+      otpDeliveryQueued,
       lockoutNotice,
       dismissLockoutNotice,
     }),
     [
       state,
       submitIdentity,
+      submitPublicRegistration,
       submitOtpAndExchangeToken,
+      submitPublicOtpAndExchangeToken,
       getFreshIdToken,
       reset,
       otpExpiresInSeconds,
       otpSendCount,
+      otpDeliveryQueued,
       lockoutNotice,
       dismissLockoutNotice,
     ]

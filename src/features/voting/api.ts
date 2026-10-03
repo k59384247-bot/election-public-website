@@ -18,8 +18,9 @@ import type {
 export interface ValidateVoterParams {
   tenantId: string;
   electionId: string;
-  matricNumber: string;
+  matricNumber?: string;
   email: string;
+  registrationData?: Record<string, string | number | boolean>;
 }
 
 export async function validateVoter({
@@ -27,11 +28,16 @@ export async function validateVoter({
   electionId,
   matricNumber,
   email,
+  registrationData,
 }: ValidateVoterParams): Promise<ValidateVoterResponse> {
+  const body: Record<string, unknown> = { electionId, email };
+  if (matricNumber !== undefined) body.matricNumber = matricNumber;
+  if (registrationData !== undefined) body.registrationData = registrationData;
+
   const { data } = await apiRequest<ValidateVoterResponse>('/v1/elections/validate-voter', {
     method: 'POST',
     tenantId,
-    body: { electionId, matricNumber, email },
+    body,
   });
   return data;
 }
@@ -39,7 +45,8 @@ export async function validateVoter({
 export interface VerifyOtpParams {
   tenantId: string;
   electionId: string;
-  matricNumber: string;
+  matricNumber?: string;
+  email: string;
   otp: string;
 }
 
@@ -52,12 +59,16 @@ export async function verifyOtp({
   tenantId,
   electionId,
   matricNumber,
+  email,
   otp,
 }: VerifyOtpParams): Promise<VerifyOtpResponse> {
+  const body: Record<string, unknown> = { electionId, email, otp };
+  if (matricNumber !== undefined) body.matricNumber = matricNumber;
+
   const { data } = await apiRequest<VerifyOtpResponse>('/v1/elections/verify-otp', {
     method: 'POST',
     tenantId,
-    body: { electionId, matricNumber, otp },
+    body,
   });
   return data;
 }
@@ -68,7 +79,7 @@ export async function verifyOtp({
 
 export interface CastVoteSuccess {
   success: true;
-  /** null only on the alreadyVoted path — the API returns no receipt there. */
+  /** May be null when the API confirms a prior vote without a receipt. */
   receiptCode: string | null;
   /**
    * True when this "success" is actually an idempotent re-submit (the
@@ -142,7 +153,7 @@ export async function castVote(
   } catch (firstErr) {
     if (!(firstErr instanceof ApiRequestError) || firstErr.code !== NETWORK_ERROR_CODE) {
       if (firstErr instanceof ApiRequestError && firstErr.code === 'ALREADY_VOTED') {
-        return { success: true, receiptCode: null, alreadyVoted: true };
+        return { success: true, receiptCode: firstErr.receiptCode ?? null, alreadyVoted: true };
       }
       // A definitive rejection on the first attempt — never retried.
       throw firstErr;
@@ -155,7 +166,7 @@ export async function castVote(
       return { success: true, receiptCode: data.receiptCode, alreadyVoted: false };
     } catch (secondErr) {
       if (secondErr instanceof ApiRequestError && secondErr.code === 'ALREADY_VOTED') {
-        return { success: true, receiptCode: null, alreadyVoted: true };
+        return { success: true, receiptCode: secondErr.receiptCode ?? null, alreadyVoted: true };
       }
 
       if (secondErr instanceof ApiRequestError && secondErr.code !== NETWORK_ERROR_CODE) {

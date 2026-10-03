@@ -3,6 +3,8 @@
  * No React/JSX imports belong in this file.
  */
 
+import type { HeadingFont } from '@/features/tenant/headingFont';
+
 // ---------------------------------------------------------------------------
 // Envelope
 // ---------------------------------------------------------------------------
@@ -18,6 +20,7 @@ export interface ApiFailure {
   error: {
     code: ApiErrorCode;
     message: string;
+    receiptCode?: string;
   };
 }
 
@@ -29,6 +32,7 @@ export type ApiEnvelope<T, M = undefined> = ApiSuccess<T, M> | ApiFailure;
 
 export type ApiErrorCode =
   | 'INVALID_ARGUMENT'
+  | 'INVALID_REGISTRATION'
   | 'VALIDATION_ERROR'
   | 'DUPLICATE_VOTE'
   | 'TOO_MANY_VOTES_FOR_POSITION'
@@ -41,6 +45,7 @@ export type ApiErrorCode =
   | 'INVALID_OTP'
   | 'OTP_EXPIRED'
   | 'OTP_LOCKED'
+  | 'EMAIL_DELIVERY_FAILED'
   | 'INVALID_TENANT'
   | 'TENANT_NOT_FOUND'
   | 'NOT_FOUND'
@@ -57,6 +62,19 @@ export type PublicElectionStatus =
   | 'voting_closed'
   | 'results_published'
   | 'upcoming';
+
+export type ElectionVisibility = 'private' | 'public';
+
+export type RegistrationFieldType = 'text' | 'email' | 'number' | 'select' | 'checkbox';
+
+export interface RegistrationField {
+  id: string;
+  key: string;
+  label: string;
+  type: RegistrationFieldType;
+  required: boolean;
+  options?: string[];
+}
 
 export interface CandidateSocialLinks {
   twitter?: string;
@@ -97,6 +115,9 @@ export interface Election {
   description: string;
   thumbnailUrl: string | null;
   status: PublicElectionStatus;
+  /** Public elections collect registration answers; absent means legacy private flow. */
+  visibility?: ElectionVisibility;
+  registrationFields?: RegistrationField[];
   startDate: string;
   endDate: string;
   votesCast: number;
@@ -116,6 +137,7 @@ export interface ElectionSummary {
   description: string;
   thumbnailUrl: string | null;
   status: PublicElectionStatus;
+  visibility?: ElectionVisibility;
   startDate: string;
   endDate: string;
   votesCast: number;
@@ -136,6 +158,8 @@ export interface TenantPublicInfo {
   primaryColor: string | null;
   description: string | null;
   /** Optional for backwards compatibility with older tenant responses. */
+  headingFont?: HeadingFont;
+  /** Optional for backwards compatibility with older tenant responses. */
   organizationType?: OrganizationType;
 }
 
@@ -145,13 +169,15 @@ export interface TenantPublicInfo {
 
 export interface ValidateVoterRequest {
   electionId: string;
-  matricNumber: string;
   email: string;
+  matricNumber?: string;
+  registrationData?: Record<string, string | number | boolean>;
 }
 
 export interface ValidateVoterResponse {
   message: string;
   expiresInSeconds: number;
+  deliveryQueued?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -160,8 +186,9 @@ export interface ValidateVoterResponse {
 
 export interface VerifyOtpRequest {
   electionId: string;
-  matricNumber: string;
+  email: string;
   otp: string;
+  matricNumber?: string;
 }
 
 export interface VerifyOtpResponse {

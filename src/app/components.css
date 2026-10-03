@@ -44,7 +44,7 @@
   border-radius: 0;
   box-shadow: none;
   color: var(--color-header-text);
-  font-family: var(--font-header);
+  font-family: var(--font-brand);
   font-size: var(--fs-body-lg);
   line-height: 1.1;
   overflow-wrap: anywhere;
@@ -203,6 +203,24 @@
   color: var(--color-neutral-700);
 }
 
+.field__input:has(option) {
+  appearance: auto;
+  cursor: pointer;
+}
+
+.registration-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.registration-checkbox input {
+  width: 20px;
+  height: 20px;
+  margin-top: 3px;
+  accent-color: var(--color-wine);
+}
+
 .field__error-text {
   font-size: var(--fs-sm);
   line-height: var(--lh-sm);
@@ -283,7 +301,7 @@
 }
 
 .powered-by__brand {
-  font-family: var(--font-header);
+  font-family: var(--font-brand);
   font-size: var(--fs-body);
   line-height: var(--lh-body);
   color: var(--color-wine);

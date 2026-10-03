@@ -53,6 +53,18 @@ const DEFAULT_DESCRIPTOR: UiErrorDescriptor = {
 };
 
 const BASE_TABLE: Partial<Record<ClientErrorCode, UiErrorDescriptor>> = {
+  INVALID_REGISTRATION: {
+    severity: 'error',
+    userMessage: 'We could not verify these registration details. Check the form and try again.',
+    recoveryAction: 'retry',
+  },
+
+  INVALID_ARGUMENT: {
+    severity: 'error',
+    userMessage: 'Some information is invalid. Check the form and try again.',
+    recoveryAction: 'retry',
+  },
+
   // Terminal, informational state on validate-voter: the voter already
   // voted, so this is not an error to recover from.
   //
@@ -90,6 +102,12 @@ const BASE_TABLE: Partial<Record<ClientErrorCode, UiErrorDescriptor>> = {
     severity: 'warning',
     userMessage: 'Your verification code has expired. Request a new one to continue.',
     recoveryAction: 'show_resend',
+  },
+
+  EMAIL_DELIVERY_FAILED: {
+    severity: 'warning',
+    userMessage: 'We could not deliver the verification email. Please try again shortly.',
+    recoveryAction: 'retry',
   },
 
   // Confirmed against the real API (2026-07-25): the backend returns this

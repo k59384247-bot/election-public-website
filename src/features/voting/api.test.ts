@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { ApiRequestError } from '@/lib/apiClient';
 import { NETWORK_ERROR_CODE } from '@/lib/errors';
-import { validateVoter } from './api';
+import { validateVoter, verifyOtp } from './api';
 
 const apiRequestMock = vi.fn();
 
@@ -80,6 +80,18 @@ describe('castVote', () => {
     expect(apiRequestMock).toHaveBeenCalledTimes(1);
   });
 
+  it('preserves a receipt code when ALREADY_VOTED includes one', async () => {
+    apiRequestMock.mockRejectedValueOnce(
+      new ApiRequestError('ALREADY_VOTED', 'You have already voted', 409, 'VOTE-ALREADY-1')
+    );
+
+    await expect(castVote(ELECTION_ID, VOTES, ID_TOKEN)).resolves.toEqual({
+      success: true,
+      receiptCode: 'VOTE-ALREADY-1',
+      alreadyVoted: true,
+    });
+  });
+
   it('a genuine ELECTION_CLOSED rejection is thrown as-is and never retried', async () => {
     const rejection = new ApiRequestError('ELECTION_CLOSED', 'Voting is not currently open');
     apiRequestMock.mockRejectedValueOnce(rejection);
@@ -139,6 +151,85 @@ describe('validateVoter', () => {
           electionId: ELECTION_ID,
           matricNumber: 'general-id-123',
           email: 'voter@example.com',
+        },
+      })
+    );
+  });
+
+  it('sends public registration data without matricNumber', async () => {
+    apiRequestMock.mockResolvedValueOnce({
+      data: { message: 'OTP sent', expiresInSeconds: 600, deliveryQueued: true },
+    });
+
+    await validateVoter({
+      tenantId: 'public-tenant',
+      electionId: ELECTION_ID,
+      email: 'voter@example.com',
+      registrationData: { name: 'Example Voter', email: 'voter@example.com', gender: 'Female' },
+    });
+
+    expect(apiRequestMock).toHaveBeenCalledWith(
+      '/v1/elections/validate-voter',
+      expect.objectContaining({
+        method: 'POST',
+        tenantId: 'public-tenant',
+        body: {
+          electionId: ELECTION_ID,
+          email: 'voter@example.com',
+          registrationData: {
+            name: 'Example Voter',
+            email: 'voter@example.com',
+            gender: 'Female',
+          },
+        },
+      })
+    );
+    expect(apiRequestMock.mock.calls[0][1].body).not.toHaveProperty('matricNumber');
+  });
+
+  it('verifies public OTP with email and does not resend registrationData', async () => {
+    apiRequestMock.mockResolvedValueOnce({
+      data: { customToken: 'custom-token', expiresInSeconds: 600 },
+    });
+
+    await verifyOtp({
+      tenantId: 'public-tenant',
+      electionId: ELECTION_ID,
+      email: 'voter@example.com',
+      otp: '123456',
+    });
+
+    expect(apiRequestMock).toHaveBeenCalledWith(
+      '/v1/elections/verify-otp',
+      expect.objectContaining({
+        method: 'POST',
+        tenantId: 'public-tenant',
+        body: { electionId: ELECTION_ID, email: 'voter@example.com', otp: '123456' },
+      })
+    );
+  });
+
+  it('keeps private OTP verification fields together', async () => {
+    apiRequestMock.mockResolvedValueOnce({
+      data: { customToken: 'custom-token', expiresInSeconds: 600 },
+    });
+
+    await verifyOtp({
+      tenantId: 'private-tenant',
+      electionId: ELECTION_ID,
+      matricNumber: '123456789',
+      email: 'voter@example.com',
+      otp: '123456',
+    });
+
+    expect(apiRequestMock).toHaveBeenCalledWith(
+      '/v1/elections/verify-otp',
+      expect.objectContaining({
+        body: {
+          electionId: ELECTION_ID,
+          matricNumber: '123456789',
+          email: 'voter@example.com',
+          otp: '123456',
         },
       })
     );

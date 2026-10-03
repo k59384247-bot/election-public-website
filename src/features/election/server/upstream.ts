@@ -1,6 +1,7 @@
 import { ApiRequestError } from '@/lib/apiClient';
 import type {
   ApiErrorCode,
+  ElectionVisibility,
   ElectionSummary,
   PaginationMeta,
   PublicElectionStatus,
@@ -58,12 +59,21 @@ function normalizeElectionSummary(value: unknown): ElectionSummary | null {
     return null;
   }
 
+  if (
+    value.visibility !== undefined &&
+    value.visibility !== 'private' &&
+    value.visibility !== 'public'
+  ) {
+    return null;
+  }
+
   return {
     id: value.id,
     title: value.title,
     description: typeof value.description === 'string' ? value.description : '',
     thumbnailUrl: typeof value.thumbnailUrl === 'string' ? value.thumbnailUrl : null,
     status: value.status as PublicElectionStatus,
+    visibility: value.visibility as ElectionVisibility | undefined,
     startDate: value.startDate,
     endDate: value.endDate,
     votesCast: typeof value.votesCast === 'number' ? value.votesCast : 0,

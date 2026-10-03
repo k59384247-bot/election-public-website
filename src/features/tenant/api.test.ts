@@ -17,6 +17,20 @@ describe('public tenant configuration', () => {
     expect(tenant.organizationType).toBe('general');
   });
 
+  it('keeps a supported heading font from the public tenant response', async () => {
+    const tenant = await resolveTenantPublicInfo('space-tenant', async () => ({
+      id: 'tenant-id',
+      tenantId: 'space-tenant',
+      name: 'Space Organization',
+      logoUrl: null,
+      primaryColor: null,
+      description: null,
+      headingFont: 'space-grotesk',
+    }));
+
+    expect(tenant.headingFont).toBe('space-grotesk');
+  });
+
   it('falls back to student configuration when loading fails', async () => {
     const tenant = await resolveTenantPublicInfo('tenant-a', async () => {
       throw new ApiRequestError('INTERNAL', 'Configuration unavailable');
@@ -24,6 +38,7 @@ describe('public tenant configuration', () => {
 
     expect(tenant).toEqual(createFallbackTenantPublicInfo('tenant-a'));
     expect(tenant.name).toBe('Election Portal');
+    expect(tenant.headingFont).toBe('georgia');
     expect(tenant.organizationType).toBe('student');
   });
 

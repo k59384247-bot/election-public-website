@@ -25,27 +25,15 @@
   flex-direction: column;
   min-height: 440px;
   overflow: hidden;
-  background-color: var(--color-header-text);
+  background-color: var(--color-primary-overlay);
 }
 
-.elections-hero__bg {
-  position: absolute;
-  inset: 0;
-  background-image: url("/assets/images/elections-hero.jpg");
-  background-position: center;
-  background-size: cover;
-}
-
-/* Gold wash faded in over the flat wine overlay, top edge only — settled on
-   0.45 opacity fading out by 37% after comparing against a stronger (0.65)
-   and weaker (0.25) pass. */
-.elections-hero__bg::after {
+.elections-hero::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(180deg, var(--color-accent-wash) 0%, transparent 37%),
-    linear-gradient(180deg, var(--color-primary-overlay) 0%, var(--color-primary-overlay) 100%);
+  /* Retain the subtle tenant accent wash without the photographic backdrop. */
+  background: linear-gradient(180deg, var(--color-accent-wash) 0%, transparent 37%);
 }
 
 /* Brand mark only — the mock's full navbar (About/Careers/Resources/Contact)

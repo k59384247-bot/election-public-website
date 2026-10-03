@@ -60,8 +60,6 @@ export function ConfirmSubmissionModal({
 
     try {
       const result = await castVote(electionId, draftToVotes(draft), idToken);
-      // TEMP vote-debug — remove once the submit-hang is diagnosed.
-      console.log('[vote-debug] castVote resolved', result);
       clearBallotDraft(electionId);
       dispatch({
         type: 'CAST_VOTE_SUCCESS',
@@ -70,8 +68,6 @@ export function ConfirmSubmissionModal({
         submittedAt: new Date().toISOString(),
       });
     } catch (err) {
-      // TEMP vote-debug — remove once the submit-hang is diagnosed.
-      console.log('[vote-debug] castVote threw', err);
       clearBallotDraft(electionId);
       // A definitive ApiRequestError (ELECTION_CLOSED, FORBIDDEN, malformed
       // ballot codes, …) — build spec §9.3 step (e). CastVoteNetworkError

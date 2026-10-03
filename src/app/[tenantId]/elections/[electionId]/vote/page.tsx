@@ -119,7 +119,16 @@ export default function VotePage() {
   if (state.step === 'idle' || state.step === 'otp_pending') {
     return (
       <VoteFlowLayout electionId={electionId}>
-        {state.step === 'idle' ? <VerifyIdentityForm /> : <OtpEntryForm />}
+        {(election, isElectionLoading, visibility) =>
+          state.step === 'idle' ? (
+            <VerifyIdentityForm
+              election={election}
+              electionLoading={isElectionLoading}
+              electionVisibility={visibility}
+            />
+          ) : (
+            <OtpEntryForm />
+          )}
       </VoteFlowLayout>
     );
   }

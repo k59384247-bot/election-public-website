@@ -40,8 +40,16 @@ function formatCooldown(totalSeconds: number): string {
 export function OtpEntryForm() {
   useRequireStep(['otp_pending']);
   const { electionId } = useParams<{ electionId: string }>();
-  const { state, submitIdentity, submitOtpAndExchangeToken, otpExpiresInSeconds, otpSendCount } =
-    useVotingSession();
+  const {
+    state,
+    submitIdentity,
+    submitPublicRegistration,
+    submitOtpAndExchangeToken,
+    submitPublicOtpAndExchangeToken,
+    otpExpiresInSeconds,
+    otpSendCount,
+    otpDeliveryQueued,
+  } = useVotingSession();
 
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,6 +108,7 @@ export function OtpEntryForm() {
 
   const matricNumber = state.matricNumber ?? '';
   const email = state.email ?? '';
+  const isPublicRegistration = state.matricNumber === null;
 
   function applyDigitsFrom(startIndex: number, value: string) {
     const chars = value.replace(/\D/g, '').slice(0, OTP_LENGTH - startIndex).split('');
@@ -168,7 +177,11 @@ export function OtpEntryForm() {
     setVerifyErrorCode(null);
     setIsSubmitting(true);
     try {
-      await submitOtpAndExchangeToken(electionId, matricNumber, otp);
+      if (isPublicRegistration) {
+        await submitPublicOtpAndExchangeToken(electionId, email, otp);
+      } else {
+        await submitOtpAndExchangeToken(electionId, matricNumber, otp);
+      }
     } catch (err) {
       const code = err instanceof ApiRequestError ? err.code : NETWORK_ERROR_CODE;
       setVerifyErrorCode(code);
@@ -187,7 +200,11 @@ export function OtpEntryForm() {
     setResendErrorCode(null);
     setIsResending(true);
     try {
-      await submitIdentity(electionId, matricNumber, email);
+      if (isPublicRegistration) {
+        await submitPublicRegistration(electionId, email, state.registrationData ?? {});
+      } else {
+        await submitIdentity(electionId, matricNumber, email);
+      }
       setVerifyErrorCode(null);
       setDigits(Array(OTP_LENGTH).fill(''));
       inputRefs.current[0]?.focus();
@@ -223,6 +240,12 @@ export function OtpEntryForm() {
           <p className="verify-email__note">
             Can&apos;t find the verification code? Please check your spam or junk folder.
           </p>
+
+          {otpDeliveryQueued === false && (
+            <p className="verify-email__note" role="status">
+              An existing verification code is still active. Use that code instead of waiting for a new email.
+            </p>
+          )}
 
           <div className="verify-email__otp">
             <label className="verify-email__otp-label" htmlFor="otp-1">
