@@ -45,6 +45,7 @@
   box-shadow: none;
   color: var(--color-header-text);
   font-family: var(--font-brand);
+  font-weight: 800;
   font-size: var(--fs-body-lg);
   line-height: 1.1;
   overflow-wrap: anywhere;
@@ -142,7 +143,7 @@
 .card__title {
   margin: 0;
   font-family: var(--font-header);
-  font-weight: 400;
+  font-weight: 800;
   font-size: var(--fs-title);
   line-height: var(--lh-title);
   color: var(--color-neutral-1100);
@@ -403,7 +404,7 @@
 .hero__title {
   margin: 0;
   font-family: var(--font-header);
-  font-weight: 400;
+  font-weight: 800;
   font-size: var(--fs-hero);
   line-height: var(--lh-hero);
 }
@@ -504,7 +505,7 @@
 .assistance__title {
   margin: 0;
   font-family: var(--font-header);
-  font-weight: 400;
+  font-weight: 800;
   font-size: var(--fs-title);
   line-height: var(--lh-title);
 }
@@ -589,8 +590,8 @@
   }
 
   .card__title {
-    font-size: 24px;
-    line-height: 32px;
+    font-size: var(--fs-heading-md);
+    line-height: var(--lh-heading-md);
   }
 
   .hero__title {
@@ -768,9 +769,9 @@
 
 .event-card__title {
   margin: 0;
-  font-weight: 600;
-  font-size: var(--fs-lg);          /* 20px */
-  line-height: 32px;
+  font-weight: 800;
+  font-size: var(--fs-heading-sm);
+  line-height: var(--lh-heading-sm);
   color: var(--color-header-text);
 }
 
@@ -931,6 +932,7 @@
   margin: 0 0 var(--space-3);
   color: var(--color-header-text);
   font-family: var(--font-header);
+  font-weight: 800;
   font-size: var(--fs-title);
   line-height: var(--lh-title);
 }
@@ -1055,8 +1057,8 @@
   }
 
   .event-card__title {
-    font-size: var(--fs-body);
-    line-height: var(--lh-body);
+    font-size: var(--fs-heading-sm);
+    line-height: var(--lh-heading-sm);
   }
 
   .event-card__desc {

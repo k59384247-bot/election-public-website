@@ -58,9 +58,11 @@
   --font-nav:    "Satoshi", var(--font-dm-sans), -apple-system, "Segoe UI", sans-serif;
 
   /* Font sizes / line heights (px, matching Figma) */
-  --fs-display: 48px;   --lh-display: 64px; /* landing banner headline (Thurkle) */
-  --fs-hero: 36px;      --lh-hero: 48px;   /* hero headline (Thurkle) */
-  --fs-title: 32px;     --lh-title: 40px;  /* card titles (Thurkle)   */
+  --fs-display: 60px;   --lh-display: 76px;
+  --fs-hero: 48px;      --lh-hero: 60px;
+  --fs-title: 44px;     --lh-title: 52px;
+  --fs-heading-md: 30px; --lh-heading-md: 38px;
+  --fs-heading-sm: 26px; --lh-heading-sm: 36px;
   --fs-lg: 20px;        --lh-lg: 24px;     /* button label            */
   --fs-body-lg: 18px;   --lh-body-lg: 24px;
   --fs-body: 16px;      --lh-body: 24px;
@@ -98,6 +100,7 @@
 .tenant-shell {
   --tenant-heading-font: "Georgia", serif;
   --font-header: var(--tenant-heading-font);
+  font-synthesis: weight;
 }
 
 .tenant-shell[data-heading-font="space-grotesk"] {
@@ -141,6 +144,7 @@
 .tenant-shell h5,
 .tenant-shell h6 {
   font-family: var(--font-header);
+  font-weight: 800;
 }
 
 /* ----- Base reset -------------------------------------------------------- */

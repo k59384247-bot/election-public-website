@@ -69,7 +69,7 @@
   margin: 0 0 var(--space-2);
   width: 100%;
   font-family: var(--font-header);
-  font-weight: 400;
+  font-weight: 800;
   font-size: var(--fs-display);
   line-height: var(--lh-display);
   color: var(--color-header-text);
@@ -193,7 +193,7 @@
 .elections-notice__title {
   margin: 0;
   font-family: var(--font-header);
-  font-weight: 400;
+  font-weight: 800;
   font-size: var(--fs-title);
   line-height: var(--lh-title);
   color: var(--color-header-text);
