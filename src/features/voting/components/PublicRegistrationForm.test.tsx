@@ -2,6 +2,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ApiRequestError } from '@/lib/apiClient';
 import type { Election } from '@/lib/types';
 
 const mocks = vi.hoisted(() => ({
@@ -18,6 +19,10 @@ vi.mock('../VotingSessionContext', () => ({
 
 vi.mock('../guards/requireStep', () => ({
   useRequireStep: vi.fn(),
+}));
+
+vi.mock('@/features/tenant/TenantContext', () => ({
+  useTenant: () => ({ tenantId: 'tenant-a' }),
 }));
 
 const { PublicRegistrationForm } = await import('./PublicRegistrationForm');
@@ -85,5 +90,23 @@ describe('PublicRegistrationForm', () => {
         }
       );
     });
+  });
+
+  it('shows the terminal already-voted card with a home link', async () => {
+    mocks.submitPublicRegistration.mockRejectedValueOnce(
+      new ApiRequestError('ALREADY_VOTED', 'Already voted')
+    );
+    render(<PublicRegistrationForm election={election} />);
+
+    fireEvent.change(screen.getByLabelText('Full name'), { target: { value: 'Example Voter' } });
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'voter@example.com' } });
+    fireEvent.change(screen.getByLabelText('Gender'), { target: { value: 'Female' } });
+    fireEvent.change(screen.getByLabelText('Age'), { target: { value: '21' } });
+    fireEvent.click(screen.getByLabelText('Accept terms'));
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByRole('heading', { name: "You've already voted" })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Return to Home' }).getAttribute('href')).toBe('/tenant-a');
+    expect(screen.queryByRole('button', { name: 'Continue' })).toBeNull();
   });
 });

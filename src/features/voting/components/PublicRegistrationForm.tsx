@@ -1,11 +1,13 @@
 'use client';
 
 import { useMemo, useState, type FormEvent } from 'react';
+import Link from 'next/link';
 import { ApiRequestError } from '@/lib/apiClient';
 import { getErrorDescriptor, NETWORK_ERROR_CODE, type ClientErrorCode } from '@/lib/errors';
 import type { Election, RegistrationField } from '@/lib/types';
 import { useVotingSession } from '../VotingSessionContext';
 import { useRequireStep } from '../guards/requireStep';
+import { useTenant } from '@/features/tenant/TenantContext';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type RegistrationValue = string | number | boolean;
@@ -156,6 +158,7 @@ function PublicRegistrationField({
 
 export function PublicRegistrationForm({ election }: PublicRegistrationFormProps) {
   useRequireStep(['idle']);
+  const { tenantId } = useTenant();
   const { submitPublicRegistration, lockoutNotice, dismissLockoutNotice } = useVotingSession();
   const fields = useMemo(() => election.registrationFields ?? [], [election.registrationFields]);
   const [values, setValues] = useState<RegistrationValues>(() => initialValues(fields));
@@ -194,6 +197,26 @@ export function PublicRegistrationForm({ election }: PublicRegistrationFormProps
   const descriptor = submitErrorCode
     ? getErrorDescriptor(submitErrorCode, 'default', 'registration details')
     : null;
+
+  if (submitErrorCode === 'ALREADY_VOTED') {
+    return (
+      <section className="verify__col card verify-form" aria-labelledby="verify-title">
+        <div className="verify-form__body">
+          <div className="verify-form__intro">
+            <h2 className="card__title" id="verify-title">
+              You&apos;ve already voted
+            </h2>
+            <p className="verify-form__subtitle">
+              {getErrorDescriptor('ALREADY_VOTED').userMessage}
+            </p>
+          </div>
+          <Link className="btn btn--gold" href={`/${tenantId}`}>
+            Return to Home
+          </Link>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="verify__col card verify-form" aria-labelledby="verify-title">
