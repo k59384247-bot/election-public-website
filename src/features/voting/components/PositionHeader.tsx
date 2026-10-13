@@ -12,12 +12,14 @@ export function PositionHeader({
   title,
   maxVotesPerVoter,
   titleId,
+  variant = 'ballot',
 }: {
   positionNumber: number;
   inverted: boolean;
   title: string;
   maxVotesPerVoter: number;
   titleId: string;
+  variant?: 'ballot' | 'results';
 }) {
   return (
     <div className={inverted ? 'position position--inverted' : 'position'}>
@@ -31,14 +33,14 @@ export function PositionHeader({
               aria-hidden="true"
             />
           </span>
-          <span className="position__name" id={titleId}>
+          <span className="position__name" id={titleId} role={variant === 'results' ? 'heading' : undefined} aria-level={variant === 'results' ? 3 : undefined}>
             {title}
           </span>
         </div>
         <div className="position__limit">
           <span className="position__limit-label">
-            <span className="position__limit-label-full">Max. Vote Allowed:</span>
-            <span className="position__limit-label-short">Max.</span>
+            <span className="position__limit-label-full">{variant === 'results' ? 'Seats:' : 'Max. Vote Allowed:'}</span>
+            <span className="position__limit-label-short">{variant === 'results' ? 'Seats:' : 'Max.'}</span>
           </span>
           <span className="position__limit-value">{maxVotesPerVoter}</span>
         </div>

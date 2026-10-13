@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { getElectionById } from '@/features/election/api';
+import { resultsHref } from '@/features/results/model';
 import '@/app/elections/[electionId]/vote/vote.css';
 import { useVotingSession } from '@/features/voting/VotingSessionContext';
 import { useRequireStep } from '@/features/voting/guards/requireStep';
@@ -113,8 +116,24 @@ function BallotFlow({ electionId }: { electionId: string }) {
 }
 
 export default function VotePage() {
-  const { electionId } = useParams<{ tenantId: string; electionId: string }>();
+  const { tenantId, electionId } = useParams<{ tenantId: string; electionId: string }>();
   const { state } = useVotingSession();
+  const router = useRouter();
+  const publicDetail = useQuery({
+    queryKey: ['public-election-detail', tenantId, electionId],
+    queryFn: () => getElectionById(tenantId, electionId),
+    enabled: state.step === 'idle' || state.step === 'otp_pending',
+    staleTime: 0, retry: false,
+  });
+  const published = publicDetail.data?.status === 'results_published';
+  useEffect(() => {
+    if (published && (state.step === 'idle' || state.step === 'otp_pending')) {
+      router.replace(resultsHref(tenantId, electionId));
+    }
+  }, [published, state.step, router, tenantId, electionId]);
+  if (published && (state.step === 'idle' || state.step === 'otp_pending')) {
+    return <VotePageShell mobileCenteredLogo><section className="card status-card" role="status"><h2 className="card__title">Opening published results…</h2></section></VotePageShell>;
+  }
 
   if (state.step === 'idle' || state.step === 'otp_pending') {
     return (

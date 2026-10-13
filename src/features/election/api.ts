@@ -5,7 +5,7 @@
  */
 
 import { apiRequest } from '@/lib/apiClient';
-import type { Election, ElectionSummary, PaginationMeta } from '@/lib/types';
+import type { Election, ElectionSummary, PaginationMeta, ElectionResults, ElectionReportDownload } from '@/lib/types';
 import { fetchAllCursorPages } from './pagination';
 
 const DEFAULT_LIMIT = 12;
@@ -69,7 +69,23 @@ export async function getAllElections({
  */
 export async function getElectionById(tenantId: string, electionId: string): Promise<Election> {
   const { data } = await apiRequest<Election>(`/v1/elections/${encodeURIComponent(electionId)}`, {
-    tenantId,
+    tenantId, cache: 'no-store',
+  });
+  return data;
+}
+
+/** Published aggregates only; never requests or downloads a PDF. */
+export async function getElectionResults(tenantId: string, electionId: string): Promise<ElectionResults> {
+  const { data } = await apiRequest<ElectionResults>(`/v1/elections/${encodeURIComponent(electionId)}/results`, {
+    tenantId, cache: 'no-store',
+  });
+  return data;
+}
+
+/** Called on explicit download only. The API returns a short-lived Storage URL. */
+export async function getElectionReportDownload(tenantId: string, electionId: string): Promise<ElectionReportDownload> {
+  const { data } = await apiRequest<ElectionReportDownload>(`/v1/elections/${encodeURIComponent(electionId)}/results/report`, {
+    tenantId, cache: 'no-store',
   });
   return data;
 }

@@ -130,6 +130,12 @@ const BASE_TABLE: Partial<Record<ClientErrorCode, UiErrorDescriptor>> = {
     recoveryAction: 'none',
   },
 
+  REPORT_NOT_READY: {
+    severity: 'info',
+    userMessage: 'The results PDF is not available yet. Please try again shortly.',
+    recoveryAction: 'retry',
+  },
+
   RATE_LIMITED: {
     severity: 'warning',
     userMessage: 'Too many attempts. Please try again shortly.',

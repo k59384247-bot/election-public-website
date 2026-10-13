@@ -10,6 +10,7 @@ import {
   isMultiDayElection,
 } from '../format';
 import { getElectionById } from '../api';
+import { resultsHref } from '@/features/results/model';
 import { useTenant } from '@/features/tenant/TenantContext';
 
 export const STATUS_CONFIG: Record<PublicElectionStatus, { label: string; pillClass: string }> = {
@@ -55,7 +56,7 @@ export function ElectionCard({ election }: { election: ElectionSummary }) {
     <article className="event-card">
       <Link
         className="event-card__link"
-        href={`/${tenantId}/elections/${election.id}/vote`}
+        href={election.status === 'results_published' ? resultsHref(tenantId, election.id) : `/${tenantId}/elections/${election.id}/vote`}
         aria-label={`Open ${election.title}`}
         onMouseEnter={prefetchFullElection}
         onFocus={prefetchFullElection}
@@ -65,8 +66,8 @@ export function ElectionCard({ election }: { election: ElectionSummary }) {
 
       <div className="event-card__media">
         {election.thumbnailUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- matches
-          // screens-html, which uses plain <img> throughout (no next/image).
+          // Matches the existing plain-img design; the thumbnail is decorative.
+          // eslint-disable-next-line @next/next/no-img-element
           <img className="event-card__media-img" src={election.thumbnailUrl} alt="" />
         ) : null}
         <span className="event-card__tag">
@@ -132,6 +133,10 @@ export function ElectionCard({ election }: { election: ElectionSummary }) {
         <div className="event-card__cta-row">
           <span className="event-card__cta">Vote Now</span>
         </div>
+      )}
+
+      {hasMounted && election.status === 'results_published' && (
+        <div className="event-card__cta-row"><span className="event-card__cta">View results</span></div>
       )}
 
       {hasMounted && election.status === 'voting_paused' && (

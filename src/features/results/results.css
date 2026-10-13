@@ -1,0 +1,110 @@
+/* Results content uses the existing voting shell and tenant tokens. */
+.result-back { align-self: flex-start; font-size: var(--fs-body); }
+.publication-line { display: flex; align-items: center; justify-content: center; gap: var(--space-2); font-size: var(--fs-sm); text-align: center; }
+.publication-line svg { flex-shrink: 0; color: var(--color-gold); }
+.result-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--space-3); width: 100%; }
+.result-download { width: auto; min-width: 280px; }
+.result-copy { padding: var(--space-4) var(--space-6); border: 1px solid var(--color-neutral-600); color: var(--color-header-text); background: transparent; font-size: var(--fs-body-lg); }
+.action-notice { flex-basis: 100%; min-height: 0; text-align: center; font-size: var(--fs-sm); }
+.action-notice:empty { display: none; }
+.result-summary { display: grid; grid-template-columns: repeat(3, 1fr); width: 612px; max-width: 100%; border-top: 1px solid var(--color-neutral-800); border-bottom: 1px solid var(--color-neutral-800); padding: var(--space-6) 0; }
+.result-summary div { display: flex; flex-direction: column; gap: var(--space-2); text-align: center; }
+.result-summary div + div { border-left: 1px solid var(--color-neutral-800); }
+.result-summary dt { font-size: var(--fs-sm); color: var(--color-body-text); }
+.result-summary dd { margin: 0; font-family: var(--font-header); font-size: var(--fs-heading-md); font-weight: 800; line-height: var(--lh-heading-md); color: var(--color-header-text); }
+.result-content { display: flex; flex-direction: column; gap: var(--space-10); width: 100%; }
+.result-section-intro { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); text-align: center; }
+.result-section-intro .vote__section-title { margin: 0; }
+.result-section-intro p { margin: 0; font-size: var(--fs-body); }
+.result-rows { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0; }
+.result-row { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-5); background: var(--color-neutral-50); border: 1px solid var(--color-neutral-500); border-radius: var(--radius-card); color: var(--color-neutral-900); }
+.result-row--elected { background: var(--color-selected-bg); border-color: var(--color-gold); }
+.result-rank { flex-shrink: 0; color: var(--color-neutral-600); font-size: var(--fs-sm); width: 12px; }
+.result-person { flex: 1; min-width: 0; }
+.result-person__top { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-3); }
+.result-person .candidate__name { font-size: var(--fs-body-lg); line-height: var(--lh-body-lg); overflow-wrap: anywhere; }
+.outcome-badges { display: inline-flex; flex-wrap: wrap; gap: var(--space-1); }
+.outcome-badge { display: inline-flex; align-items: center; gap: var(--space-1); border-radius: var(--radius-pill); padding: var(--space-1) var(--space-2); font-size: 12px; font-weight: 600; line-height: 16px; color: var(--color-neutral-900); background: var(--color-gold-100); white-space: nowrap; }
+.outcome-badge--tie { background: var(--color-neutral-200); }
+.result-bar { height: 6px; width: 100%; background: var(--color-neutral-200); overflow: hidden; border-radius: var(--radius-pill); }
+.result-bar__fill { display: block; height: 100%; background: var(--color-neutral-600); border-radius: inherit; }
+.result-bar__fill--elected { background: var(--color-wine); }
+.result-count { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1); flex-shrink: 0; width: 150px; }
+.result-count strong { font-size: var(--fs-lg); line-height: var(--lh-lg); color: var(--color-neutral-900); }
+.result-count strong span { font-size: var(--fs-sm); font-weight: 400; }
+.result-count > span { font-size: 12px; color: var(--color-neutral-600); }
+.result-note { display: flex; align-items: flex-start; gap: var(--space-2); margin: 0; font-size: 12px; line-height: 18px; color: var(--color-body-text); }
+.result-note svg { flex-shrink: 0; }
+.result-note--tie { color: var(--color-gold-100); }
+.winner-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-10) var(--space-6); }
+.winner-position { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+.winner-position .position__bar { min-height: 48px; height: auto; }
+.winner-position .position__name { font-size: var(--fs-body-lg); overflow-wrap: anywhere; }
+.winner-position .position__icon-badge { display: none; }
+.winner-card { cursor: default; padding: var(--space-6); gap: var(--space-6); border-color: var(--color-gold); background: var(--color-selected-bg); }
+.winner-card--tie { background: var(--color-neutral-50); border-color: var(--color-neutral-500); }
+.winner-card__people { display: flex; flex-direction: column; gap: var(--space-5); }
+.winner-person { display: flex; align-items: center; gap: var(--space-4); min-width: 0; }
+.winner-person > div { min-width: 0; }
+.winner-person h4 { margin: var(--space-2) 0; font-size: var(--fs-heading-sm); line-height: 30px; color: var(--color-neutral-900); overflow-wrap: anywhere; }
+.winner-person p { font-size: var(--fs-body); color: var(--color-neutral-800); }
+.winner-person p span { color: var(--color-neutral-600); }
+.winner-tie-copy { font-size: var(--fs-sm); color: var(--color-neutral-600); }
+.winner-breakdown { border-top: 1px solid var(--color-neutral-300); padding-top: var(--space-4); }
+.winner-breakdown summary { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); cursor: pointer; font-size: var(--fs-sm); font-weight: 600; color: var(--color-neutral-900); list-style: none; min-height: 44px; }
+.winner-breakdown summary::-webkit-details-marker { display: none; }
+.winner-breakdown[open] summary { margin-bottom: var(--space-4); }
+.winner-breakdown[open] summary svg { transform: rotate(180deg); }
+.winner-breakdown .result-row { padding: var(--space-3); gap: var(--space-2); border-color: var(--color-neutral-300); background: var(--color-white); flex-wrap: wrap; border-radius: var(--radius-md); }
+.winner-breakdown .result-avatar { width: 36px; height: 36px; font-size: 12px; }
+.winner-breakdown .result-person { flex-basis: calc(100% - 76px); }
+.winner-breakdown .result-person .candidate__name { font-size: var(--fs-sm); }
+.winner-breakdown .result-person__top { margin-bottom: var(--space-2); }
+.winner-breakdown .result-count { width: 100%; flex-direction: row; align-items: center; justify-content: space-between; padding-left: 58px; }
+.winner-breakdown .result-count strong { font-size: var(--fs-body); }
+.winner-breakdown .result-note { color: var(--color-neutral-600); margin-top: var(--space-4); }
+.results-footnote { width: 100%; text-align: center; color: var(--color-body-text); font-size: var(--fs-sm); line-height: var(--lh-body); padding-top: var(--space-6); border-top: 1px solid var(--color-neutral-800); }
+.results-footnote a { display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-5); color: var(--color-header-text); }
+.tenant-shell button { cursor: pointer; }
+.tenant-shell :is(button, a, summary, select, [tabindex]):focus-visible { outline: 3px solid var(--color-gold); outline-offset: 4px; }
+@media (max-width: 900px) {
+  .winner-grid { grid-template-columns: minmax(0, 1fr); width: 612px; max-width: 100%; align-self: center; }
+}
+@media (max-width: 640px) {
+  .result-back { order: 0; align-self: center; font-size: var(--fs-sm); }
+  .publication-line { font-size: 12px; }
+  .result-actions { flex-direction: column; gap: var(--space-3); }
+  .result-download { width: 100%; min-width: 0; height: 56px; font-size: var(--fs-body); }
+  .result-copy { height: 48px; font-size: var(--fs-sm); }
+  .result-summary { padding: var(--space-5) 0; }
+  .result-summary dd { font-size: var(--fs-heading-sm); }
+  .result-summary dt { font-size: 12px; }
+  .result-content { gap: var(--space-8); }
+  .result-section-intro p { font-size: var(--fs-sm); }
+  .result-section-intro .vote__section-title { font-size: var(--fs-heading-sm); }
+  .result-row { padding: var(--space-4); gap: var(--space-2); flex-wrap: wrap; border-radius: 20px; }
+  .result-rank { width: 10px; }
+  .result-person { flex-basis: calc(100% - 68px); }
+  .result-person .candidate__name { font-size: var(--fs-body); }
+  .result-person__top { margin-bottom: var(--space-2); }
+  .result-count { width: 100%; flex-direction: row; align-items: center; justify-content: space-between; padding-left: 66px; }
+  .result-count strong { font-size: var(--fs-body-lg); }
+  .result-count > span { font-size: 11px; }
+  .winner-card { padding: var(--space-5); }
+  .winner-person { gap: var(--space-3); }
+  .winner-person h4 { font-size: var(--fs-heading-sm); line-height: 30px; }
+  .winner-person p { font-size: var(--fs-sm); }
+}
+
+.winner-empty h4 { margin: 0 0 var(--space-3); color: var(--color-neutral-900); font-size: var(--fs-heading-sm); }
+.winner-empty p { color: var(--color-neutral-600); font-size: var(--fs-sm); }
+.winner-breakdown .candidate__avatar { width: 36px; height: 36px; font-size: 12px; }
+.results-state { width: 612px; max-width: 100%; gap: var(--space-4); align-items: center; text-align: center; color: var(--color-neutral-900); }
+.results-state h2 { font-size: var(--fs-heading-md); }
+.report-availability { text-align: center; font-size: var(--fs-sm); }
+.report-availability button { font: inherit; margin-top: var(--space-2); padding: var(--space-2) var(--space-4); border: 1px solid var(--color-neutral-600); border-radius: var(--radius-pill); background: transparent; color: var(--color-header-text); min-height: 44px; }
+.report-size { font-size: 12px; opacity: .75; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (max-width: 640px) { .winner-person .candidate__avatar { width: 64px; height: 64px; font-size: var(--fs-lg); } }
+@media (prefers-reduced-motion: no-preference) { .results-state > svg, .result-download:disabled > svg { animation: results-spin 1s linear infinite; } }
+@keyframes results-spin { to { transform: rotate(360deg); } }

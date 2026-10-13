@@ -35,7 +35,6 @@ describe('ElectionCard navigation', () => {
     'upcoming',
     'voting_paused',
     'voting_closed',
-    'results_published',
   ] satisfies ElectionSummary['status'][])(
     'links the full %s card to its vote page',
     (status) => {
@@ -46,4 +45,9 @@ describe('ElectionCard navigation', () => {
       expect(link.classList.contains('event-card__link')).toBe(true);
     }
   );
+  it('opens published results directly and exposes the View results action', () => {
+    render(<ElectionCard election={election('results_published')} />);
+    expect(screen.getByRole('link', { name: 'Open Student Election' }).getAttribute('href')).toBe('/tenant-a/elections/election-1/results');
+    expect(screen.getByText('View results')).toBeTruthy();
+  });
 });

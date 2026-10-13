@@ -50,6 +50,7 @@ export type ApiErrorCode =
   | 'TENANT_NOT_FOUND'
   | 'NOT_FOUND'
   | 'RATE_LIMITED'
+  | 'REPORT_NOT_READY'
   | 'INTERNAL';
 
 // ---------------------------------------------------------------------------
@@ -224,11 +225,15 @@ export interface CandidateResult {
   candidateName: string;
   votes: number;
   winner: boolean;
+  isTie: boolean;
+  percent: number;
 }
 
 export interface PositionResult {
   positionId: string;
   positionTitle: string;
+  maxVotesPerVoter: number;
+  order?: number;
   results: CandidateResult[];
 }
 
@@ -236,5 +241,13 @@ export interface ElectionResults {
   electionId: string;
   title: string;
   totalVotesCast: number;
+  publishedAt?: string | null;
+  report?: {
+    status: 'unavailable' | 'pending' | 'generating' | 'ready' | 'failed';
+    filename: string | null;
+    bytes: number | null;
+  };
   positions: PositionResult[];
 }
+
+export interface ElectionReportDownload { downloadUrl: string; filename: string; bytes: number; }

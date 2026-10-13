@@ -1,0 +1,367 @@
+{
+  "version": 1,
+  "project": {
+    "name": "election-public-website",
+    "productType": "Public voting and published election results",
+    "stack": [
+      "nextjs",
+      "react"
+    ]
+  },
+  "sources": {
+    "tokens": [
+      "src/app/globals.css",
+      "src/features/tenant/theme.ts"
+    ],
+    "components": [
+      "src/features/voting/components/VotePageShell.tsx",
+      "src/features/voting/components/ElectionHead.tsx",
+      "src/features/voting/components/PositionHeader.tsx",
+      "src/features/tenant/components/TenantLogo.tsx",
+      "src/features/voting/components/CandidateAvatar.tsx"
+    ],
+    "assets": [
+      "public/assets"
+    ],
+    "instructions": [
+      "AGENTS.md"
+    ]
+  },
+  "design": {
+    "colorMode": "dark",
+    "colors": {
+      "--color-header-text": {
+        "value": "#faf9f7",
+        "source": "src/app/globals.css"
+      },
+      "--color-body-text": {
+        "value": "#d1ccc5",
+        "source": "src/app/globals.css"
+      },
+      "--color-gold": {
+        "value": "#f4c95d",
+        "source": "src/app/globals.css"
+      },
+      "--color-gold-100": {
+        "value": "#ffe8a9",
+        "source": "src/app/globals.css"
+      },
+      "--color-wine": {
+        "value": "#900000",
+        "source": "src/app/globals.css"
+      },
+      "--color-wine-500": {
+        "value": "#5e0807",
+        "source": "src/app/globals.css"
+      },
+      "--color-wine-200": {
+        "value": "#8a0401",
+        "source": "src/app/globals.css"
+      },
+      "--color-white": {
+        "value": "#ffffff",
+        "source": "src/app/globals.css"
+      },
+      "--color-page-bg": {
+        "value": "#111111",
+        "source": "src/app/globals.css"
+      },
+      "--color-alt-bg": {
+        "value": "#171717",
+        "source": "src/app/globals.css"
+      },
+      "--color-section-bg": {
+        "value": "#090909",
+        "source": "src/app/globals.css"
+      },
+      "--color-neutral-50": {
+        "value": "#f7f7f7",
+        "source": "src/app/globals.css"
+      },
+      "--color-neutral-100": {
+        "value": "#f1f1f1",
+        "source": "src/app/globals.css"
+      },
+      "--color-neutral-200": {
+        "value": "#ebebeb",
+        "source": "src/app/globals.css"
+      },
+      "--color-neutral-300": {
+        "value": "#d1d1d1",
+        "source": "src/app/globals.css"
+      },
+      "--color-neutral-400": {
+        "value": "#bfbfbf",
+        "source": "src/app/globals.css"
+      },
+      "--color-neutral-500": {
+        "value": "#7b7b7b",
+        "source": "src/app/globals.css"
+      },
+      "--color-neutral-600": {
+        "value": "#5c5c5c",
+        "source": "src/app/globals.css"
+      },
+      "--color-neutral-700": {
+        "value": "#808080",
+        "source": "src/app/globals.css"
+      },
+      "--color-neutral-800": {
+        "value": "#262626",
+        "source": "src/app/globals.css"
+      },
+      "--color-neutral-900": {
+        "value": "#1c1c1c",
+        "source": "src/app/globals.css"
+      },
+      "--color-neutral-1100": {
+        "value": "#2b2b2b",
+        "source": "src/app/globals.css"
+      },
+      "--color-neutral-1200": {
+        "value": "#000000",
+        "source": "src/app/globals.css"
+      },
+      "--color-input-border": {
+        "value": "#cfcfcf",
+        "source": "src/app/globals.css"
+      },
+      "--color-select-border": {
+        "value": "#a3a3a3",
+        "source": "src/app/globals.css"
+      },
+      "--color-selected-bg": {
+        "value": "#fffbf1",
+        "source": "src/app/globals.css"
+      },
+      "--color-amber": {
+        "value": "#ed9a00",
+        "source": "src/app/globals.css"
+      },
+      "--color-accent-muted": {
+        "value": "rgba(255, 232, 169, 0.5)",
+        "source": "src/app/globals.css"
+      },
+      "--color-accent-subtle": {
+        "value": "rgba(244, 201, 93, 0.05)",
+        "source": "src/app/globals.css"
+      },
+      "--color-accent-medium": {
+        "value": "rgba(244, 201, 93, 0.5)",
+        "source": "src/app/globals.css"
+      },
+      "--color-accent-wash": {
+        "value": "rgba(244, 201, 93, 0.45)",
+        "source": "src/app/globals.css"
+      },
+      "--color-accent-skeleton-low": {
+        "value": "rgba(244, 201, 93, 0.08)",
+        "source": "src/app/globals.css"
+      },
+      "--color-accent-skeleton-high": {
+        "value": "rgba(244, 201, 93, 0.18)",
+        "source": "src/app/globals.css"
+      },
+      "--color-primary-overlay": {
+        "value": "rgba(41, 8, 8, 0.8)",
+        "source": "src/app/globals.css"
+      }
+    },
+    "typography": {
+      "--font-header": {
+        "value": "Georgia, serif",
+        "source": "Public AMSUL tenant config (2026-10-13)"
+      },
+      "--font-brand": {
+        "value": "var(--font-thurkle), \"Georgia\", serif",
+        "source": "src/app/globals.css"
+      },
+      "--font-body": {
+        "value": "var(--font-dm-sans), -apple-system, \"Segoe UI\", Roboto, sans-serif",
+        "source": "src/app/globals.css"
+      },
+      "--font-nav": {
+        "value": "\"Satoshi\", var(--font-dm-sans), -apple-system, \"Segoe UI\", sans-serif",
+        "source": "src/app/globals.css"
+      },
+      "--tenant-heading-font": {
+        "value": "var(--font-thurkle), \"Georgia\", serif",
+        "source": "src/app/globals.css"
+      }
+    },
+    "spacing": {
+      "--space-1": {
+        "value": "4px",
+        "source": "src/app/globals.css"
+      },
+      "--space-2": {
+        "value": "8px",
+        "source": "src/app/globals.css"
+      },
+      "--space-3": {
+        "value": "12px",
+        "source": "src/app/globals.css"
+      },
+      "--space-4": {
+        "value": "16px",
+        "source": "src/app/globals.css"
+      },
+      "--space-5": {
+        "value": "20px",
+        "source": "src/app/globals.css"
+      },
+      "--space-6": {
+        "value": "24px",
+        "source": "src/app/globals.css"
+      },
+      "--space-8": {
+        "value": "32px",
+        "source": "src/app/globals.css"
+      },
+      "--space-10": {
+        "value": "40px",
+        "source": "src/app/globals.css"
+      },
+      "--space-12": {
+        "value": "48px",
+        "source": "src/app/globals.css"
+      },
+      "--space-14": {
+        "value": "56px",
+        "source": "src/app/globals.css"
+      },
+      "--space-16": {
+        "value": "64px",
+        "source": "src/app/globals.css"
+      },
+      "--space-24": {
+        "value": "96px",
+        "source": "src/app/globals.css"
+      }
+    },
+    "radius": {
+      "--radius-md": {
+        "value": "16px",
+        "source": "src/app/globals.css"
+      },
+      "--radius-card": {
+        "value": "24px",
+        "source": "src/app/globals.css"
+      },
+      "--radius-logo": {
+        "value": "32px",
+        "source": "src/app/globals.css"
+      },
+      "--radius-btn": {
+        "value": "48px",
+        "source": "src/app/globals.css"
+      },
+      "--radius-pill": {
+        "value": "100px",
+        "source": "src/app/globals.css"
+      },
+      "--radius-round": {
+        "value": "1000px",
+        "source": "src/app/globals.css"
+      }
+    },
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [
+      "Reuse the original voting-page shell, circular AMSUL logo, centered ElectionHead, spacing, and mobile header behaviour unchanged.",
+      "Use runtime AMSUL primary #b1300b and the original buildTenantTheme function, Georgia headings, and locally loaded DM Sans body text.",
+      "Keyboard controls, readable numeric text alongside bars, and mobile layouts.",
+      "Anonymous results only for published, unarchived elections in the requested active tenant.",
+      "Read backend winner and tie flags unchanged; display one-seat ties as Tied without Elected. Keep Elected plus Tied for multi-seat ties.",
+      "Compressed PDF generated once at publication, stored and reused; signed download URL requested only on click."
+    ],
+    "avoid": [
+      "Reinvented application header or wordmark.",
+      "Decorative hero gradients, admin navigation, or unrelated visual identity.",
+      "Hosted 21st generation without verified AI access."
+    ]
+  },
+  "decisions": [
+    {
+      "date": "2026-10-13",
+      "decision": "Use Winners first inside the original public voting shell.",
+      "source": "User selected option 2 in conversation.",
+      "scope": "Accepted and implemented in the public results route and shared backend."
+    },
+    {
+      "date": "2026-10-13",
+      "decision": "Follow the current backend tie rule. One-seat ties display Tied only; multi-seat cutoff ties retain Elected plus Tied.",
+      "source": "User explicitly selected current backend rule.",
+      "scope": "Accepted and implemented in the public results route and shared backend."
+    },
+    {
+      "date": "2026-10-13",
+      "decision": "Include an optional compressed public-results PDF in the first release. Generate once per publication, store and reuse it, and transfer it only when the visitor clicks Download.",
+      "source": "User explicitly accepted generated-once, compressed, click-to-download report.",
+      "constraints": [
+        "Keep text and vote figures readable and accurate.",
+        "Reduce image dimensions and image encoding size; avoid unnecessary embedded assets.",
+        "Keep the public results page available if PDF generation fails."
+      ],
+      "scope": "Accepted and implemented in the public results route and shared backend."
+    },
+    {
+      "date": "2026-10-13",
+      "decision": "Implement the accepted results flow in both the dashboard/backend and public voting website.",
+      "source": "User explicitly approved work in both projects.",
+      "scope": "Local implementation; deployment separate."
+    }
+  ],
+  "evidence": [
+    {
+      "fact": "design.colorMode:light",
+      "source": "src/app/globals.css"
+    },
+    {
+      "fact": "design.tokens",
+      "source": "src/app/globals.css"
+    },
+    {
+      "fact": "project.stack:nextjs",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:react",
+      "source": "package.json"
+    },
+    {
+      "type": "project",
+      "source": "src/features/results",
+      "note": "Uses real API data and existing VotePageShell, ElectionHead, PositionHeader, CandidateAvatar and tenant theme."
+    }
+  ],
+  "generatedAt": "2026-10-13T11:29:10.434Z",
+  "exploration": {
+    "status": "selected",
+    "directions": [
+      "winners-first"
+    ],
+    "preferred": "winners-first",
+    "references": [
+      "https://21st.dev/@eugeneshilow/components/leaderboard-table",
+      "https://21st.dev/@nayan_radadiya6/components/first-place-leaderboard",
+      "https://21st.dev/@dhxwhy/components/stretch-tabs"
+    ],
+    "hostedGeneration": "not used: CLI signed out, AI access unknown",
+    "selected": "winners-first",
+    "removedDirections": [
+      "full-results",
+      "position-explorer"
+    ],
+    "openQuestions": [],
+    "handoffStatus": "implemented"
+  }
+}

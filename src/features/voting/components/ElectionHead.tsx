@@ -15,7 +15,7 @@ const STATUS_LABEL: Record<PublicElectionStatus, string> = {
 };
 
 /** Election summary + voter identity tags shown at the top of every ballot/review/receipt screen. */
-export function ElectionHead({ election }: { election: Election }) {
+export function ElectionHead({ election, showVoterDetails = true }: { election: Election; showVoterDetails?: boolean }) {
   const { state } = useVotingSession();
 
   return (
@@ -33,7 +33,7 @@ export function ElectionHead({ election }: { election: Election }) {
 
       <ElectionMeta startDate={election.startDate} endDate={election.endDate} />
 
-      {(state.matricNumber || state.email) && (
+      {showVoterDetails && (state.matricNumber || state.email) && (
         <div className="voter-tags">
           <span className="voter-tags__label">Voter&apos;s Details:</span>
           <div className="voter-tags__list">
