@@ -292,8 +292,8 @@
   "decisions": [
     {
       "date": "2026-10-13",
-      "decision": "Make the full-count disclosure look clickable with a tenant-colored border, white fill, hover state and circular chevron. Its label changes between View full count and Hide full count. Remove the outcome-first subtitle above the results cards.",
-      "source": "User requested a clearer results disclosure control and removal of the subtitle.",
+      "decision": "Use a softly tinted full-count expand row with dark text, a plain chevron and a subtle hover state. Its label changes between View full count and Hide full count. The outcome-first subtitle is removed.",
+      "source": "User requested a clearer disclosure control and rejected the outlined button with a circular chevron; revised to a restrained expand row.",
       "scope": "Results disclosure appearance and section copy."
     },
     {

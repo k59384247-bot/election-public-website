@@ -47,11 +47,11 @@
 .winner-person p span { color: var(--color-neutral-600); }
 .winner-tie-copy { font-size: var(--fs-sm); color: var(--color-neutral-600); }
 .winner-breakdown { border-top: 1px solid var(--color-neutral-300); padding-top: var(--space-4); }
-.winner-breakdown summary { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); width: 100%; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-wine); border-radius: var(--radius-md); background: var(--color-white); cursor: pointer; font-size: var(--fs-body); line-height: var(--lh-body); font-weight: 600; color: var(--color-wine); list-style: none; min-height: 56px; }
+.winner-breakdown summary { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); width: 100%; padding: var(--space-3) var(--space-4); border-radius: var(--space-3); background: color-mix(in srgb, var(--color-wine) 6%, var(--color-selected-bg)); cursor: pointer; font-size: var(--fs-body); line-height: var(--lh-body); font-weight: 600; color: var(--color-neutral-900); list-style: none; min-height: 52px; }
 .winner-breakdown summary::-webkit-details-marker { display: none; }
-.winner-breakdown summary:hover { background: var(--color-selected-bg); border-color: var(--color-wine-500); }
-.winner-breakdown summary:active { background: var(--color-gold-100); }
-.winner-breakdown__toggle { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 32px; height: 32px; border-radius: var(--radius-round); background: var(--color-selected-bg); }
+.winner-breakdown summary:hover { background: color-mix(in srgb, var(--color-wine) 12%, var(--color-selected-bg)); }
+.winner-breakdown summary:active { background: color-mix(in srgb, var(--color-wine) 16%, var(--color-selected-bg)); }
+.winner-breakdown__toggle { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-neutral-600); }
 .winner-breakdown__label--open { display: none; }
 .winner-breakdown[open] summary { margin-bottom: var(--space-4); }
 .winner-breakdown[open] .winner-breakdown__label--closed { display: none; }
