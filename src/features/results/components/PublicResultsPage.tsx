@@ -1,14 +1,15 @@
 'use client';
 
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, CheckCheck, Download, Link2, Loader2 } from 'lucide-react';
+import { CheckCheck, Download, Link2, Loader2 } from 'lucide-react';
 import { getElectionById, getElectionResults, getElectionReportDownload } from '@/features/election/api';
 import { useTenant } from '@/features/tenant/TenantContext';
 import { ElectionHead } from '@/features/voting/components/ElectionHead';
 import { VotePageShell } from '@/features/voting/components/VotePageShell';
+import { ElectionBackLink } from '@/features/voting/components/ElectionBackLink';
+import { AssistanceCard } from '@/features/voting/components/AssistanceCard';
 import { ApiRequestError } from '@/lib/apiClient';
 import { getErrorDescriptor } from '@/lib/errors';
 import { buildResultsView, publishedDate, resultsHref } from '../model';
@@ -76,15 +77,15 @@ export function PublicResultsPage() {
       </div>
       {report?.status !== 'ready' && <div className="report-availability"><p>{report?.status === 'pending' || report?.status === 'generating' ? 'The results PDF is being prepared. You can read the full results below.' : 'The PDF is currently unavailable. You can read the full results below.'}</p><button type="button" disabled={results.isFetching} onClick={() => void results.refetch()}>Check PDF availability</button></div>}
       <dl className="result-summary"><div><dt>Ballots cast</dt><dd>{data.totalVotesCast.toLocaleString('en-US')}</dd></div><div><dt>Positions</dt><dd>{positions.length}</dd></div><div><dt>Voting</dt><dd>Closed</dd></div></dl>
-      <section className="result-content" aria-labelledby="result-section-title"><div className="result-section-intro"><h2 className="vote__section-title" id="result-section-title">{hasSingleSeatTie ? 'RESULTS BY POSITION' : 'MEET YOUR ELECTED TEAM'}</h2><p>The outcome first. Full counts are one click away.</p></div>
+      <section className="result-content" aria-labelledby="result-section-title"><div className="result-section-intro"><h2 className="vote__section-title" id="result-section-title">{hasSingleSeatTie ? 'RESULTS BY POSITION' : 'MEET YOUR ELECTED TEAM'}</h2></div>
         {positions.length ? <div className="winner-grid">{positions.map((position, index) => <ResultPositionCard position={position} index={index} key={position.id} />)}</div> : <section className="card results-state"><h3>No positions to display</h3><p>No positions were configured for this election.</p></section>}
       </section>
-      <div className="results-footnote"><p>Individual ballots and voter information are private.</p><Link href={`/${tenantId}`}>Back to Elections <ArrowRight size={18} aria-hidden="true" /></Link></div>
     </>;
   }
-  return <VotePageShell mobileCenteredLogo>
-    <Link className="btn btn--ghost result-back" href={`/${tenantId}`}><ArrowLeft size={24} aria-hidden="true" />Back to Elections</Link>
-    {election && <ElectionHead election={election} showVoterDetails={false} />}
+  return <VotePageShell mobileCenteredLogo className="vote--results">
+    <ElectionBackLink tenantId={tenantId} className={election ? 'verify__desktop-back' : ''} />
+    {election && <ElectionHead election={election} showVoterDetails={false} showMobileBackLink />}
     {content}
+    {election && <div className="results-assistance"><AssistanceCard election={election} /></div>}
   </VotePageShell>;
 }

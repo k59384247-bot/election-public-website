@@ -5,6 +5,8 @@ import type { Election, PublicElectionStatus } from '@/lib/types';
 import { useVotingSession } from '../VotingSessionContext';
 import { ElectionMeta } from '@/features/election/components/ElectionMeta';
 import { TenantLogo } from '@/features/tenant/components/TenantLogo';
+import { useTenant } from '@/features/tenant/TenantContext';
+import { ElectionBackLink } from './ElectionBackLink';
 
 const STATUS_LABEL: Record<PublicElectionStatus, string> = {
   voting_open: 'VOTING IN PROGRESS',
@@ -15,12 +17,15 @@ const STATUS_LABEL: Record<PublicElectionStatus, string> = {
 };
 
 /** Election summary + voter identity tags shown at the top of every ballot/review/receipt screen. */
-export function ElectionHead({ election, showVoterDetails = true }: { election: Election; showVoterDetails?: boolean }) {
+export function ElectionHead({ election, showVoterDetails = true, showMobileBackLink = false }: { election: Election; showVoterDetails?: boolean; showMobileBackLink?: boolean }) {
   const { state } = useVotingSession();
+  const { tenantId } = useTenant();
 
   return (
     <section className="election-head" aria-labelledby="election-title">
       <TenantLogo className="election-head__logo" />
+
+      {showMobileBackLink && <ElectionBackLink tenantId={tenantId} className="verify__mobile-back" />}
 
       <span className="status-pill">
         <span className="status-pill__dot" aria-hidden="true" />

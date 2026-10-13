@@ -6,7 +6,7 @@ import type { Election, ElectionResults } from '@/lib/types';
 
 const api = vi.hoisted(() => ({ detail: vi.fn(), results: vi.fn(), download: vi.fn() }));
 vi.mock('next/navigation', () => ({ useParams: () => ({ tenantId: 'amsul', electionId: 'e1' }) }));
-vi.mock('@/features/tenant/TenantContext', () => ({ useTenant: () => ({ tenantId: 'amsul' }) }));
+vi.mock('@/features/tenant/TenantContext', () => ({ useTenant: () => ({ tenantId: 'amsul', tenant: { organizationType: 'student' } }) }));
 vi.mock('@/features/election/api', () => ({ getElectionById: api.detail, getElectionResults: api.results, getElectionReportDownload: api.download }));
 vi.mock('@/features/voting/components/VotePageShell', () => ({ VotePageShell: ({ children }: { children: React.ReactNode }) => <main>{children}</main> }));
 vi.mock('@/features/voting/components/ElectionHead', () => ({ ElectionHead: ({ showVoterDetails }: { showVoterDetails: boolean }) => <h1>{showVoterDetails ? 'Voter details' : 'Published election'}</h1> }));

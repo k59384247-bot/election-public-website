@@ -28,19 +28,24 @@ export function ResultPositionCard({ position, index }: { position: ResultPositi
         </div>) : <div className="winner-empty"><h4>No candidate elected</h4><p>{position.candidates.length === 0 ? 'No candidates were configured for this position.' : position.candidates.every((candidate) => candidate.votes === 0) ? 'No positive votes were recorded for this position.' : 'No elected candidate has been declared for this position.'}</p></div>}
       </div>
       {tied && <p className="winner-tie-copy">{position.seats === 1 ? 'The leading candidates are tied for one seat.' : 'All candidates tied at the winning cutoff are elected under the current result rules.'}</p>}
-      {position.candidates.length > 0 && <details className="winner-breakdown"><summary>View full count<span className="visually-hidden"> for {position.title}</span><ChevronDown size={18} aria-hidden="true" /></summary>
-        <ol className="result-rows" aria-label={`${position.title} candidate results`}>
-          {position.candidates.map((candidate, rank) => {
+      {position.candidates.length > 0 && <details className="winner-breakdown"><summary>
+        <span className="winner-breakdown__label--closed">View full count</span>
+        <span className="winner-breakdown__label--open">Hide full count</span>
+        <span className="visually-hidden"> for {position.title}</span>
+        <span className="winner-breakdown__toggle" aria-hidden="true"><ChevronDown size={20} /></span>
+      </summary>
+        <ul className="result-rows" role="list" aria-label={`${position.title} candidate results`}>
+          {position.candidates.map((candidate) => {
             const declaredElected = candidate.winner && !(candidate.isTie && position.seats === 1);
             return <li className={`result-row${declaredElected ? ' result-row--elected' : ''}`} key={candidate.candidateId}>
-            <span className="result-rank" aria-hidden="true">{rank + 1}</span><CandidateAvatar name={candidate.candidateName} photoUrl={candidate.photoUrl} />
+            <CandidateAvatar name={candidate.candidateName} photoUrl={candidate.photoUrl} />
             <div className="result-person"><div className="result-person__top"><span className="candidate__name">{candidate.candidateName}</span><OutcomeBadges candidate={candidate} seats={position.seats} /></div>
               <div className="result-bar" aria-hidden="true"><span className={declaredElected ? 'result-bar__fill result-bar__fill--elected' : 'result-bar__fill'} style={{ width: `${Math.max(0, Math.min(100, candidate.percent))}%` }} /></div></div>
             <div className="result-count"><strong>{candidate.votes.toLocaleString('en-US')} <span>votes</span></strong><span>{candidate.percent.toFixed(2)}% of selections</span></div>
           </li>;
           })}
-        </ol>
-        <p className="result-note">{position.seats > 1 ? `Voters could select up to ${position.seats} candidates. ` : ''}Percentages use total candidate selections for this position.</p>
+        </ul>
+        {position.seats > 1 && <p className="result-note">Voters could select up to {position.seats} candidates.</p>}
       </details>}
     </div>
   </section>;

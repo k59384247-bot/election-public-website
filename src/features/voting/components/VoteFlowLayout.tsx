@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, ShieldCheck, UserCog, VenetianMask, Waves } from 'lucide-react';
+import { ShieldCheck, UserCog, VenetianMask, Waves } from 'lucide-react';
 import type { Election, ElectionVisibility, PublicElectionStatus } from '@/lib/types';
 import { useElection } from '@/features/election/useElection';
 import { getElectionById } from '@/features/election/api';
@@ -13,6 +13,7 @@ import { useTenant } from '@/features/tenant/TenantContext';
 import { TenantLogo } from '@/features/tenant/components/TenantLogo';
 import { getEligibleVoterNoticeText, getTenantTerminology } from '@/features/tenant/terminology';
 import { ElectionAccessGate } from './ElectionAccessGate';
+import { ElectionBackLink } from './ElectionBackLink';
 
 const STATUS_CONFIG: Record<PublicElectionStatus, { label: string; pillClass: string }> = {
   voting_open: { label: 'VOTING IN PROGRESS', pillClass: 'status-pill--open' },
@@ -88,27 +89,13 @@ export function VoteFlowLayout({
       </header>
 
       <main className="verify__main">
-        <Link className="btn btn--ghost verify__desktop-back" href={`/${tenantId}`}>
-          <ArrowRight
-            className="btn__icon"
-            aria-hidden="true"
-            style={{ transform: 'rotate(180deg)' }}
-          />
-          Back to Elections
-        </Link>
+        <ElectionBackLink tenantId={tenantId} className="verify__desktop-back" />
 
         <div className="verify__row">
           <section className="verify__col hero" aria-labelledby="election-title">
             <TenantLogo className="hero__logo" />
 
-            <Link className="btn btn--ghost verify__mobile-back" href={`/${tenantId}`}>
-              <ArrowRight
-                className="btn__icon"
-                aria-hidden="true"
-                style={{ transform: 'rotate(180deg)' }}
-              />
-              Back to Elections
-            </Link>
+            <ElectionBackLink tenantId={tenantId} className="verify__mobile-back" />
 
             {status && (
               <span className={`status-pill ${status.pillClass}`}>

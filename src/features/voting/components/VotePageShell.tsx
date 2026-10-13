@@ -17,19 +17,19 @@ import { TenantLogo } from '@/features/tenant/components/TenantLogo';
 export function VotePageShell({
   children,
   mobileCenteredLogo = false,
+  className = '',
 }: {
   children: ReactNode;
   mobileCenteredLogo?: boolean;
+  className?: string;
 }) {
   const { tenantId, tenant } = useTenant();
   return (
-    <div className={mobileCenteredLogo ? 'vote vote--mobile-centered-logo' : 'vote'}>
+    <div className={`vote${mobileCenteredLogo ? ' vote--mobile-centered-logo' : ''}${className ? ` ${className}` : ''}`}>
       <header>
         <nav className="navbar" aria-label="Primary">
           <Link className="navbar__brand" href={`/${tenantId}`} aria-label={`${tenant.name} home`}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- matches
-                screens-html, which uses plain <img> throughout. */}
-            <TenantLogo className="navbar__logo" />
+            <TenantLogo className="navbar__logo" alt={`${tenant.name} logo`} />
           </Link>
         </nav>
       </header>

@@ -1,16 +1,13 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, type Dispatch } from 'react';
-import { AlertCircle, ArrowRight, UserCog, VenetianMask, Waves } from 'lucide-react';
+import { AlertCircle, ArrowRight } from 'lucide-react';
 import type { Election } from '@/lib/types';
-import { useTenant } from '@/features/tenant/TenantContext';
-import { getEligibleVoterNoticeText } from '@/features/tenant/terminology';
 import { getIncompletePositionIds, type BallotDraft, type BallotDraftAction } from '../useBallotDraft';
 import { PerPageSelect } from '@/components/PerPageSelect';
 import { ElectionHead } from './ElectionHead';
 import { PositionControl } from './PositionControl';
-import { NoticeCard } from './NoticeCard';
-import { AssistanceCard } from './AssistanceCard';
+import { VotingPageFooter } from './VotingPageFooter';
 import { resetPaginationScroll } from '@/lib/paginationScroll';
 
 const PER_PAGE_OPTIONS = [3, 5, 10] as const;
@@ -36,12 +33,6 @@ export function MainVotingPage({
   dispatch: Dispatch<BallotDraftAction>;
   onProceedToReview: () => void;
 }) {
-  const { tenant } = useTenant();
-  const votingNoticeItems = [
-    { icon: UserCog, text: 'You can review and edit your selections before submitting.' },
-    { icon: Waves, text: getEligibleVoterNoticeText(tenant.organizationType) },
-    { icon: VenetianMask, text: 'Your vote remains anonymous throughout the election process.' },
-  ];
   const positions = useMemo(
     () => [...election.positions].sort((a, b) => a.order - b.order),
     [election.positions]
@@ -207,10 +198,7 @@ export function MainVotingPage({
         </nav>
       </div>
 
-      <div className="verify__row">
-        <NoticeCard title="VOTING NOTICE" lead="Before you begin, please note:" items={votingNoticeItems} />
-        <AssistanceCard election={election} />
-      </div>
+      <VotingPageFooter election={election} />
     </>
   );
 }

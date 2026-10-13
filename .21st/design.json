@@ -292,6 +292,48 @@
   "decisions": [
     {
       "date": "2026-10-13",
+      "decision": "Make the full-count disclosure look clickable with a tenant-colored border, white fill, hover state and circular chevron. Its label changes between View full count and Hide full count. Remove the outcome-first subtitle above the results cards.",
+      "source": "User requested a clearer results disclosure control and removal of the subtitle.",
+      "scope": "Results disclosure appearance and section copy."
+    },
+    {
+      "date": "2026-10-13",
+      "decision": "Restore the normal numbered position header with full-width result cards beneath it on all screen sizes. Remove the separate number gutter and its extra page width. Keep the normal-width centered assistance footer.",
+      "source": "User requested reverting the gutter after reviewing mobile screens.",
+      "scope": "Supersedes the separate results-position gutter decision."
+    },
+    {
+      "date": "2026-10-13",
+      "decision": "Keep results assistance centered at its normal 612px column width rather than stretching across the page. Give each position number its own gutter and align the title pill and result card in the adjacent column. Allow additional desktop page width for the gutters so result cards remain spacious; keep two result columns above 900px.",
+      "source": "User clarified normal footer proportions and separate position-number gutters.",
+      "scope": "Results footer sizing and position-card alignment."
+    },
+    {
+      "date": "2026-10-13",
+      "decision": "Use 26px winner names with 18px vote text (16px on mobile), restore result-position number pills, and keep the wide two-column result cards. Fix position-title centering and wrapping in the shared pill layout. Results show only centered Electoral Committee assistance; the main voting page retains its Voting Notice footer.",
+      "source": "User supplied an updated screenshot and requested balanced typography, restored position numbers, app-wide position-pill alignment, and assistance-only results footer.",
+      "scope": "Supersedes prior results heading, numbering, and footer decisions."
+    },
+    {
+      "date": "2026-10-13",
+      "decision": "Result cards fill the same column widths as the Voting Notice footer card. Remove remaining result-position serial numbers so the title pill and card share a left edge without a reserved number gutter. Use shared card__title styles for winner headings and the original voting position-title size. Keep result and footer grids at two columns above 900px and one below.",
+      "source": "User requested result cards at least as wide as Voting Notice and consistent heading sizes; earlier requested serial-number removal.",
+      "scope": "Results card dimensions, headings and footer alignment."
+    },
+    {
+      "date": "2026-10-13",
+      "decision": "Widen the results content area and increase card padding while retaining two result columns above 900px. Reuse one shared VotingPageFooter for the main ballot and results pages, with Voting Notice and the election's Electoral Committee contacts.",
+      "source": "User requested bigger result cards and the main voting page footer.",
+      "scope": "Public results sizing and shared voting footer."
+    },
+    {
+      "date": "2026-10-13",
+      "decision": "Use the shared back link on results, centered on desktop and beneath the election logo on mobile. Align winner cards with the position title pill, inherit ballot avatar sizes for all candidates, and omit candidate serial numbers and the percentage explanation.",
+      "source": "User requested results-page corrections with annotated screenshots.",
+      "scope": "Public results layout and shared election navigation."
+    },
+    {
+      "date": "2026-10-13",
       "decision": "Use Winners first inside the original public voting shell.",
       "source": "User selected option 2 in conversation.",
       "scope": "Accepted and implemented in the public results route and shared backend."
