@@ -148,6 +148,7 @@ export function RejectedElectionState() {
   const { tenantId } = useTenant();
   const { state, reset } = useVotingSession();
   const isNetworkFailure = state.rejectionReason === 'network';
+  const sessionExpired = state.rejectionReason === 'session_expired';
 
   // See the matching comment in VoteSuccessPage — reset on unmount, not on
   // the Link's click, so the identity form doesn't flash before navigation
@@ -157,10 +158,10 @@ export function RejectedElectionState() {
   return (
     <section className="card rejected-card" aria-labelledby="rejected-title" role="alert">
       <h2 className="card__title" id="rejected-title">
-        {isNetworkFailure ? 'We Could Not Submit Your Vote' : 'Voting Is No Longer Available'}
+        {sessionExpired ? 'Your Voting Session Has Ended' : isNetworkFailure ? 'We Could Not Submit Your Vote' : 'Voting Is No Longer Available'}
       </h2>
       <p className="rejected-card__subtitle">
-        {isNetworkFailure
+        {sessionExpired ? 'Your 30-minute session has ended. Your selections were not submitted. Verify with a code to start again.' : isNetworkFailure
           ? "We couldn't reach the server to confirm your submission, even after retrying. Please start again from the Home Page."
           : 'Voting for this election was closed or paused after you started. Your selections were not submitted.'}
       </p>

@@ -46,7 +46,7 @@ export interface VotingSessionState {
    * retry with no response at all. Kept as a plain string union (not an API
    * error code) so this file stays free of API-layer imports.
    */
-  rejectionReason: 'election_state' | 'network' | null;
+  rejectionReason: 'election_state' | 'network' | 'session_expired' | null;
 }
 
 export const initialVotingSessionState: VotingSessionState = {
@@ -77,11 +77,12 @@ export type VotingSessionAction =
       registrationData?: Record<string, string | number | boolean>;
     }
   | { type: 'VERIFY_OTP_SUCCESS'; idToken: string }
+  | { type: 'EMAIL_LINK_SUCCESS'; idToken: string; matricNumber: string; email: string }
   | { type: 'VERIFY_OTP_FAILURE'; code: OtpFailureCode }
   | { type: 'PROCEED_TO_BALLOT' }
   | { type: 'SUBMIT_VOTE' }
   | { type: 'CAST_VOTE_SUCCESS'; receiptCode: string | null; alreadyVoted: boolean; submittedAt: string }
-  | { type: 'CAST_VOTE_FAILURE'; reason: 'election_state' | 'network' }
+  | { type: 'CAST_VOTE_FAILURE'; reason: 'election_state' | 'network' | 'session_expired' }
   | { type: 'RESET' };
 
 export function votingSessionReducer(
@@ -89,6 +90,10 @@ export function votingSessionReducer(
   action: VotingSessionAction
 ): VotingSessionState {
   switch (action.type) {
+    case 'EMAIL_LINK_SUCCESS': {
+      if (state.step !== 'idle') return state;
+      return { ...initialVotingSessionState, step: 'token_acquired', idToken: action.idToken, matricNumber: action.matricNumber, email: action.email };
+    }
     case 'SUBMIT_IDENTITY_SUCCESS': {
       if (state.step !== 'idle') return state;
       return {

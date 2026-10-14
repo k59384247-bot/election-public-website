@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { getElectionById } from '@/features/election/api';
@@ -13,6 +13,8 @@ import { useBallotDraft } from '@/features/voting/useBallotDraft';
 import { VoteFlowLayout } from '@/features/voting/components/VoteFlowLayout';
 import { VerifyIdentityForm } from '@/features/voting/components/VerifyIdentityForm';
 import { OtpEntryForm } from '@/features/voting/components/OtpEntryForm';
+import { EmailLinkEntryForm } from '@/features/voting/components/EmailLinkEntryForm';
+import { readEmailBrowserToken } from '@/features/voting/emailLinkStorage';
 import { VotePageShell } from '@/features/voting/components/VotePageShell';
 import { MainVotingPage } from '@/features/voting/components/MainVotingPage';
 import { VoteReviewPage } from '@/features/voting/components/VoteReviewPage';
@@ -119,6 +121,22 @@ export default function VotePage() {
   const { tenantId, electionId } = useParams<{ tenantId: string; electionId: string }>();
   const { state } = useVotingSession();
   const router = useRouter();
+  const [emailEntry, setEmailEntry] = useState<{ ready: boolean; enabled: boolean; token: string | null }>({ ready: false, enabled: false, token: null });
+  const capturedEmailLink = useRef<{ scope: string; token: string | null } | null>(null);
+  const closeEmailEntry = useCallback(() => {
+    if (capturedEmailLink.current) capturedEmailLink.current.token = null;
+    setEmailEntry({ ready: true, enabled: false, token: null });
+  }, []);
+  useEffect(() => {
+    const scope = `${tenantId}:${electionId}`;
+    if (capturedEmailLink.current?.scope !== scope) {
+      const fragment = new URLSearchParams(window.location.hash.slice(1));
+      capturedEmailLink.current = { scope, token: fragment.get('voting-link') };
+      if (fragment.has('voting-link')) window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}`);
+    }
+    const token = capturedEmailLink.current.token;
+    setEmailEntry({ ready: true, enabled: token !== null || readEmailBrowserToken(tenantId, electionId) !== null, token });
+  }, [tenantId, electionId]);
   const publicDetail = useQuery({
     queryKey: ['public-election-detail', tenantId, electionId],
     queryFn: () => getElectionById(tenantId, electionId),
@@ -137,17 +155,19 @@ export default function VotePage() {
 
   if (state.step === 'idle' || state.step === 'otp_pending') {
     return (
-      <VoteFlowLayout electionId={electionId}>
-        {(election, isElectionLoading, visibility) =>
-          state.step === 'idle' ? (
+      <VoteFlowLayout electionId={electionId} emailLinkEntry={emailEntry.enabled}>
+        {(election, isElectionLoading, visibility) => {
+          if (state.step === 'otp_pending') return <OtpEntryForm />;
+          if (!emailEntry.ready) return <section className="verify__col card status-card" role="status"><h2 className="card__title">Opening voting page…</h2></section>;
+          if (emailEntry.enabled) return <EmailLinkEntryForm electionId={electionId} token={emailEntry.token} onUseCode={closeEmailEntry} onReady={closeEmailEntry} />;
+          return (
             <VerifyIdentityForm
               election={election}
               electionLoading={isElectionLoading}
               electionVisibility={visibility}
             />
-          ) : (
-            <OtpEntryForm />
-          )}
+          );
+        }}
       </VoteFlowLayout>
     );
   }

@@ -33,9 +33,11 @@ const STATUS_CONFIG: Record<PublicElectionStatus, { label: string; pillClass: st
  */
 export function VoteFlowLayout({
   electionId,
+  emailLinkEntry = false,
   children,
 }: {
   electionId: string;
+  emailLinkEntry?: boolean;
   children:
     | ReactNode
     | ((
@@ -149,6 +151,7 @@ export function VoteFlowLayout({
                 <p className="notice__text">
                   {isPublicElection
                     ? 'You will register with the required details and verify your email address.'
+                    : emailLinkEntry ? 'Your personal voting link verifies your eligibility. Press Continue to start your voting session.'
                     : `You will verify your identity using your ${terminology.identifierLabel.toLowerCase()} and email address.`}
                 </p>
               </li>

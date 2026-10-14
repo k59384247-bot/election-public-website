@@ -50,11 +50,11 @@ export function ConfirmSubmissionModal({
     let idToken: string;
     try {
       idToken = await getFreshIdToken();
-    } catch {
+    } catch (error) {
       // No live auth session (unreachable on the normal path) — fail loud
       // instead of sending an unauthenticated request.
       clearBallotDraft(electionId);
-      dispatch({ type: 'CAST_VOTE_FAILURE', reason: 'network' });
+      dispatch({ type: 'CAST_VOTE_FAILURE', reason: error instanceof ApiRequestError && error.code === 'TOKEN_EXPIRED' ? 'session_expired' : 'network' });
       return;
     }
 
@@ -73,7 +73,7 @@ export function ConfirmSubmissionModal({
       // ballot codes, …) — build spec §9.3 step (e). CastVoteNetworkError
       // (or anything else) means castVote() gave up after its own retry
       // with no response at all.
-      const reason = err instanceof ApiRequestError ? 'election_state' : 'network';
+      const reason = err instanceof ApiRequestError ? err.code === 'TOKEN_EXPIRED' ? 'session_expired' : 'election_state' : 'network';
       dispatch({ type: 'CAST_VOTE_FAILURE', reason });
     }
   }

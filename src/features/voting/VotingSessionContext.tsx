@@ -7,11 +7,12 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   useState,
   type Dispatch,
   type ReactNode,
 } from 'react';
-import { signInWithCustomToken, getIdToken } from 'firebase/auth';
+import { signInWithCustomToken, getIdToken, setPersistence, inMemoryPersistence } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { ApiRequestError } from '@/lib/apiClient';
 import { getErrorDescriptor } from '@/lib/errors';
@@ -22,7 +23,9 @@ import {
   type VotingSessionAction,
   type VotingSessionState,
 } from './votingSessionReducer';
-import { validateVoter, verifyOtp } from './api';
+import { validateVoter, verifyOtp, type EmailLinkSession } from './api';
+import { clearEmailBrowserToken } from './emailLinkStorage';
+import { clearBallotDraft } from './useBallotDraft';
 
 const OTP_FAILURE_CODES: readonly string[] = ['INVALID_OTP', 'OTP_LOCKED', 'OTP_EXPIRED'];
 
@@ -76,6 +79,8 @@ export interface VotingSessionContextValue {
    */
   lockoutNotice: string | null;
   dismissLockoutNotice: () => void;
+  acceptEmailLinkSession: (electionId: string, session: EmailLinkSession) => Promise<void>;
+  emailLinkExpiresAt: number | null;
 }
 
 const VotingSessionContext = createContext<VotingSessionContextValue | null>(null);
@@ -92,6 +97,20 @@ export function VotingSessionProvider({
   const [otpSendCount, setOtpSendCount] = useState(0);
   const [otpDeliveryQueued, setOtpDeliveryQueued] = useState<boolean | null>(null);
   const [lockoutNotice, setLockoutNotice] = useState<string | null>(null);
+  const [emailLinkExpiresAt, setEmailLinkExpiresAt] = useState<number | null>(null);
+  const emailLinkElectionRef = useRef<string | null>(null);
+
+  const acceptEmailLinkSession = useCallback(async (electionId: string, session: EmailLinkSession) => {
+    if (!Number.isFinite(session.expiresAt) || session.expiresAt <= Date.now()) throw new ApiRequestError('TOKEN_EXPIRED', 'Your voting session has expired.', 401);
+    await setPersistence(auth, inMemoryPersistence);
+    const userCredential = await signInWithCustomToken(auth, session.customToken);
+    const idToken = await getIdToken(userCredential.user);
+    if (session.expiresAt <= Date.now()) { await auth.signOut(); throw new ApiRequestError('TOKEN_EXPIRED', 'Your voting session has expired.', 401); }
+    emailLinkElectionRef.current = electionId;
+    setEmailLinkExpiresAt(session.expiresAt);
+    setLockoutNotice(null);
+    dispatch({ type: 'EMAIL_LINK_SUCCESS', idToken, matricNumber: session.matricNumber, email: session.email });
+  }, []);
 
   const submitIdentity = useCallback(async (electionId: string, matricNumber: string, email: string) => {
     // Failure here has no reducer transition (build spec §8 only defines a
@@ -184,6 +203,7 @@ export function VotingSessionProvider({
   );
 
   const getFreshIdToken = useCallback(async () => {
+    if (emailLinkExpiresAt !== null && emailLinkExpiresAt <= Date.now()) throw new ApiRequestError('TOKEN_EXPIRED', 'Your voting session has expired.', 401);
     const user = auth.currentUser;
     if (!user) {
       // Unreachable on the normal path — signInWithCustomToken above
@@ -195,14 +215,28 @@ export function VotingSessionProvider({
     // trusting the SDK's cached one, so clock skew or a token that expired
     // mid-session can never reach cast-vote's verifyIdToken.
     return getIdToken(user, true);
-  }, []);
+  }, [emailLinkExpiresAt]);
 
   const reset = useCallback(() => {
+    if (emailLinkElectionRef.current) clearEmailBrowserToken(tenantId, emailLinkElectionRef.current);
+    emailLinkElectionRef.current = null;
+    setEmailLinkExpiresAt(null);
     dispatch({ type: 'RESET' });
     setOtpExpiresInSeconds(null);
     setOtpSendCount(0);
     setOtpDeliveryQueued(null);
-  }, []);
+  }, [tenantId]);
+
+  useEffect(() => {
+    if (emailLinkExpiresAt === null || !['token_acquired', 'ballot_in_progress'].includes(state.step)) return;
+    const timer = window.setTimeout(() => {
+      if (emailLinkElectionRef.current) clearBallotDraft(emailLinkElectionRef.current);
+      reset();
+      setLockoutNotice('Your 30-minute voting session has ended. Verify with a code to start again.');
+      void auth.signOut().catch(() => {});
+    }, Math.max(0, emailLinkExpiresAt - Date.now()));
+    return () => window.clearTimeout(timer);
+  }, [emailLinkExpiresAt, state.step, reset]);
 
   const dismissLockoutNotice = useCallback(() => {
     setLockoutNotice(null);
@@ -214,9 +248,10 @@ export function VotingSessionProvider({
   // this point (the voting outcome is already final either way).
   useEffect(() => {
     if (state.step === 'voted' || state.step === 'rejected_election_state') {
+      if (emailLinkElectionRef.current) clearEmailBrowserToken(tenantId, emailLinkElectionRef.current);
       void auth.signOut().catch(() => {});
     }
-  }, [state.step]);
+  }, [state.step, tenantId]);
 
   const value = useMemo<VotingSessionContextValue>(
     () => ({
@@ -233,6 +268,8 @@ export function VotingSessionProvider({
       otpDeliveryQueued,
       lockoutNotice,
       dismissLockoutNotice,
+      acceptEmailLinkSession,
+      emailLinkExpiresAt,
     }),
     [
       state,
@@ -247,6 +284,8 @@ export function VotingSessionProvider({
       otpDeliveryQueued,
       lockoutNotice,
       dismissLockoutNotice,
+      acceptEmailLinkSession,
+      emailLinkExpiresAt,
     ]
   );
 

@@ -18,7 +18,7 @@ const STATUS_LABEL: Record<PublicElectionStatus, string> = {
 
 /** Election summary + voter identity tags shown at the top of every ballot/review/receipt screen. */
 export function ElectionHead({ election, showVoterDetails = true, showMobileBackLink = false }: { election: Election; showVoterDetails?: boolean; showMobileBackLink?: boolean }) {
-  const { state } = useVotingSession();
+  const { state, emailLinkExpiresAt } = useVotingSession();
   const { tenantId } = useTenant();
 
   return (
@@ -37,6 +37,11 @@ export function ElectionHead({ election, showVoterDetails = true, showMobileBack
       </h1>
 
       <ElectionMeta startDate={election.startDate} endDate={election.endDate} />
+      {showVoterDetails && typeof emailLinkExpiresAt === 'number' && state.step !== 'voted' && (
+        <p className="verify-form__note">
+          Submit before <time dateTime={new Date(emailLinkExpiresAt).toISOString()}>{new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(emailLinkExpiresAt)}</time> or voting closes, whichever comes first. Refreshing does not extend your session.
+        </p>
+      )}
 
       {showVoterDetails && (state.matricNumber || state.email) && (
         <div className="voter-tags">

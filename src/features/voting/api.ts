@@ -15,6 +15,34 @@ import type {
   VerifyOtpResponse,
 } from '@/lib/types';
 
+export interface EmailLinkPreview {
+  voterName: string;
+  electionTitle: string;
+  canContinue: boolean;
+  sessionMinutes: number;
+}
+
+export interface EmailLinkSession {
+  customToken: string;
+  expiresAt: number;
+  expiresInSeconds: number;
+  voterName: string;
+  matricNumber: string;
+  email: string;
+}
+
+export async function previewEmailLink(tenantId: string, electionId: string, token: string): Promise<EmailLinkPreview> {
+  return (await apiRequest<EmailLinkPreview>('/v1/elections/email-link/preview', { method: 'POST', tenantId, body: { electionId, token } })).data;
+}
+
+export async function continueEmailLink(tenantId: string, electionId: string, token: string, browserToken: string): Promise<EmailLinkSession> {
+  return (await apiRequest<EmailLinkSession>('/v1/elections/email-link/continue', { method: 'POST', tenantId, body: { electionId, token, browserToken } })).data;
+}
+
+export async function resumeEmailLink(tenantId: string, electionId: string, browserToken: string): Promise<EmailLinkSession> {
+  return (await apiRequest<EmailLinkSession>('/v1/elections/email-link/resume', { method: 'POST', tenantId, body: { electionId, browserToken } })).data;
+}
+
 export interface ValidateVoterParams {
   tenantId: string;
   electionId: string;
