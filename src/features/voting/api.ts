@@ -15,13 +15,6 @@ import type {
   VerifyOtpResponse,
 } from '@/lib/types';
 
-export interface EmailLinkPreview {
-  voterName: string;
-  electionTitle: string;
-  canContinue: boolean;
-  sessionMinutes: number;
-}
-
 export interface EmailLinkSession {
   customToken: string;
   expiresAt: number;
@@ -29,10 +22,6 @@ export interface EmailLinkSession {
   voterName: string;
   matricNumber: string;
   email: string;
-}
-
-export async function previewEmailLink(tenantId: string, electionId: string, token: string): Promise<EmailLinkPreview> {
-  return (await apiRequest<EmailLinkPreview>('/v1/elections/email-link/preview', { method: 'POST', tenantId, body: { electionId, token } })).data;
 }
 
 export async function continueEmailLink(tenantId: string, electionId: string, token: string, browserToken: string): Promise<EmailLinkSession> {

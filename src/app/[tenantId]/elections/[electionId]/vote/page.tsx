@@ -124,6 +124,9 @@ export default function VotePage() {
   const [emailEntry, setEmailEntry] = useState<{ ready: boolean; enabled: boolean; token: string | null }>({ ready: false, enabled: false, token: null });
   const capturedEmailLink = useRef<{ scope: string; token: string | null } | null>(null);
   const closeEmailEntry = useCallback(() => {
+    if (new URLSearchParams(window.location.hash.slice(1)).has('voting-link')) {
+      window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}`);
+    }
     if (capturedEmailLink.current) capturedEmailLink.current.token = null;
     setEmailEntry({ ready: true, enabled: false, token: null });
   }, []);
@@ -132,7 +135,7 @@ export default function VotePage() {
     if (capturedEmailLink.current?.scope !== scope) {
       const fragment = new URLSearchParams(window.location.hash.slice(1));
       capturedEmailLink.current = { scope, token: fragment.get('voting-link') };
-      if (fragment.has('voting-link')) window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}`);
+      // Retain the fragment until sign-in succeeds so refresh can recover an interrupted request.
     }
     const token = capturedEmailLink.current.token;
     setEmailEntry({ ready: true, enabled: token !== null || readEmailBrowserToken(tenantId, electionId) !== null, token });
@@ -153,13 +156,18 @@ export default function VotePage() {
     return <VotePageShell mobileCenteredLogo><section className="card status-card" role="status"><h2 className="card__title">Opening published results…</h2></section></VotePageShell>;
   }
 
+  if (state.step === 'idle' && !emailEntry.ready) {
+    return <VotePageShell><section className="card status-card" role="status"><h2 className="card__title">Opening voting page…</h2></section></VotePageShell>;
+  }
+  if (state.step === 'idle' && emailEntry.enabled) {
+    return <VotePageShell><EmailLinkEntryForm electionId={electionId} token={emailEntry.token} onUseCode={closeEmailEntry} onReady={closeEmailEntry} /></VotePageShell>;
+  }
+
   if (state.step === 'idle' || state.step === 'otp_pending') {
     return (
-      <VoteFlowLayout electionId={electionId} emailLinkEntry={emailEntry.enabled}>
+      <VoteFlowLayout electionId={electionId}>
         {(election, isElectionLoading, visibility) => {
           if (state.step === 'otp_pending') return <OtpEntryForm />;
-          if (!emailEntry.ready) return <section className="verify__col card status-card" role="status"><h2 className="card__title">Opening voting page…</h2></section>;
-          if (emailEntry.enabled) return <EmailLinkEntryForm electionId={electionId} token={emailEntry.token} onUseCode={closeEmailEntry} onReady={closeEmailEntry} />;
           return (
             <VerifyIdentityForm
               election={election}
