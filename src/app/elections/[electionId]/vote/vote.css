@@ -46,7 +46,14 @@
   width: 100%;
 }
 
-.email-link-entry__back {
+.btn--ghost.btn--election-back {
+  align-self: center;
+  min-width: min(100%, 240px);
+  height: 56px;
+  padding: var(--space-3) var(--space-6);
+  background-color: var(--color-gold-100);
+  color: var(--color-neutral-900);
+  font-weight: 600;
   justify-content: center;
 }
 
@@ -1308,15 +1315,6 @@
   line-height: var(--lh-body);
   color: var(--color-neutral-800);
   text-align: center;
-}
-
-/* Reuses the shared .pagination__btn pill shape and just swaps to the gold
-   fill and a larger 56px height. */
-.success-cta {
-  align-self: center;
-  height: 56px;
-  padding: var(--space-3) var(--space-6);
-  background-color: var(--color-gold-100);
 }
 
 /* ----- Status / rejected cards (submitting, loading, rejected_election_state) ---

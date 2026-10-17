@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
-import { ArrowRight, Ban, Check, FileCheck2, Lock } from 'lucide-react';
+import { Ban, Check, FileCheck2, Lock } from 'lucide-react';
 import type { Election } from '@/lib/types';
 import { formatElectionDate, formatTime, isToday } from '@/features/election/format';
 import { useVotingSession } from '../VotingSessionContext';
@@ -10,6 +10,7 @@ import { ElectionHead } from './ElectionHead';
 import { NoticeCard } from './NoticeCard';
 import { AssistanceCard } from './AssistanceCard';
 import { useTenant } from '@/features/tenant/TenantContext';
+import { ElectionBackLink } from './ElectionBackLink';
 
 const WHAT_HAPPENS_NEXT_ITEMS = [
   { icon: Lock, text: 'Your vote has been encrypted.' },
@@ -121,12 +122,8 @@ export function VoteSuccessPage({ election }: { election: Election }) {
             {formatTime(election.endDate)}.
           </p>
         )}
+        <ElectionBackLink tenantId={tenantId} className="btn--election-back" label="Back to Election" />
       </section>
-
-      <Link className="pagination__btn success-cta" href={`/${tenantId}`}>
-        Return to Election Information
-        <ArrowRight className="pagination__btn-icon" style={{ color: 'var(--color-neutral-900)' }} aria-hidden="true" />
-      </Link>
 
       <div className="verify__row">
         <NoticeCard title="What Happens Next?" items={WHAT_HAPPENS_NEXT_ITEMS} />
