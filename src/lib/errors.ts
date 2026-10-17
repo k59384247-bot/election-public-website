@@ -56,7 +56,7 @@ const BASE_TABLE: Partial<Record<ClientErrorCode, UiErrorDescriptor>> = {
   LINK_INVALID: { severity: 'warning', userMessage: 'This voting link is no longer valid. You can still vote by verifying with a code.', recoveryAction: 'redirect_to_start' },
   LINK_USED: { severity: 'info', userMessage: 'This link has already been used. Continue in the original browser, or verify with a code to start again.', recoveryAction: 'redirect_to_start' },
   LINK_EXPIRED: { severity: 'warning', userMessage: 'This voting link has expired. Verify with a code if voting is still open.', recoveryAction: 'redirect_to_start' },
-  TOKEN_EXPIRED: { severity: 'warning', userMessage: 'Your 30-minute voting session has ended. Verify with a code to start again.', recoveryAction: 'redirect_to_start' },
+  TOKEN_EXPIRED: { severity: 'warning', userMessage: 'Your voting session has ended. Reopen your email link or verify with a code to start again.', recoveryAction: 'redirect_to_start' },
   INVALID_REGISTRATION: {
     severity: 'error',
     userMessage: 'We could not verify these registration details. Check the form and try again.',

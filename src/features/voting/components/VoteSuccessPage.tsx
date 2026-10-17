@@ -158,7 +158,7 @@ export function RejectedElectionState() {
         {sessionExpired ? 'Your Voting Session Has Ended' : isNetworkFailure ? 'We Could Not Submit Your Vote' : 'Voting Is No Longer Available'}
       </h2>
       <p className="rejected-card__subtitle">
-        {sessionExpired ? 'Your 30-minute session has ended. Your selections were not submitted. Verify with a code to start again.' : isNetworkFailure
+        {sessionExpired ? 'Your 30-minute session has ended. Your selections were not submitted. Reopen your email link or verify with a code to start again.' : isNetworkFailure
           ? "We couldn't reach the server to confirm your submission, even after retrying. Please start again from the Home Page."
           : 'Voting for this election was closed or paused after you started. Your selections were not submitted.'}
       </p>

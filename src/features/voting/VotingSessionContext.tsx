@@ -232,7 +232,7 @@ export function VotingSessionProvider({
     const timer = window.setTimeout(() => {
       if (emailLinkElectionRef.current) clearBallotDraft(emailLinkElectionRef.current);
       reset();
-      setLockoutNotice('Your 30-minute voting session has ended. Verify with a code to start again.');
+      setLockoutNotice('Your 30-minute voting session has ended. Reopen your email link or verify with a code to start again.');
       void auth.signOut().catch(() => {});
     }, Math.max(0, emailLinkExpiresAt - Date.now()));
     return () => window.clearTimeout(timer);
