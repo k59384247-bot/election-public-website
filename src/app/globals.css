@@ -58,9 +58,9 @@
   --font-nav:    "Satoshi", var(--font-dm-sans), -apple-system, "Segoe UI", sans-serif;
 
   /* Font sizes / line heights (px, matching Figma) */
-  --fs-display: 60px;   --lh-display: 76px;
-  --fs-hero: 48px;      --lh-hero: 60px;
-  --fs-title: 44px;     --lh-title: 52px;
+  --fs-display: 36px;   --lh-display: 44px;
+  --fs-hero: 36px;      --lh-hero: 44px;
+  --fs-title: 36px;     --lh-title: 44px;
   --fs-heading-md: 30px; --lh-heading-md: 38px;
   --fs-heading-sm: 26px; --lh-heading-sm: 36px;
   --fs-lg: 20px;        --lh-lg: 24px;     /* button label            */

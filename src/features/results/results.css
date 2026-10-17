@@ -37,12 +37,13 @@
 .winner-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-10) var(--space-6); }
 .winner-position { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
 .winner-position .position__icon-badge { display: none; }
+.winner-position .position__name { font-size: 19px; line-height: 24px; }
 .winner-card { min-width: 0; cursor: default; padding: var(--space-8); gap: var(--space-8); border-color: var(--color-gold); background: var(--color-selected-bg); }
 .winner-card--tie { background: var(--color-neutral-50); border-color: var(--color-neutral-500); }
 .winner-card__people { display: flex; flex-direction: column; gap: var(--space-5); }
 .winner-person { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-4); min-width: 0; }
 .winner-person > div:not(.candidate__avatar) { flex: 1 1 120px; min-width: 0; }
-.winner-person h4 { margin: var(--space-2) 0; font-size: var(--fs-heading-sm); line-height: var(--lh-heading-sm); color: var(--color-neutral-900); overflow-wrap: anywhere; }
+.winner-person h4 { margin: var(--space-2) 0; font-size: 19px; line-height: 24px; color: var(--color-neutral-900); overflow-wrap: anywhere; }
 .winner-person p { font-size: var(--fs-body-lg); line-height: 28px; color: var(--color-neutral-800); }
 .winner-person p span { color: var(--color-neutral-600); }
 .winner-tie-copy { font-size: var(--fs-sm); color: var(--color-neutral-600); }

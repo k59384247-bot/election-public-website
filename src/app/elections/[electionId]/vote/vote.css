@@ -46,6 +46,10 @@
   width: 100%;
 }
 
+.email-link-entry__back {
+  justify-content: center;
+}
+
 .verify-form__note {
   font-size: var(--fs-body);
   line-height: var(--lh-body);

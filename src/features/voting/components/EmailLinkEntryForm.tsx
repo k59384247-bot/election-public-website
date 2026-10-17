@@ -7,6 +7,7 @@ import { useTenant } from '@/features/tenant/TenantContext';
 import { useVotingSession } from '../VotingSessionContext';
 import { continueEmailLink, resumeEmailLink, type EmailLinkSession } from '../api';
 import { clearEmailBrowserToken, createEmailBrowserToken, readEmailBrowserToken } from '../emailLinkStorage';
+import { ElectionBackLink } from './ElectionBackLink';
 
 export function EmailLinkEntryForm({ electionId, token, onUseCode, onReady }: {
   electionId: string;
@@ -72,8 +73,10 @@ export function EmailLinkEntryForm({ electionId, token, onUseCode, onReady }: {
             {descriptor && <p className="field__error-text" role="alert">{descriptor.userMessage}</p>}
             {browserError && <p className="field__error-text" role="alert">This browser could not save your voting session. Use a verification code instead.</p>}
             {recoverable && <button className="btn btn--gold" type="button" onClick={() => { setErrorCode(null); setLoading(true); setRetry((value) => value + 1); }}>Try again</button>}
-            <button className="btn" type="button" onClick={() => { clearEmailBrowserToken(tenantId, electionId); onUseCode(); }}>Use a verification code instead</button>
-            <p className="verify-form__note">This link is personal. Do not share it.</p>
+            {errorCode === 'ALREADY_VOTED' ? <ElectionBackLink tenantId={tenantId} className="email-link-entry__back" label="Back to Election" /> : <>
+              <button className="btn" type="button" onClick={() => { clearEmailBrowserToken(tenantId, electionId); onUseCode(); }}>Use a verification code instead</button>
+              <p className="verify-form__note">This link is personal. Do not share it.</p>
+            </>}
           </div>
         )}
       </div>
