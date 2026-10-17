@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { Check } from 'lucide-react';
 import { ApiRequestError } from '@/lib/apiClient';
 import { getErrorDescriptor, NETWORK_ERROR_CODE, type ClientErrorCode } from '@/lib/errors';
 import { useTenant } from '@/features/tenant/TenantContext';
@@ -59,27 +60,39 @@ export function EmailLinkEntryForm({ electionId, token, onUseCode, onReady }: {
 
   const descriptor = errorCode ? getErrorDescriptor(errorCode) : null;
   const recoverable = errorCode === NETWORK_ERROR_CODE || errorCode === 'INTERNAL';
+  const alreadyVoted = errorCode === 'ALREADY_VOTED';
   return (
-    <section className="card status-card" aria-labelledby="email-link-title" aria-busy={loading}>
-      <div className="verify-form__body">
-        <div className="verify-form__intro">
-          <h2 className="card__title" id="email-link-title">
-            {loading ? 'Opening your ballot…' : errorCode === 'ALREADY_VOTED' ? 'Your vote is already recorded' : 'Could not open your ballot'}
-          </h2>
-          {loading && <p className="verify-form__subtitle" role="status">Your email link is signing you in automatically.</p>}
+    <section className={`card status-card${alreadyVoted ? ' status-card--already-voted' : ''}`} aria-labelledby="email-link-title" aria-busy={loading}>
+      {alreadyVoted ? (
+        <div className="email-link-entry__complete">
+          <span className="email-link-entry__badge" aria-hidden="true">
+            <Check className="email-link-entry__badge-icon" />
+          </span>
+          <div className="email-link-entry__copy">
+            <h2 className="card__title" id="email-link-title">Your vote is already recorded</h2>
+            <p className="email-link-entry__message" role="status">{descriptor?.userMessage}</p>
+          </div>
+          <ElectionBackLink tenantId={tenantId} className="btn--election-back" label="Back to Election" />
         </div>
-        {!loading && (
-          <div className="verify-form__actions">
-            {descriptor && <p className="field__error-text" role="alert">{descriptor.userMessage}</p>}
-            {browserError && <p className="field__error-text" role="alert">This browser could not save your voting session. Use a verification code instead.</p>}
-            {recoverable && <button className="btn btn--gold" type="button" onClick={() => { setErrorCode(null); setLoading(true); setRetry((value) => value + 1); }}>Try again</button>}
-            {errorCode === 'ALREADY_VOTED' ? <ElectionBackLink tenantId={tenantId} className="btn--election-back" label="Back to Election" /> : <>
+      ) : (
+        <div className="verify-form__body">
+          <div className="verify-form__intro">
+            <h2 className="card__title" id="email-link-title">
+              {loading ? 'Opening your ballot…' : 'Could not open your ballot'}
+            </h2>
+            {loading && <p className="verify-form__subtitle" role="status">Your email link is signing you in automatically.</p>}
+          </div>
+          {!loading && (
+            <div className="verify-form__actions">
+              {descriptor && <p className="field__error-text" role="alert">{descriptor.userMessage}</p>}
+              {browserError && <p className="field__error-text" role="alert">This browser could not save your voting session. Use a verification code instead.</p>}
+              {recoverable && <button className="btn btn--gold" type="button" onClick={() => { setErrorCode(null); setLoading(true); setRetry((value) => value + 1); }}>Try again</button>}
               <button className="btn" type="button" onClick={() => { clearEmailBrowserToken(tenantId, electionId); onUseCode(); }}>Use a verification code instead</button>
               <p className="verify-form__note">This link is personal. Do not share it.</p>
-            </>}
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }

@@ -57,6 +57,63 @@
   justify-content: center;
 }
 
+.status-card--already-voted {
+  width: 520px;
+  padding: var(--space-8);
+  border-color: var(--color-neutral-200);
+}
+
+.email-link-entry__complete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+.email-link-entry__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--color-accent-medium);
+  border-radius: 50%;
+  background: var(--color-gold-100);
+  color: var(--color-neutral-900);
+}
+
+.email-link-entry__badge-icon {
+  width: 28px;
+  height: 28px;
+  stroke-width: 2.5;
+}
+
+.email-link-entry__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  text-align: center;
+}
+
+.email-link-entry__copy .card__title {
+  max-width: 18ch;
+}
+
+.email-link-entry__message {
+  width: 100%;
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-accent-medium);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-subtle);
+  color: var(--color-neutral-600);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
 .verify-form__note {
   font-size: var(--fs-body);
   line-height: var(--lh-body);
