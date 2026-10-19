@@ -96,7 +96,7 @@ export default async function ElectionsHomePage({
 
         <div className="site-footer__bottom">
           <p>© 2026 {tenant.name}. All rights reserved.</p>
-          <p>Built by StruktHQ</p>
+          <p>Powered by StruktHQ</p>
         </div>
       </footer>
     </div>
