@@ -5,7 +5,7 @@
  */
 
 import { initializeApp, getApps, getApp, type FirebaseOptions } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { initializeAuth, inMemoryPersistence } from 'firebase/auth';
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -16,4 +16,5 @@ const firebaseConfig: FirebaseOptions = {
 // Avoid re-initializing the app on hot-reload / repeated module evaluation.
 const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-export const auth = getAuth(firebaseApp);
+// Voting sessions stay in memory so Safari's IndexedDB cannot block token exchange.
+export const auth = initializeAuth(firebaseApp, { persistence: inMemoryPersistence });
